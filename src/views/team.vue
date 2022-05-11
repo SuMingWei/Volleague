@@ -1,7 +1,7 @@
 <template>
   <div class="row py-4 px-4" style="background-color:#EAECEE"> 
-    <div class="col-md-6 mx-auto "> 
-      <div class="col-md-10 ">
+    <div class="col-md-6 col-lg-5 mx-auto "> 
+      <div class="col-md-12  col-lg-12">
         <form class="d-flex mx-5">
           <input class="form-control me-2 my-3" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-primary my-3" type="submit">Search</button>
@@ -17,13 +17,13 @@
             </div>
           </nav>
           <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-teamlist" role="tabpanel" aria-labelledby="nav-teamlist-tab"  style="height: 400px; overflow-y:scroll">
+            <div class="tab-pane fade show active" id="nav-teamlist" role="tabpanel" aria-labelledby="nav-teamlist-tab"  style="height: 500px; overflow-y:scroll">
               <div class="card">
                 <router-link to="/singleteam" class="btn teambtn my-2 mx-2 p-2 fw-bolder fs-4 text-left">
-                  <i class="fa-solid fa-poo"></i> NCKU CSIE
+                  NCKU CSIE
                 </router-link>
                 <router-link to="/singleteam" class="btn teambtn my-2 mx-2 p-2 fw-bolder fs-4 ">
-                  <i class="fa-solid fa-poo"></i> NTU CE
+                  NTU CE
                 </router-link>
               </div>
             </div>

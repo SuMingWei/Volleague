@@ -1,6 +1,6 @@
 <template>
   <div class="row py-4 px-4" style="background-color:#EAECEE"> 
-      <div class="col-md-10 mx-auto">  
+      <div class="col-md-8 mx-auto">  
         <!-- Profile widget --> 
         <div class="card" >
           <div class="card-body">
