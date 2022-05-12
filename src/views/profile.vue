@@ -18,7 +18,7 @@
                 </div>
               </div>
               <div class="col-sm-8">
-                <p class="my-2 text-muted text-start">
+                <p class="my-2 text-start">
                   Welcome to my profile and nice to meet you.<br>
                   Welcome to my profile and nice to meet you.
                   Welcome to my profile and nice to meet you.
@@ -27,13 +27,13 @@
               </div>
             </div>
             <div>
-              <button class="btn btn-outline-dark mt-3" style="width:150px">Edit profile</button>
+              <button class="btn btn-outline-dark text-muted mt-3" style="width:150px">Edit profile</button>
             </div>
             <hr>
             <div class="my-3 mx-3 card fw-bold">
               <div class="card-head py-2" style="background-color:#E5E8E8">
                 <span>
-                  <i class="fa-solid fa-circle-check mx-2"/> Team
+                  <i class="fa-solid fa-people-group mx-2"/> Team
                 </span>
               </div>
               <div class="card-body fs-3 text-start">
@@ -50,23 +50,23 @@
               <div class="card-body my-2 d-flex justify-content-between stats bd-highlight">
                 <div class="d-flex flex-column">
                   <span class="fs-6">Game</span>
-                  <span class="fw-bold border rounded">75</span> 
+                  <span class="fw-bold">75</span> 
                 </div>
                 <div class="d-flex flex-column">
                   <span class="fs-6">Spike</span>
-                  <span class="fw-bold border rounded">322</span> 
+                  <span class="fw-bold">322</span> 
                 </div>
                 <div class="d-flex flex-column">
                   <span class="fs-6">Block</span>
-                  <span class="fw-bold border rounded">30</span> 
+                  <span class="fw-bold">30</span> 
                 </div>
                 <div class="d-flex flex-column">
                   <span class="fs-6">Serve</span>
-                  <span class="fw-bold border rounded">41</span>   
+                  <span class="fw-bold">41</span>   
                 </div>
                 <div class="d-flex flex-column">
                   <span class="fs-6">Rating</span>
-                  <span class="fw-bolder border rounded">5.24</span>
+                  <span class="fw-bolder">5.24</span>
                 </div>
               </div>
             </div>
