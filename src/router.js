@@ -7,6 +7,8 @@ import Signup from './views/signup.vue';
 import Profile from './views/profile.vue';
 import Team from './views/team.vue';
 import SingleTeam from './views/singleTeam.vue';
+import AddContest from './views/addContest.vue';
+import SingleRecord from './views/singleRecord.vue';
 
 
 Vue.use(VueRouter);
@@ -37,6 +39,14 @@ export default new VueRouter({
         {
           path:'/singleteam',
           component:SingleTeam,
+        },
+        {
+          path:'/addcontest',
+          component:AddContest,
+        },
+        {
+          path:'/singlerecord',
+          component:SingleRecord,
         }
       ]
     },

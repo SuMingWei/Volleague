@@ -4,7 +4,7 @@
       <div class="col-md-12 col-lg-12">
         <div class="d-flex align-items-center">
           <form class="me-4 my-3">
-            <router-link to="/team" class="btn teambtn align-center"><i class="fa-solid fa-arrow-left fs-2"></i></router-link>
+            <router-link to="/team" class="btn align-center"><i class="fa-solid fa-arrow-left fs-2" style="color:#2c3e50"></i></router-link>
           </form>
           <span class="fs-2 fw-bolder">NCKU CSIE</span>
         </div>
@@ -56,23 +56,23 @@
             <div class="card-body text-start">
               <div class="row">
                 <div class=" col-auto mx-2 my-2 d-flex align-items-center">
-                  <span class="badge bg-danger text-wrap mx-1" style="width:30px">27</span>
+                  <span class="badge bg-danger text-wrap mx-1" style="width:35px">27</span>
                   <span class="text-nowrap">Justin biebieber</span>
                 </div>
                 <div class=" col-auto mx-2 my-2 d-flex align-items-center">
-                  <span class="badge bg-warning text-wrap mx-1" style="width:30px">12</span>
+                  <span class="badge bg-warning text-wrap mx-1" style="width:35px">12</span>
                   <span class="text-nowrap">蘇名偉偉</span>
                 </div>
                 <div class=" col-auto mx-2 my-2 d-flex align-items-center">
-                  <span class="badge bg-success text-wrap mx-1" style="width:30px">33</span>
+                  <span class="badge bg-success text-wrap mx-1" style="width:35px">33</span>
                   <span class="text-nowrap">蘇名</span>
                 </div>
                 <div class=" col-auto mx-2 my-2 d-flex align-items-center">
-                  <span class="badge bg-primary text-wrap mx-1" style="width:30px">2</span>
+                  <span class="badge bg-primary text-wrap mx-1" style="width:35px">2</span>
                   <span class="text-nowrap">蘇名偉</span>
                 </div>
                 <div class=" col-auto mx-2 my-2 d-flex align-items-center">
-                  <span class="badge bg-secondary text-wrap mx-1" style="width:30px">9</span>
+                  <span class="badge bg-secondary text-wrap mx-1" style="width:35px">9</span>
                   <span class="text-nowrap">蘇</span>
                 </div>
               </div>
@@ -89,9 +89,9 @@
             </div>
             <div class="card-body text-start">
               <div class="d-block text-end ">
-                <button class="btn btn-outline-dark me-2 mb-2 " data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <router-link to="/addcontest" class="btn btn-outline-dark me-2 mb-2 ">
                   <i class="fa-solid fa-plus"></i> New Contest
-                </button>
+                </router-link>
               </div>
               <div class="list-group" style="height: 230px; overflow-y:scroll">
                 <div class="list-group-item d-flex justify-content-between list-group-item-action">
@@ -102,7 +102,8 @@
                   </div>
                   <div class="d-grid gap-2 text-center">
                     <button class="btn btn-sm btn-primary">Scoring</button>
-                    <button class="btn btn-sm btn-success">Record</button>
+                    <router-link to="/singlerecord" class="btn btn-sm btn-success">Record</router-link>
+                    <!-- <button class="btn btn-sm btn-success">Record</button> -->
                   </div>
                 </div>
                 <div class="list-group-item d-flex justify-content-between list-group-item-action">
