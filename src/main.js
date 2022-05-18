@@ -1,10 +1,13 @@
 import Vue from 'vue'
 import App from './App.vue'
 import Router from './router'
+import VueResource from 'vue-resource'
+
+// import VueFire from 'vuefire'
+import '@/css/font.css'
 
 Vue.config.productionTip = false
-
-import '@/css/font.css'
+Vue.use(VueResource);
 
 new Vue({
   render: h => h(App),
