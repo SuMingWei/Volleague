@@ -4,13 +4,9 @@
       <a class="navbar-brand ms-4 fs-2 fw-bold" href="#">Volleague</a>
       <ul class="nav fs-6 fw-bold">
         <li class="nav-item">
-          <router-link class="nav-link text-white" to="/profile">
+          <!-- <router-link class="nav-link text-white" :to="{name: 'profile', params: {id: this.id}}" > -->
+          <router-link class="nav-link text-white" :to="`/home/${id}/profile`" >
             <i class="fa-solid fa-user"/> 
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link text-white" to="/team">
-            <i class="fa-solid fa-people-group "/> 
           </router-link>
         </li>
         <li class="nav-item">
@@ -20,15 +16,17 @@
         </li>
       </ul>
     </div>
-    <router-view></router-view>
+    <router-view :uid="id"></router-view>
   </div>
 </template>
 
 <script>
 // import Profile from './profile.vue'
 export default {
-  components: {
-    // 'profile': Profile,
+  data() {
+    return {
+      id: this.$route.params.id,
+    }
   },
 }
 </script>

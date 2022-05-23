@@ -5,7 +5,6 @@ import Home from './views/home.vue';
 import Login from './views/login.vue';
 import Signup from './views/signup.vue';
 import Profile from './views/profile.vue';
-import Team from './views/team.vue';
 import SingleTeam from './views/singleTeam.vue';
 import AddContest from './views/addContest.vue';
 import SingleRecord from './views/singleRecord.vue';
@@ -24,20 +23,16 @@ export default new VueRouter({
       component:Signup
     },
     {
-      path:'/home',
+      path:'/home/:id',
       component:Home,
       children: [
         {
-          path:'/profile',
-          alias:'/home',
+          path:'/home/:id/profile',
+          alias: '/home/:id',
           component:Profile
         },
         {
-          path:'/team',
-          component:Team,
-        },
-        {
-          path:'/singleteam',
+          path:'/home/:id/team',
           component:SingleTeam,
         },
         {

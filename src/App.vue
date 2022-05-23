@@ -2,7 +2,7 @@
   <div id="app">
     <!-- <router-link class="nav-link" to="/" exact>Home</router-link> -->
     <router-view></router-view>
-    <router-link class="nav-link" to="/home" exact>Home</router-link>
+    <!-- <router-link class="nav-link" to="/home" exact>Home</router-link> -->
   </div>
 </template>
 

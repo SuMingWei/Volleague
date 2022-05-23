@@ -1,7 +1,7 @@
 <template>
   <div class="row py-4 px-4" style="background-color:#EAECEE"> 
       <div class="col-md-10 col-lg-10 mx-auto "> 
-        <div class="col-md-12 col-lg-12">
+        <div class="col-md-10 col-lg-10">
           <div class="d-flex align-items-center">
             <form class="me-4 my-3 text-center">
               <router-link to="/singleteam" class="btn d-flex align-items-center fs-4" style="color:#2c3e50">
@@ -13,7 +13,7 @@
         <div class="card" >
           <div class="card-body"> 
             <h3 class="d-flex text-start align-items-center"><i class="fa-regular fa-face-laugh"></i>&nbsp;我方得失紀錄</h3>
-            <div class="table-responsive-md">
+            <div class="table-responsive">
               <table class="table table-striped align-middle text-nowrap">
                 <thead>
                   <tr style="color:#2c3e50;">

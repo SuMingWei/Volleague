@@ -8,49 +8,69 @@
       <div class="text-center mb-4">
         <h1 class="mt-4">Sign Up</h1>
       </div>
-      <div v-if="errorMessage !== ''" class="alert alert-danger" role="alert">
-          {{ errorMessage }}
+      <div v-if="errorMessage !== ''" class="alert alert-danger mx-4" role="alert">
+        <span>{{ errorMessage }}</span>
+      </div>
+      <div v-if="successMessage !== ''" class="alert alert-success mx-4" role="alert">
+        {{ successMessage }}&nbsp;&nbsp;<router-link to="/">Login</router-link>
       </div>
       <form id="signup-form" >
         <div class="row justify-content-center">
           <div class="col-sm-10 mb-4 form-group">
-            <label class="fs-5 mb-1" for="name">Username</label>
-            <input type="text" id="name" v-model="user.name" class="form-control form-control-lg">
+            <label class="fs-5 mb-1" for="account">Account</label>
+            <input type="text" id="account" v-model="user.account" class="form-control form-control-lg">
           </div>
           <div class="col-sm-10 mb-4 form-group">
             <label class="fs-5 mb-1" for="password">Password</label>
-            <input type="text" id="password" v-model="user.password" class="form-control form-control-lg">
+            <input type="password" id="password" v-model="user.password" class="form-control form-control-lg">
           </div>
           <div class="col-sm-12 mb-4 form-group">
-            <button @click.prevent="signupRequest" class="btn btn-success btn-lg col-sm-4">Sign up</button>
+            <button :disabled="user.account == '' || user.password == ''" @click.prevent="signupRequest" class="btn btn-success btn-lg col-sm-4">Sign up</button>
           </div>
           <div class="col-sm-12 form-group">
             <p>Already have an account? <router-link to="/">Login</router-link></p>
           </div>
         </div>
       </form>
+      <!-- <div v-for="(user,idx) in allUser" :key="idx">
+        hello
+        {{user.account}}
+      </div> -->
     </div>
   </div>
 </div>
 </template>
 
 <script>
-// import { auth } from '../db'
+
 export default{
   data() {
     return {
       user: {
-        name: '',
+        account: '',
         password: '',
       },
       errorMessage: '',
+      successMessage: '',
       allUser: [],
-      db: 'https://volleague-default-rtdb.firebaseio.com/auth.json',
+      db: 'https://volleague-default-rtdb.firebaseio.com/',
+      SingleProfile: {
+        authid: '',
+        name: 'User',
+        birthday: {
+          year: 'yyyy',
+          month: 'mm',
+          day: 'dd',
+        },
+        position: ['OH'],
+        teamList: [''],
+        StatisticsList: [''],
+      }
     }
   },
   created() {
     // get all user
-    this.$http.get(this.db).then(function(data){
+    this.$http.get(this.db + 'auth.json').then(function(data){
       return data.json();
     }).then(function(data){
       var userArr = [];
@@ -65,11 +85,20 @@ export default{
   methods: {
     signupRequest() {
       this.errorMessage = '';
-      
-      // this.$http.post(this.db, this.user).then(function(data){
-      //   console.log(data);
-      //   // this.submitted = true;
-      // })
+      this.successMessage = '';
+      if(this.allUser.find(element => element.account == this.user.account)){
+        this.errorMessage = 'This Account Already Exists !';
+      }else{
+        this.successMessage = 'Sign Up Successfully !';
+        // create auth
+        this.$http.post(this.db + 'auth.json', this.user).then(function(data){
+          this.SingleProfile.authid = data.body.name;
+          this.$http.post(this.db + 'user.json',this.SingleProfile).then(function(data){
+            console.log(data);
+          });
+          
+        })
+      }
     }
   },
 }

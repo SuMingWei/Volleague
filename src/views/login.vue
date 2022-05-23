@@ -8,19 +8,21 @@
       <div class="text-center mb-4">
         <h1 class="mt-4">Log In</h1>
       </div>
-
+      <div v-if="errorMessage !== ''" class="alert alert-danger mx-4" role="alert">
+        <span>{{ errorMessage }}</span>
+      </div>
       <form id="login-form">
         <div class="row justify-content-center">
           <div class="col-sm-10 mb-4 form-group">
-            <label class="fs-5 mb-1" for="name">Username</label>
-            <input type="text" id="name" class="form-control form-control-lg">
+            <label class="fs-5 mb-1" for="account">Account</label>
+            <input type="text" id="account" v-model="user.account" class="form-control form-control-lg">
           </div>
           <div class="col-sm-10 mb-4 form-group">
             <label class="fs-5 mb-1" for="password">Password</label>
-            <input type="text" id="password" class="form-control form-control-lg">
+            <input type="password" id="password" v-model="user.password" class="form-control form-control-lg">
           </div>
           <div class="col-sm-12 mb-4 form-group">
-            <button class="btn btn-primary btn-lg col-sm-4">Log In</button>
+            <button :disabled="user.account == '' || user.password == ''" @click.prevent="loginRequest" class="btn btn-primary btn-lg col-sm-4">Log In</button>
           </div>
           <div class="col-sm-12 form-group">
           <p>Don't have an account? <router-link to="/signup">Sign Up</router-link></p>
@@ -34,7 +36,66 @@
 
 <script>
 export default{
-
+  data() {
+    return {
+      user: {
+        account: '',
+        password: '',
+      },
+      errorMessage: '',
+      allUser: [],
+      db: 'https://volleague-default-rtdb.firebaseio.com/',
+    }
+  },
+  created(){
+    // get all user
+    this.$http.get(this.db + 'auth.json').then(function(data){
+      return data.json();
+    }).then(function(data){
+      var userArr = [];
+      for(let key in data){
+        data[key].id = key;
+        userArr.push(data[key]);
+      }
+      this.allUser = userArr;
+      // console.log(this.allUser);
+    })
+  },
+  methods: {
+    loginRequest(){
+      this.errorMessage = '';
+      this.allUser.find((value) => {
+        if(value.account == this.user.account && value.password == this.user.password){
+          // value.id is for auth
+          // now get user.id 
+          this.errorMessage = '';
+          var authID = value.id;
+          this.$http.get(this.db + 'user.json').then(function(data){
+            return data.json();
+          }).then(function(data){
+            for(let userID in data){
+              if(data[userID].authid == authID){
+                this.$router.push('/home/' + userID);
+              }
+            }
+          })
+        }else if(value.account == this.user.account && value.password != this.user.password){
+          this.errorMessage = 'Wrong Password !';
+        }else{
+          this.errorMessage = 'No Such User !';
+        }
+      });
+      
+      // if(this.allUser.find(element => element.account == this.user.account && element.password == this.user.password)){
+      //   console.log(element);
+      //   // this.$router.push('/home/' + );
+      // }else if(this.allUser.find(element => element.account == this.user.account && element.password != this.user.password)){
+      //   this.errorMessage = 'Wrong Password !';
+      // }else{
+      //   this.errorMessage = 'No Such User !';
+      // }
+    },
+  },
 }
 </script>
 
