@@ -35,13 +35,17 @@
               <div class="card-body fs-3 text-start">
                 <div>
                   <div class="d-flex my-2">
-                    <button class="btn btn-outline-dark me-4 text-nowrap" @click="createTeamModal=true">
+                    <button class="btn btn-outline-dark me-3 text-nowrap" @click="createTeamModal=true">
                       <i class="fa-solid fa-plus"></i> Create
                     </button>
-                    <input class="form-control me-2" placeholder="Team's ID">
-                    <button class="btn btn-outline-dark">Join</button>
+                    <dropSearch class="form-control" 
+                                :options="options"
+                                :disabled="false"
+                                v-on:selected="validateSelection">
+                    </dropSearch>
                   </div>
                 </div>
+                
                 <hr>
                 <div>
                   <router-link :to="`/home/${id}/team`" class="btn teambtn mx-1 mb-1 fw-bolder">NCKU CSIE</router-link>
@@ -235,12 +239,52 @@
         </div>
       </div>
     </div>
+    <!-- Modal Join team-->
+    <div v-if="teamInfoModal">
+      <div name="modal fade">
+        <div class="modal-mask">
+          <div class="modal-wrapper">
+            <div class="modal-dialog"> 
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title">{{teamInfo.teamName}}&nbsp;</h4>
+                  <i v-if="profile.teamList.includes(teamInfo.teamName)" class="fa-solid fa-circle-check text-success"></i>
+                  <button type="button" class="btn-close" @click="teamInfoModal=false"></button>
+                </div>
+                <div class="modal-body text-start">
+                  Members:
+                  <div v-for="(mem,idx) in teamInfo.members" :key=idx class="row">
+                    <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                      <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                      <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                      <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
+                      <span v-else-if="mem.position=='O'" class="badge bg-primary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                      <span v-else-if="mem.position=='L'" class="badge bg-secondary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                      <span class="text-nowrap">{{mem.name}}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn teambtn" :disabled="profile.teamList.includes(teamInfo.teamName)" @click="JoinTeam(teamInfo.teamName)">Join</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+// import Dropdown from 'vue-simple-search-dropdown';
+import DropSearch from '../components/dropSearch.vue';
+
 export default {
   props: ['uid'],
+  components:{
+    'dropSearch':DropSearch,
+  },
   data() {
     return {
       id: '',
@@ -271,8 +315,14 @@ export default {
         position: '',
         name: '',
       },
+      teamInfo: {
+        teamName: '',
+        memebers: [],
+      },
       editProfileModal: false,
       createTeamModal: false,
+      teamInfoModal: false,
+      options: [],
     }
   },
   beforeMount(){
@@ -282,6 +332,21 @@ export default {
       return data.json();
     }).then(function(data){
       this.profile = data;
+    })
+
+    // get all team 
+    this.$http.get(this.db + 'team.json').then(function(data){
+      return data.json();
+    }).then(function(data){
+      var teamArr = [];
+      for(let key in data){
+        var opt = {};
+        opt["name"] = data[key].teamName;
+        opt["id"] = key;
+        teamArr.push(opt);
+      }
+      teamArr.sort();
+      this.options = teamArr;
     })
   },
   methods: {
@@ -345,12 +410,42 @@ export default {
           });
         }
       })
-    }
+    },
+    JoinTeam(teamname){
+      console.log(teamname);
+      // // add team to teamlist
+      // if(this.profile.teamList[0] == ''){
+      //   this.profile.teamList[0] = teamname;
+      // }else{
+      //   this.profile.teamList.push(teamname);
+      // }
+      // this.$http.patch(this.db + 'user/' + this.id + '.json', {teamList: this.profile.teamList});
+    },
+    validateSelection(selection) {
+      this.selected = selection;
+      console.log(selection.name + " has been selected");
+      if(selection.name != undefined){
+        this.teamInfo.teamName = selection.name;
+        this.$http.get(this.db + 'team/'+ selection.id + '.json').then(function(data){
+          return data.json();
+        }).then(function(data){
+          this.teamInfo.members = data.members;
+          // console.log(this.teamInfo.members);
+          this.teamInfoModal = true;
+        })
+        
+      }
+    },
   }
 }
 </script>
 
 <style scope>
+/* #dropdown >>> .dropdown-input {
+  min-width: 100px;
+  max-width: 500px;
+} */
+
 .teambtn {
   background-color:#2c3e50; 
   color:white;
