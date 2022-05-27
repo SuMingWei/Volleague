@@ -64,20 +64,22 @@
       
       <!-- 分頁標籤 -->
       <div class="card-head">
-        <ul class="nav nav-tabs my-3 mx-3 fw-bold">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item">
-            <a class="nav-link active" href="#">Active</a>
+            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
+            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" href="#">Disabled</a>
+            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
           </li>
         </ul>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">1111111</div>
+          <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">222222</div>
+          <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">123123123</div>
+        </div>
       </div>
 
       <!-- 各球紀錄 & 落點紀錄 -->
@@ -110,7 +112,7 @@
         </div>
 
         <!-- 落點紀錄 -->
-        <div class="card fw-bold">
+        <div class="card mb-3 fw-bold">
           <div class="card-head py-2" style="background-color:#E5E8E8">
             <span class="fw-bolder fs-5">
               <i class="fas fa-volleyball-ball"></i> 落點紀錄
@@ -159,7 +161,7 @@
               <!-- 右邊控制項 & 界外按鈕 -->
               <div class="d-grid" style="grid-template-rows: 1fr 2fr">
                 <div class="landing-spots">
-                  <button type="button" class="btn btn-outline-secondary" style="padding: auto auto"> 界外 </button>
+                  <button type="button" class="btn btn-outline-secondary" style="padding: auto auto"> Touch Out </button>
                 </div>
 
                 <div class="d-grid text-center" style="grid-template-rows: repeat(4, 1fr)">
@@ -175,18 +177,18 @@
           </div>
         </div>
 
-        <!-- 本局紀錄 -->
-        <div class="card fw-bold">
+        <!-- 本局歷史紀錄 -->
+        <div class="card mb-3 fw-bold">
           <div class="card-head py-2" style="background-color:#E5E8E8">
             <span class="fw-bolder fs-5">
               <i class="fas fa-server"></i> 本局歷史紀錄
             </span>
           </div>
-
+  
           <div class="card-body text-center">
-            <div class="table-responsive-md" style="width: 100%">
+            <div class="table-responsive-md" style="max-height:300px;">
               <table class="table table-striped align-middle text-nowrap">
-                <thead>
+                <thead class="sticky-top">
                   <tr style="background-color:#2c3e50; color:white">
                     <th scope="col">球員</th>
                     <th scope="col">位置</th>
@@ -224,6 +226,108 @@
                     <td class="border-start">MB</td>
                     <td class="border-start">攔網失誤</td>
                     <td class="border-start">2</td>
+                    <td class="border-start"> 
+                      <button style="border-color: red; border-style: solid; border-radius: 20%">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </button>
+                    </td >
+                  </tr>
+                  <!-- row3 -->
+                  <tr>
+                    <td>
+                      <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                        <span class="badge bg-success text-wrap mx-1" style="width:35px">34</span>
+                        <span class="text-nowrap">蘇蘇蘇</span>
+                      </div>
+                    </td>
+                    <td class="border-start">S</td>
+                    <td class="border-start">舉球失誤</td>
+                    <td class="border-start">5</td>
+                    <td class="border-start"> 
+                      <button style="border-color: red; border-style: solid; border-radius: 20%">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </button>
+                    </td >
+                  </tr>
+                  <!-- row3 -->
+                  <tr>
+                    <td>
+                      <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                        <span class="badge bg-success text-wrap mx-1" style="width:35px">34</span>
+                        <span class="text-nowrap">蘇蘇蘇</span>
+                      </div>
+                    </td>
+                    <td class="border-start">S</td>
+                    <td class="border-start">舉球失誤</td>
+                    <td class="border-start">5</td>
+                    <td class="border-start"> 
+                      <button style="border-color: red; border-style: solid; border-radius: 20%">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </button>
+                    </td >
+                  </tr>
+                  <!-- row3 -->
+                  <tr>
+                    <td>
+                      <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                        <span class="badge bg-success text-wrap mx-1" style="width:35px">34</span>
+                        <span class="text-nowrap">蘇蘇蘇</span>
+                      </div>
+                    </td>
+                    <td class="border-start">S</td>
+                    <td class="border-start">舉球失誤</td>
+                    <td class="border-start">5</td>
+                    <td class="border-start"> 
+                      <button style="border-color: red; border-style: solid; border-radius: 20%">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </button>
+                    </td >
+                  </tr>
+                  <!-- row3 -->
+                  <tr>
+                    <td>
+                      <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                        <span class="badge bg-success text-wrap mx-1" style="width:35px">34</span>
+                        <span class="text-nowrap">蘇蘇蘇</span>
+                      </div>
+                    </td>
+                    <td class="border-start">S</td>
+                    <td class="border-start">舉球失誤</td>
+                    <td class="border-start">5</td>
+                    <td class="border-start"> 
+                      <button style="border-color: red; border-style: solid; border-radius: 20%">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </button>
+                    </td >
+                  </tr>
+                  <!-- row3 -->
+                  <tr>
+                    <td>
+                      <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                        <span class="badge bg-success text-wrap mx-1" style="width:35px">34</span>
+                        <span class="text-nowrap">蘇蘇蘇</span>
+                      </div>
+                    </td>
+                    <td class="border-start">S</td>
+                    <td class="border-start">舉球失誤</td>
+                    <td class="border-start">5</td>
+                    <td class="border-start"> 
+                      <button style="border-color: red; border-style: solid; border-radius: 20%">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </button>
+                    </td >
+                  </tr>
+                  <!-- row3 -->
+                  <tr>
+                    <td>
+                      <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                        <span class="badge bg-success text-wrap mx-1" style="width:35px">34</span>
+                        <span class="text-nowrap">蘇蘇蘇</span>
+                      </div>
+                    </td>
+                    <td class="border-start">S</td>
+                    <td class="border-start">舉球失誤</td>
+                    <td class="border-start">5</td>
                     <td class="border-start"> 
                       <button style="border-color: red; border-style: solid; border-radius: 20%">
                         <i class="fas fa-trash-alt" style="color: red"></i>
