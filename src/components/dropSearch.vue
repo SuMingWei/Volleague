@@ -19,7 +19,7 @@
         @mousedown="selectOption(option)"
         v-for="(option, index) in filteredOptions"
         :key="index">
-          {{ option.name || option.id || '-' }}
+          {{ option.name || option.teamid || '-' }}
       </div>
     </div>
   </div>

@@ -45,11 +45,11 @@
                     </dropSearch>
                   </div>
                 </div>
-                
                 <hr>
                 <div>
-                  <router-link :to="`/home/${id}/team`" class="btn teambtn mx-1 mb-1 fw-bolder">NCKU CSIE</router-link>
-                  <router-link :to="`/home/${id}/team`" class="btn teambtn mx-1 mb-1 fw-bolder">NTU CE</router-link>
+                  <span v-for="team in profile.teamList" :key="team">
+                    <router-link :to="`/home/${id}/team/${getTeamID(team)}`" class="btn teambtn me-2 mb-2 fw-bolder">{{team}}</router-link>
+                  </span>
                 </div>
               </div>
             </div>
@@ -252,15 +252,36 @@
                   <button type="button" class="btn-close" @click="teamInfoModal=false"></button>
                 </div>
                 <div class="modal-body text-start">
-                  Members:
-                  <div v-for="(mem,idx) in teamInfo.members" :key=idx class="row">
-                    <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                  <div class="form-group">
+                    <label class="fs-5">Members: </label>
+                  </div>
+                  <div  class="row">
+                    <div class=" col-auto mx-2 my-2 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
                       <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
                       <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
                       <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
                       <span v-else-if="mem.position=='O'" class="badge bg-primary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
                       <span v-else-if="mem.position=='L'" class="badge bg-secondary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
                       <span class="text-nowrap">{{mem.name}}</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="fs-5">Your Personal Information: </label>
+                  </div>
+                  <div class="d-flex gap-3">
+                    <div class="col">
+                      <label>Number</label>
+                      <input type="text" class="form-control" v-model="personalInfo.number" />
+                    </div>
+                    <div class="col">
+                      <label>Position</label>
+                      <select class="form-select" v-model="personalInfo.position">
+                        <option value="OH" selected>Outside Hitter</option>
+                        <option value="MB">Middle Blocker</option>
+                        <option value="S">Setter</option>
+                        <option value="O">Opposite</option>
+                        <option value="L">Libero</option>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -301,7 +322,7 @@ export default {
         teamList: [],
         StatisticsList: [],
       },
-      allTeam: [],
+      allTeamName: [],
       errorMessage: '',
       newTeam:{
         teamName: '',
@@ -317,7 +338,7 @@ export default {
       },
       teamInfo: {
         teamName: '',
-        memebers: [],
+        members: [],
       },
       editProfileModal: false,
       createTeamModal: false,
@@ -326,7 +347,6 @@ export default {
     }
   },
   beforeMount(){
-    // console.log('before');
     this.id = this.uid;
     this.$http.get(this.db + 'user/' + this.id + '.json').then(function(data){
       return data.json();
@@ -335,19 +355,7 @@ export default {
     })
 
     // get all team 
-    this.$http.get(this.db + 'team.json').then(function(data){
-      return data.json();
-    }).then(function(data){
-      var teamArr = [];
-      for(let key in data){
-        var opt = {};
-        opt["name"] = data[key].teamName;
-        opt["id"] = key;
-        teamArr.push(opt);
-      }
-      teamArr.sort();
-      this.options = teamArr;
-    })
+    this.getAllTeam();
   },
   methods: {
     changeProfile(){
@@ -362,7 +370,7 @@ export default {
       }
       this.$http.patch(this.db + 'user/' + this.id + '.json', updateData).then(function(data){
         console.log(data);
-        this.editProfileModal=false
+        this.editProfileModal=false;
       })
     },
     createTeam(){
@@ -370,14 +378,14 @@ export default {
       this.$http.get(this.db + 'team.json').then(function(data){
         return data.json();
       }).then(function(data){
-        var teamArr = [];
+        var teamNameArr = [];
         for(let key in data){
-          teamArr.push(data[key].teamName);
+          teamNameArr.push(data[key].teamName);
         }
-        this.allTeam = teamArr;
+        this.allTeamName = teamNameArr;
         
         // check
-        if(this.allTeam.find(element => element == this.newTeam.teamName)){
+        if(this.allTeamName.find(element => element == this.newTeam.teamName)){
           this.errorMessage = 'This Team Name Already Exists !';
         }else{
           // create team
@@ -400,33 +408,69 @@ export default {
               awards: [''],
               members: [],
               contestRecords: [''],
-            },
+            };
             this.personalInfo = {
               number: '',
               position: '',
               name: '',
-            },
+            };
             this.createTeamModal=false;
+            //update options
+            this.getAllTeam();
           });
         }
       })
     },
+    getAllTeam(){
+      this.$http.get(this.db + 'team.json').then(function(data){
+        return data.json();
+      }).then(function(data){
+        var teamArr = [];
+        for(let key in data){
+          var opt = {};
+          opt["name"] = data[key].teamName;
+          opt["teamid"] = key;
+          teamArr.push(opt);
+        }
+        teamArr.sort();
+        this.options = teamArr;
+      })
+    },
+    getTeamID(teamname){
+      var team = this.options.find(element => element["name"] == teamname);
+      if(team != undefined){
+        return team["teamid"];
+      }
+    },
     JoinTeam(teamname){
-      console.log(teamname);
-      // // add team to teamlist
-      // if(this.profile.teamList[0] == ''){
-      //   this.profile.teamList[0] = teamname;
-      // }else{
-      //   this.profile.teamList.push(teamname);
-      // }
-      // this.$http.patch(this.db + 'user/' + this.id + '.json', {teamList: this.profile.teamList});
+      // console.log(teamname);
+      // add team to personal teamlist
+      if(this.profile.teamList[0] == ''){
+        this.profile.teamList[0] = teamname;
+      }else{
+        this.profile.teamList.push(teamname);
+      }
+      this.$http.patch(this.db + 'user/' + this.id + '.json', {teamList: this.profile.teamList});
+      // add new member to this team 
+      this.personalInfo.name = this.profile.name;
+      this.teamInfo.members.push(this.personalInfo);
+      var team = this.options.find(element => element["name"] == teamname);
+      this.$http.patch(this.db + 'team/' + team["teamid"] + '.json',{members: this.teamInfo.members});
+      // clear
+      this.personalInfo = {
+        number: '',
+        position: '',
+        name: '',
+      };
+      this.teamInfoModal = false;
+      
     },
     validateSelection(selection) {
       this.selected = selection;
       console.log(selection.name + " has been selected");
       if(selection.name != undefined){
         this.teamInfo.teamName = selection.name;
-        this.$http.get(this.db + 'team/'+ selection.id + '.json').then(function(data){
+        this.$http.get(this.db + 'team/'+ selection.teamid + '.json').then(function(data){
           return data.json();
         }).then(function(data){
           this.teamInfo.members = data.members;

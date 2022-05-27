@@ -4,11 +4,13 @@
       <div class="col-md-12 col-lg-12">
         <div class="d-flex align-items-center">
           <form class="me-4 my-3">
-            <router-link to="/team" class="btn align-center"><i class="fa-solid fa-arrow-left fs-2" style="color:#2c3e50"></i></router-link>
+            <!-- <router-link to="/team" class="btn align-center"><i class="fa-solid fa-arrow-left fs-2" style="color:#2c3e50"></i></router-link> -->
+            <button class="btn align-center" @click="$router.push('/home/'+ uid + '/profile')"><i class="fa-solid fa-arrow-left fs-2" style="color:#2c3e50"></i></button>
           </form>
           <span class="fs-2 fw-bolder">NCKU CSIE</span>
         </div>
       </div>
+      <!-- {{teamid}} -->
       <div class="card" >
         <div class="card-body"> 
           <div class="my-3 mx-3 card fw-bold">
@@ -141,6 +143,12 @@
 // import AddContest from "../components/add_contest.vue";
 
 export default {
+  props: ['uid'],
+  data() {
+    return {
+      teamid: this.$router.params.teamid,
+    }
+  },
   components:{
     
   },

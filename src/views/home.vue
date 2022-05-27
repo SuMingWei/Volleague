@@ -16,7 +16,7 @@
         </li>
       </ul>
     </div>
-    <router-view :uid="id"></router-view>
+    <router-view :uid="id" ></router-view>
   </div>
 </template>
 

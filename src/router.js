@@ -29,10 +29,10 @@ export default new VueRouter({
         {
           path:'/home/:id/profile',
           alias: '/home/:id',
-          component:Profile
+          component:Profile,
         },
         {
-          path:'/home/:id/team',
+          path:'/home/:id/team/:teamid',
           component:SingleTeam,
         },
         {
