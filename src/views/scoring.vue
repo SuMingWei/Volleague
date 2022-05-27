@@ -184,59 +184,71 @@
           </div>
 
           <div class="card-body text-center">
-            <div class="d-grid" style="grid-template-columns: 3fr 1fr; column-gap: 5px">
-              <!-- 場地九宮格 -->
-              <div class="container border border-2 border-dark" style="width: 272px">
-                <div class="row border-bottom border-2 border-dark" style="width: 270px">
-                  <div class="d-flex col landing-spots" style="height: 90px">
-                    <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> 1 </button>
-                  </div>
-                  <div class="d-flex col landing-spots" style="height: 90px">
-                    <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> 2 </button>
-                  </div>
-                  <div class="d-flex col landing-spots" style="height: 90px">
-                    <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> 3 </button>
-                  </div>
-                </div>
-                <div class="row border-bottom border-2 border-dark-80" style="width: 270px">
-                  <div class="d-flex col landing-spots" style="height: 90px">
-                    <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> 4 </button>
-                  </div>
-                  <div class="d-flex col landing-spots" style="height: 90px">
-                    <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> 5 </button>
-                  </div>
-                  <div class="d-flex col landing-spots" style="height: 90px">
-                    <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> 6 </button>
-                  </div>
-                </div>
-                <div class="row" style="width: 270px">
-                  <div class="d-flex col landing-spots" style="height: 90px">
-                    <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> 7 </button>
-                  </div>
-                  <div class="d-flex col landing-spots" style="height: 90px">
-                    <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> 8 </button>
-                  </div>
-                  <div class="d-flex col landing-spots" style="height: 90px">
-                    <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> 9 </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 右邊控制項 & 界外按鈕 -->
-              <div class="d-grid" style="grid-template-rows: 1fr 2fr">
-                <div class="landing-spots">
-                  <button type="button" class="btn btn-outline-secondary" style="padding: auto auto"> 界外 </button>
-                </div>
-
-                <div class="d-grid text-center" style="grid-template-rows: repeat(4, 1fr)">
-                  <p class="" style="margin: auto auto; grid-row-start: 2">輸入背號</p>
-                  <input type="text" id="fname" name="fname" size="1" class="mx-1 my-1" style="grid-row-start: 3">
-                  <button type="button" class="btn btn-outline-secondary mx-1 my-1"
-                        style="background-color: #90be6d; border-color: #90be6d !important; color: #FFF; grid-row-start: 4"> 
-                        送出
-                  </button>
-                </div>
-              </div>
+            <div class="table-responsive-md" style="width: 100%">
+              <table class="table table-striped align-middle text-nowrap">
+                <thead>
+                  <tr style="background-color:#2c3e50; color:white">
+                    <th scope="col">球員</th>
+                    <th scope="col">位置</th>
+                    <th scope="col">內容</th>
+                    <th scope="col">落點</th>
+                    <th scope="col">功能</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- row1 -->
+                  <tr>
+                    <td>
+                      <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                        <span class="badge bg-primary text-wrap mx-1" style="width:35px">2</span>
+                        <span class="text-nowrap">蘇名偉</span>
+                      </div>
+                    </td>
+                    <td class="border-start">OP</td>
+                    <td class="border-start">攻擊失誤</td>
+                    <td class="border-start">3</td>
+                    <td class="border-start"> 
+                      <button style="border-color: red; border-style: solid; border-radius: 20%">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </button>
+                    </td >
+                  </tr>
+                  <!-- row2 -->
+                  <tr>
+                    <td>
+                      <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                        <span class="badge bg-warning text-wrap mx-1" style="width:35px">22</span>
+                        <span class="text-nowrap">蘇名</span>
+                      </div>
+                    </td>
+                    <td class="border-start">MB</td>
+                    <td class="border-start">攔網失誤</td>
+                    <td class="border-start">2</td>
+                    <td class="border-start"> 
+                      <button style="border-color: red; border-style: solid; border-radius: 20%">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </button>
+                    </td >
+                  </tr>
+                  <!-- row3 -->
+                  <tr>
+                    <td>
+                      <div class=" col-auto mx-2 my-2 d-flex align-items-center">
+                        <span class="badge bg-success text-wrap mx-1" style="width:35px">34</span>
+                        <span class="text-nowrap">蘇蘇蘇</span>
+                      </div>
+                    </td>
+                    <td class="border-start">S</td>
+                    <td class="border-start">舉球失誤</td>
+                    <td class="border-start">5</td>
+                    <td class="border-start"> 
+                      <button style="border-color: red; border-style: solid; border-radius: 20%">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </button>
+                    </td >
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
