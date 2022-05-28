@@ -1,11 +1,10 @@
 <template>
-  <!-- <div class="row py-4 px-4" style="background-color:#EAECEE">  -->
   <div>
     <div class="card text-center">
       <!-- 計分表 -->
       <div class="card-body mx-1">
-        <!-- 隊伍 & 局數 & 分數 -->
         <div class="card" style="border: none">
+          <!-- 隊伍 & 局數 & 分數 -->
           <div class="d-grid score-board text-center">
             <div class="d-grid scores text-center">
               <button class="btn btn-sm btn-primary" style="background-color: #e76f51; border: none;"> {{ scoring['host']['name'] }} </button>
@@ -19,8 +18,31 @@
             <!-- 下一局 & 結束比賽 -->
             <div class="d-grid round-controls text-center">
               <button class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888" v-on:click="nextGame()">下一局</button>
-              <button class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888" v-on:click="endGame()">結束比賽</button>
+              <button class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888"
+                      data-bs-toggle="modal" data-bs-target="#endGameCheck">結束比賽</button>
             </div>
+
+            <!-- 結束比賽的的 modal -->
+            <div class="modal fade" id="endGameCheck" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="endGameCheckLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="endGameCheckLabel">確定要結束比賽嗎？</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    若要確定要結束，請按<span style="text-weight: bold; color: red">「確認」</span><pre/>
+                    若否，請按<span style="text-weight: bold; color: red">「取消」</span>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" v-on:click="endGame()" data-bs-dismiss="modal">確定</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
           </div>
         </div>
       </div>
@@ -34,19 +56,65 @@
             </span>
           </div>
           <div class="card-body text-center" style="padding: 0.5em 0.5em !important">
-            <div class="d-grid team-members-grid">
+            <!-- 已經有設定過上場人員了 -->
+            <div v-if="this.isCourtMemSet" class="d-grid team-members-grid">
+              <!-- 上場人員九宮格 -->
               <button v-for="(member, index) in selected_members" :key="index" type="button" class="btn btn-outline-secondary team-member" 
                       v-bind:style="[ index == 6 ? {gridColumnStart: 2} : {} ]"
                       v-on:click="selected_button['name'] = member['name']; selected_button['number'] = member['number']">
                 <span :class="setPositionTag(member)" style="width:35px">{{ member['number'] }}</span> {{ member['name'] }}
               </button>
 
-              <div class="d-block text-end">
-                <button class="btn text-black-50 mx-1 my-1" v-on:click="setCourtMem()">
+              <!-- 開啟 modal -->
+              <div class="d-block text-end" style="grid-column-start: 3; grid-row-start: 3">
+                <button class="btn text-black-50 mx-1 my-1" data-bs-toggle="modal" data-bs-target="#setCourtMemModal">
                   <i class="fa-solid fa-pencil fs-5"></i>
                 </button>
               </div>
             </div>
+
+            <!-- 沒有設定過上場人員（初始化） -->
+            <div v-else>
+              <div class="d-block text-center">
+                <button class="btn btn-outline-secondary text-black-50 mx-1 my-1" data-bs-toggle="modal" data-bs-target="#setCourtMemModal">
+                  按我來選擇上場的人員
+                </button>
+              </div>
+
+            </div>
+            
+            <!-- 編輯上場人員的 modal -->
+            <div class="modal fade" id="setCourtMemModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setCourtMemModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="setCourtMemModalLabel">選擇上場人員</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <!-- <button v-on:click="setCourtMem()">Set Court Member</button> -->
+                    <div class="d-grid mx-1 my-1 team-members-grid">
+                      <div v-for="n in 7" :key="n" v-bind:style="[ n == 7 ? {gridColumnStart: 2} : {} ]">
+                        <select class="form-select text-center"  v-model="selected_members[n-1]">
+                          <option selected>
+                            <p v-if="n != 7">人員 {{ n }}</p>
+                            <p v-else>自由</p>
+                          </option>
+                          <option v-for="(item, index) in team_members" :key="index" :value="item"> 
+                            <p>{{ item['number'] }} | {{ item['name'] }} | {{ item['position'] }}</p>
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" v-on:click="checkSetCourtMem()" data-bs-dismiss="modal">確認</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -236,6 +304,7 @@ export default {
     return {
       cur_game: 1,
       opponent: '', // bind to opponent input box
+      isCourtMemSet: false, // bind to court member section
       records: [{'num': 22, 'name': '張祐誠', 'position': 'MB', 'record': '攻擊得分', 'opponent': 'none', 'landing': '3', 'game': 1},
                 {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record': '攔網失誤', 'opponent': '43', 'landing': '7', 'game': 1},
                 {'num': 2, 'name': '張張張', 'position': 'S', 'record': '舉球得分', 'opponent': 'none', 'landing': '8', 'game': 1}],
@@ -252,9 +321,20 @@ export default {
         'opponent': '',
         'game': this.cur_game
       },
-      team_members: [{}],     // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
-      selected_members: [{}], // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+      selected_members: [{}, {}, {}, {}, {}, {}, {}],     // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+      team_members:[{'name': '張祐誠', 'number': 22, 'position': 'MB'},
+                        {'name': '張祐誠', 'number': 23, 'position': 'S'},
+                        {'name': '張祐誠', 'number': 24, 'position': 'OP'},
+                        {'name': '張祐誠', 'number': 25, 'position': 'L'},
+                        {'name': '張祐誠', 'number': 26, 'position': 'OH'},
+                        {'name': '張祐誠', 'number': 27, 'position': 'OH'},
+                        {'name': '張祐誠', 'number': 28, 'position': 'MB'},
+                        {'name': '張祐誠', 'number': 29, 'position': 'S'}], // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
 
+
+      // records: [{'num': 22, 'name': '張祐誠', 'position': 'MB', 'record': '攻擊得分', 'opponent': 'none', 'landing': '3', 'game': 1},
+      //           {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record': '攔網失誤', 'opponent': '43', 'landing': '7', 'game': 1},
+      //           {'num': 2, 'name': '張張張', 'position': 'S', 'record': '舉球得分', 'opponent': 'none', 'landing': '8', 'game': 1}],
       // team_members:[{'name': '張祐誠', 'number': 22, 'position': 'MB'},
       //               {'name': '張祐誠', 'number': 23, 'position': 'S'},
       //               {'name': '張祐誠', 'number': 24, 'position': 'OP'},
@@ -303,10 +383,25 @@ export default {
                               {'name': '張祐誠', 'number': 22, 'position': 'MB'},
                               {'name': '張祐誠', 'number': 28, 'position': 'MB'},
                               {'name': '張祐誠', 'number': 25, 'position': 'L'}];
+      console.log(this.selected_members);
+    },
+    checkSetCourtMem() {
+      for (let i = 0; i < 7; ++i) {
+        if (Object.entries(this.selected_members[i]).length == 0) {
+          this.isCourtMemSet = false;
+          return;
+        }
+      }
+      this.isCourtMemSet = true;
+
+      for (let i = 0; i < 7; ++i)
+        console.log(this.selected_members[i]);
+      console.log(this.isCourtMemSet);
     },
     resetGame() {
       this.cur_game = 1;
       this.scoring['host']['cur_score'] = this.scoring['opponent']['cur_score'] = 0;
+      this.isCourtMemSet = false;
       this.selected_button = {
         'name': '',
         'number': 0,
@@ -315,7 +410,8 @@ export default {
         'landing': '',
         'opponent': '',
         'game': this.cur_game
-      }
+      };
+      
       // this.team_members = this.selected_members = [{}];
     },
     nextGame() {
@@ -326,7 +422,7 @@ export default {
       else 
         this.scoring['opponent']['winned_game'] += 1;
       
-      // send info
+      // send info & clear the record
 
       // reset game
       this.resetGame();
@@ -334,9 +430,7 @@ export default {
     endGame() {
       this.nextGame();
       this.scoring['host']['winned_game'] = this.scoring['opponent']['winned_game'] = 0;
-
-      // send modal to leave or continue
-
+      this.selected_members = [{}, {}, {}, {}, {}, {}, {}];
     }
 
   }
@@ -382,4 +476,7 @@ export default {
   align-items: center;
   justify-content: center;
 }
+/* for modal */
+
+
 </style>
