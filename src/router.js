@@ -32,7 +32,7 @@ export default new VueRouter({
           component:Profile,
         },
         {
-          path:'/home/:id/team/:teamid',
+          path:'team/:teamid',
           component:SingleTeam,
         },
         {

@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <!-- <router-link class="nav-link" to="/" exact>Home</router-link> -->
+    <!-- <router-view name="nav"></router-view> -->
     <router-view></router-view>
     <!-- <router-link class="nav-link" to="/home" exact>Home</router-link> -->
   </div>
@@ -11,7 +12,7 @@
 export default {
   name: 'App',
   components: {
-  }
+  },
 }
 </script>
 
