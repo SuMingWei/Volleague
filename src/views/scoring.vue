@@ -476,7 +476,4 @@ export default {
   align-items: center;
   justify-content: center;
 }
-/* for modal */
-
-
 </style>
