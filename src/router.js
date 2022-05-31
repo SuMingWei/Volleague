@@ -8,40 +8,43 @@ import Profile from './views/profile.vue';
 import SingleTeam from './views/singleTeam.vue';
 import AddContest from './views/addContest.vue';
 import SingleRecord from './views/singleRecord.vue';
+import Scoring from './views/scoring.vue';
 
 
 Vue.use(VueRouter);
 
 export default new VueRouter({
-  routes: [
-    {
-      path:'/',
-      component:Login
+  routes: [{
+      path: '/',
+      component: Login
     },
     {
-      path:'/signup',
-      component:Signup
+      path: '/signup',
+      component: Signup
     },
     {
-      path:'/home/:id',
-      component:Home,
-      children: [
-        {
-          path:'/home/:id/profile',
+      path: '/home/:id',
+      component: Home,
+      children: [{
+          path: '/home/:id/profile',
           alias: '/home/:id',
-          component:Profile,
+          component: Profile,
         },
         {
-          path:'team/:teamid',
-          component:SingleTeam,
+          path: 'team/:teamid',
+          component: SingleTeam,
         },
         {
-          path:'/addcontest',
-          component:AddContest,
+          path: '/addcontest',
+          component: AddContest,
         },
         {
-          path:'/singlerecord',
-          component:SingleRecord,
+          path: '/singlerecord',
+          component: SingleRecord,
+        },
+        {
+          path: '/scoring',
+          component: Scoring,
         }
       ]
     },

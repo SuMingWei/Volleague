@@ -85,7 +85,7 @@
                     <p class="mb-0 opacity-75">2:0</p> 
                   </div>
                   <div class="d-grid gap-2 text-center">
-                    <button class="btn btn-sm btn-primary">Scoring</button>
+                    <router-link to="/scoring" class="btn btn-sm btn-primary">Scoring</router-link>
                     <router-link to="/singlerecord" class="btn btn-sm btn-success">Record</router-link>
                     <!-- <button class="btn btn-sm btn-success">Record</button> -->
                   </div>
