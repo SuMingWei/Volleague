@@ -64,12 +64,13 @@ export default{
   methods: {
     loginRequest(){
       this.errorMessage = '';
-      this.allUser.find((value) => {
-        if(value.account == this.user.account && value.password == this.user.password){
-          // value.id is for auth
-          // now get user.id 
+      var matchAcc = this.allUser.find(element => element.account == this.user.account);
+      if(matchAcc == undefined){
+        this.errorMessage = 'No Such User !';
+      }else{
+        if(matchAcc.password == this.user.password){
           this.errorMessage = '';
-          var authID = value.id;
+          var authID = matchAcc.id;
           this.$http.get(this.db + 'user.json').then(function(data){
             return data.json();
           }).then(function(data){
@@ -79,21 +80,10 @@ export default{
               }
             }
           })
-        }else if(value.account == this.user.account && value.password != this.user.password){
-          this.errorMessage = 'Wrong Password !';
         }else{
-          this.errorMessage = 'No Such User !';
+          this.errorMessage = 'Wrong Password !';
         }
-      });
-      
-      // if(this.allUser.find(element => element.account == this.user.account && element.password == this.user.password)){
-      //   console.log(element);
-      //   // this.$router.push('/home/' + );
-      // }else if(this.allUser.find(element => element.account == this.user.account && element.password != this.user.password)){
-      //   this.errorMessage = 'Wrong Password !';
-      // }else{
-      //   this.errorMessage = 'No Such User !';
-      // }
+      }
     },
   },
 }
