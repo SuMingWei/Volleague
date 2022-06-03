@@ -6,7 +6,6 @@ import Login from './views/login.vue';
 import Signup from './views/signup.vue';
 import Profile from './views/profile.vue';
 import SingleTeam from './views/singleTeam.vue';
-import AddContest from './views/addContest.vue';
 import SingleRecord from './views/singleRecord.vue';
 import Scoring from './views/scoring.vue';
 
@@ -35,11 +34,7 @@ export default new VueRouter({
           component: SingleTeam,
         },
         {
-          path: '/addcontest',
-          component: AddContest,
-        },
-        {
-          path: '/singlerecord',
+          path: 'team/:teamid/record/:contestid',
           component: SingleRecord,
         },
         {

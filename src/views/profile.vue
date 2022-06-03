@@ -19,7 +19,7 @@
                 </span>
               </div>
               <div>
-                <button class="btn btn-outline-dark text-muted mt-3" style="width:150px" @click="editProfileModal=true">Edit profile</button>
+                <button class="btn border-secondary text-secondary text-muted mt-3" style="width:150px" @click="editProfileModal=true">編輯個人檔案</button>
               </div>
             </div>
           </div>
@@ -29,18 +29,19 @@
             <div class="my-3 mx-3 card fw-bold">
               <div class="card-head py-2" style="background-color:#E5E8E8">
                 <span>
-                  <i class="fa-solid fa-people-group mx-2"/> Team
+                  <i class="fa-solid fa-people-group mx-2"/> 隊伍資訊
                 </span>
               </div>
               <div class="card-body fs-3 text-start">
                 <div>
                   <div class="d-flex my-2">
                     <button class="btn btn-outline-dark me-3 text-nowrap" @click="createTeamModal=true">
-                      <i class="fa-solid fa-plus"></i> Create
+                      <i class="fa-solid fa-plus"></i> 建立隊伍
                     </button>
                     <dropSearch class="form-control" 
                                 :options="options"
                                 :disabled="false"
+                                :placeholder="'搜尋隊伍...'"
                                 v-on:selected="validateSelection">
                     </dropSearch>
                   </div>
@@ -48,7 +49,7 @@
                 <hr>
                 <div>
                   <span v-for="team in profile.teamList" :key="team">
-                    <router-link :to="`/home/${id}/team/${getTeamID(team)}`" class="btn teambtn me-2 mb-2 fw-bolder">{{team}}</router-link>
+                    <router-link :to="`/home/${id}/team/${getTeamID(team)}`" v-if="team!=''" class="btn teambtn me-2 mb-2 fw-bolder">{{team}}</router-link>
                   </span>
                 </div>
               </div>
@@ -56,7 +57,7 @@
             <div class="my-3 mx-3 card fw-bold">
               <div class="card-head py-2" style="background-color:#E5E8E8">
                 <span>
-                  <i class="fa-solid fa-chart-simple mx-2"/> Statistics
+                  <i class="fa-solid fa-chart-simple mx-2"/> 個人數據紀錄
                 </span>
               </div>
               <div class="card-body" style="height: 500px; overflow-y:scroll">
@@ -86,7 +87,7 @@
                         <td>
                           <div class=" text-center">
                             <p class="mb-1">NCKU CSIE <span class="badge bg-main">VS</span> NCKU CE</p>
-                            <p class="mb-0 opacity-75">2022-01-02 | 18:00</p>
+                            <p class="mb-0 opacity-75">2022-01-02</p>
                             <p class="mb-0 opacity-75">2:0</p> 
                           </div>
                         </td>
@@ -104,7 +105,7 @@
                         <td>
                           <div class=" text-center">
                             <p class="mb-1">NCKU CSIE <span class="badge bg-main">VS</span> NCKU EE</p>
-                            <p class="mb-0 opacity-75">2022-01-03 | 18:00</p>
+                            <p class="mb-0 opacity-75">2022-01-03</p>
                             <p class="mb-0 opacity-75">2:1</p> 
                           </div>
                         </td>
@@ -136,16 +137,16 @@
             <div class="modal-dialog modal-dialog-centered"> 
               <div class="modal-content">
                 <div class="modal-header">
-                  <h4 class="modal-title">Edit Profile</h4>
+                  <h4 class="modal-title">編輯個人檔案</h4>
                   <button type="button" class="btn-close" @click="editProfileModal=false"></button>
                 </div>
                 <div class="modal-body">
                   <div class="form-group mb-2">
-                    <label>Name</label>
+                    <label>姓名</label>
                     <input type="text" class="form-control" v-model="profile.name" />
                   </div>
                   <div class="form-group mb-2">
-                    <label>Birthday</label>
+                    <label>生日</label>
                     <div class="d-flex gap-3">
                       <input type="text" class="form-control col" v-model="profile.birthday.year" />
                       <input type="text" class="form-control col" v-model="profile.birthday.month" />
@@ -153,7 +154,7 @@
                     </div>
                   </div>
                   <div class="form-group">
-                    <label>Position</label>
+                    <label>位置</label>
                   </div>
                   <div>
                     <div class="form-check form-check-inline mb-1">
@@ -179,7 +180,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button class="btn teambtn" @click="changeProfile">Save Change</button>
+                  <button class="btn teambtn" @click="changeProfile">儲存</button>
                 </div>
               </div>
             </div>
@@ -195,7 +196,7 @@
             <div class="modal-dialog"> 
               <div class="modal-content">
                 <div class="modal-header">
-                  <h4 class="modal-title">Create a New Team</h4>
+                  <h4 class="modal-title">建立新隊伍</h4>
                   <button type="button" class="btn-close" @click="createTeamModal=false"></button>
                 </div>
                 <div v-if="errorMessage !== ''" class="alert alert-danger mx-4" role="alert">
@@ -203,23 +204,23 @@
                 </div>
                 <div class="modal-body">
                   <div class="form-group mb-2">
-                    <label>Team Name</label>
+                    <label>隊名</label>
                     <input type="text" class="form-control" v-model="newTeam.teamName" />
                   </div>
                   <div class="form-group mb-2">
-                    <label>Bulletin Board</label>
-                    <input type="text" class="form-control" v-model="newTeam.bulletin" />
+                    <label>佈告欄</label>
+                    <textarea class="form-control" v-model="newTeam.bulletin" />
                   </div>
                   <div class="form-group">
-                    <label>Your Personal Information</label>
+                    <label>個人資訊</label>
                   </div>
                   <div class="d-flex gap-3">
                     <div class="col">
-                      <label>Number</label>
+                      <label>背號</label>
                       <input type="text" class="form-control" v-model="personalInfo.number" />
                     </div>
                     <div class="col">
-                      <label>Position</label>
+                      <label>位置</label>
                       <select class="form-select" v-model="personalInfo.position">
                         <option value="OH" selected>Outside Hitter</option>
                         <option value="MB">Middle Blocker</option>
@@ -231,7 +232,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button class="btn teambtn" @click="createTeam">Create</button>
+                  <button class="btn teambtn" @click="createTeam">建立</button>
                 </div>
               </div>
             </div>
@@ -251,9 +252,9 @@
                   <i v-if="profile.teamList.includes(teamInfo.teamName)" class="fa-solid fa-circle-check text-success"></i>
                   <button type="button" class="btn-close" @click="teamInfoModal=false"></button>
                 </div>
-                <div class="modal-body text-start">
+                <div class="modal-body">
                   <div class="form-group">
-                    <label class="fs-5">Members: </label>
+                    <label>成員</label>
                   </div>
                   <div  class="row">
                     <div class=" col-auto mx-2 my-2 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
@@ -266,15 +267,15 @@
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="fs-5">Your Personal Information: </label>
+                    <label>個人資訊</label>
                   </div>
                   <div class="d-flex gap-3">
                     <div class="col">
-                      <label>Number</label>
+                      <label>背號</label>
                       <input type="text" class="form-control" v-model="personalInfo.number" />
                     </div>
                     <div class="col">
-                      <label>Position</label>
+                      <label>位置</label>
                       <select class="form-select" v-model="personalInfo.position">
                         <option value="OH" selected>Outside Hitter</option>
                         <option value="MB">Middle Blocker</option>
@@ -286,7 +287,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button class="btn teambtn" :disabled="profile.teamList.includes(teamInfo.teamName)" @click="JoinTeam(teamInfo.teamName)">Join</button>
+                  <button class="btn teambtn" :disabled="profile.teamList.includes(teamInfo.teamName)" @click="JoinTeam(teamInfo.teamName)">加入</button>
                 </div>
               </div>
             </div>
@@ -386,7 +387,7 @@ export default {
         
         // check
         if(this.allTeamName.find(element => element == this.newTeam.teamName)){
-          this.errorMessage = 'This Team Name Already Exists !';
+          this.errorMessage = '這個隊名已被他人使用!';
         }else{
           // create team
           this.personalInfo.name = this.profile.name;
@@ -484,12 +485,7 @@ export default {
 }
 </script>
 
-<style scope>
-/* #dropdown >>> .dropdown-input {
-  min-width: 100px;
-  max-width: 500px;
-} */
-
+<style scoped>
 .teambtn {
   background-color:#2c3e50; 
   color:white;
@@ -499,7 +495,7 @@ export default {
 }
 .modal-mask {
   position: fixed;
-  z-index: 9998;
+  z-index: 999;
   top: 0;
   left: 0;
   width: 100%;

@@ -16,7 +16,7 @@
           <div class="my-3 mx-3 card fw-bold">
             <div class="card-head py-2" style="background-color:#E5E8E8">
               <span class="fw-bolder fs-5">
-                <i class="fa-solid fa-bullhorn mx-2"></i> Bulletin Board
+                <i class="fa-solid fa-bullhorn mx-2"></i> 佈告欄
               </span>
             </div>
             <div class="card-body text-start">
@@ -29,13 +29,13 @@
           <div class="my-3 mx-3 card fw-bold">
             <div class="card-head py-2" style="background-color:#E5E8E8">
               <span class="fw-bolder fs-5">
-                <i class="fa-solid fa-trophy mx-2"></i> Awards
+                <i class="fa-solid fa-trophy mx-2"></i> 比賽得名
               </span>
             </div>
             <div class="card-body">
               <div class="row">
                 <div class="col-auto mx-2 my-2 d-flex align-items-center" v-for="award in teamInfo.awards" :key="award">
-                  <span class="badge bg-light text-dark text-nowrap fs-5">{{award}}</span>
+                  <span class="badge bg-light text-dark text-nowrap fs-6">{{award}}</span>
                 </div>
               </div>
             </div>
@@ -46,7 +46,7 @@
           <div class="my-3 mx-3 card fw-bold">
             <div class="card-head py-2" style="background-color:#E5E8E8">
               <span class="fw-bolder fs-5">
-                <i class="fa-solid fa-person mx-2"></i> Members
+                <i class="fa-solid fa-person mx-2"></i> 成員
               </span>
             </div>
             <div class="card-body text-start">
@@ -61,55 +61,36 @@
                 </div>
               </div>
             </div>
-            <div class="d-block text-end ">
-              <button class="btn text-black-50 me-2 mb-2"><i class="fa-solid fa-pencil fs-5"></i></button>
-            </div>
           </div>
           <div class="my-3 mx-3 card fw-bold">
             <div class="card-head py-2" style="background-color:#E5E8E8">
               <span class="fw-bolder fs-5">
-                <i class="fa-solid fa-clipboard mx-2"></i> Contest Records
+                <i class="fa-solid fa-clipboard mx-2"></i> 比賽紀錄
               </span>
             </div>
             <div class="card-body text-start">
               <div class="d-block text-end ">
-                <router-link to="/addcontest" class="btn btn-outline-dark me-2 mb-2 ">
-                  <i class="fa-solid fa-plus"></i> New Contest
-                </router-link>
+                <button @click="addContestModal=true" class="btn btn-outline-dark me-2 mb-2 ">
+                  <i class="fa-solid fa-plus"></i> 新增比賽
+                </button>
+              </div>
+              <div class="d-flex gap-3 justify-content-center mb-2">
+                <button @click="addPoint" class="btn btn-warning">紀錄得分</button>
               </div>
               <div class="list-group" style="height: 230px; overflow-y:scroll">
-                <div class="list-group-item d-flex justify-content-between list-group-item-action">
+                <div v-for="(item,idx) in teamInfo.contestRecords" :key="idx" class="list-group-item d-flex justify-content-between list-group-item-action">
                   <div class=" text-center">
-                    <p class="mb-1">資訊 VS 土木</p>
-                    <p class="mb-0 opacity-75">2022-01-02 | 18:00</p>
-                    <p class="mb-0 opacity-75">2:0</p> 
+                    <p class="mb-0">{{item.contest}}</p>
+                    <!-- <p class="mb-1"><i class="fa-solid fa-hand-fist"></i> {{item.opponent}}</p> -->
+                    <p class="mb-0">vs <span class="badge bg-main">{{item.opponent}}</span></p>
+                    <p class="mb-0 opacity-75">{{item.date}}</p>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <p class="mb-0">{{item.score}}</p> 
                   </div>
                   <div class="d-grid gap-2 text-center">
-                    <router-link to="/scoring" class="btn btn-sm btn-primary">Scoring</router-link>
-                    <router-link to="/singlerecord" class="btn btn-sm btn-success">Record</router-link>
-                    <!-- <button class="btn btn-sm btn-success">Record</button> -->
-                  </div>
-                </div>
-                <div class="list-group-item d-flex justify-content-between list-group-item-action">
-                  <div class=" text-center">
-                    <p class="mb-1">資訊 VS 電機</p>
-                    <p class="mb-0 opacity-75">2022-01-03 | 1:00</p>
-                    <p class="mb-0 opacity-75">2:0</p> 
-                  </div>
-                  <div class="d-grid gap-2 text-center">
-                    <button class="btn btn-sm btn-primary">Scoring</button>
-                    <button class="btn btn-sm btn-success">Record</button>
-                  </div>
-                </div>
-                <div class="list-group-item d-flex justify-content-between list-group-item-action">
-                  <div class=" text-center">
-                    <p class="mb-1">資訊 VS 材料</p>
-                    <p class="mb-0 opacity-75">2022-01-04 | 1:00</p>
-                    <p class="mb-0 opacity-75">2:0</p> 
-                  </div>
-                  <div class="d-grid gap-2 text-center">
-                    <button class="btn btn-sm btn-primary">Scoring</button>
-                    <button class="btn btn-sm btn-success">Record</button>
+                    <router-link to="/scoring" class="btn btn-sm btn-primary">計分</router-link>
+                    <router-link :to="`/home/${uid}/team/${teamid}/record/${item.key}`" class="btn btn-sm btn-success">紀錄</router-link>
                   </div>
                 </div>
               </div>
@@ -126,7 +107,7 @@
             <div class="modal-dialog"> 
               <div class="modal-content">
                 <div class="modal-header">
-                  <h4 class="modal-title">Edit Bulletin</h4>
+                  <h4 class="modal-title">編輯佈告欄</h4>
                   <button type="button" class="btn-close" @click="editBulletinModal=false"></button>
                 </div>
                 <div class="modal-body">
@@ -135,7 +116,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button class="btn teambtn" @click="editBulletin">Modify</button>
+                  <button class="btn teambtn" @click="editBulletin">儲存</button>
                 </div>
               </div>
             </div>
@@ -151,21 +132,69 @@
             <div class="modal-dialog"> 
               <div class="modal-content">
                 <div class="modal-header">
-                  <h4 class="modal-title">Edit Awards</h4>
+                  <h4 class="modal-title">新增比賽得名</h4>
                   <button type="button" class="btn-close" @click="editAwardsModal=false"></button>
                 </div>
                 <div class="modal-body">
                   <div class="form-group mb-2">
-                    <label>New Awards</label>
+                    <label>獎項</label>
                     <div class="d-flex gap-3">
-                      <input type="text" class="form-control col" v-model="newAward.year" placeholder="year"/>
-                      <input type="text" class="form-control col" v-model="newAward.contest" placeholder="contest"/>
-                      <input type="text" class="form-control col" v-model="newAward.award" placeholder="award"/>
+                      <input type="text" class="form-control col" v-model="newAward.year" placeholder="年份"/>
+                      <input type="text" class="form-control col" v-model="newAward.contest" placeholder="比賽"/>
+                      <input type="text" class="form-control col" v-model="newAward.award" placeholder="名次"/>
                     </div>
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button class="btn teambtn" @click="editAwards" :disabled="newAward.year=='' || newAward.contest=='' || newAward.award==''">Modify</button>
+                  <button class="btn teambtn" @click="editAwards" :disabled="newAward.year=='' || newAward.contest=='' || newAward.award==''">新增</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal add contest-->
+    <div v-if="addContestModal">
+      <div name="modal fade">
+        <div class="modal-mask">
+          <div class="modal-wrapper">
+            <div class="modal-dialog"> 
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title"><i class="fa-solid fa-volleyball fs-4"></i>&nbsp;&nbsp;新比賽</h4>
+                  <button type="button" class="btn-close" @click="addContestModal=false"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group mb-2">
+                    <label>對手</label>
+                    <input type="text" class="form-control" v-model="newContest.opponent" />
+                  </div>
+                  <div class="d-flex gap-3 mb-2">
+                    <div class="col">
+                      <label>盃賽</label>
+                      <input type="text" class="form-control" v-model="newContest.contest" />
+                    </div>
+                    <div class="col">
+                      <label>局數</label>
+                      <select class="form-select" v-model="newContest.gamesNum">
+                        <option>1</option>
+                        <option>2</option>
+                        <option selected>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>日期</label>
+                  </div>
+                  <div class="form-group">
+                    <date-picker v-model="newContest.date" valueType="format"></date-picker>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button @click="addContest" class="btn teambtn">新增</button>
                 </div>
               </div>
             </div>
@@ -178,9 +207,14 @@
 
 <script>
 // import AddContest from "../components/add_contest.vue";
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
 
 export default {
   props: ['uid'],
+  components:{
+    'date-picker': DatePicker,
+  },
   data() {
     return {
       teamid: this.$route.params.teamid,
@@ -192,13 +226,54 @@ export default {
         members: [],
         contestRecords: [''],
       },
+      allContest: [],
       newAward: {
         year: '',
         contest: '',
         award: '',
       },
+      newContest: {
+        opponent: '',
+        contest: '',
+        date:'',
+        score: '0:0',
+        gamesNum: 3,
+      },
+      personalRecord:{
+        name: '',
+        pos: '',
+        number: '',
+        attackPoint: 0,
+        blockPoint: 0,
+        servicePoint: 0,
+        attackError: 0,
+        tossError: 0,
+        blockError: 0,
+        receiveError: 0,
+        serviceError: 0,
+      },
+      personalPlacement:{
+        pos: '',
+        number: '',
+      },
+      emptyGame: {
+        ourTeam: [''],
+        placement:{
+          1: [''],
+          2: [''],
+          3: [''],
+          4: [''],
+          5: [''],
+          6: [''],
+          7: [''],
+          8: [''],
+          9: [''],
+          'touchout': [''],
+        }
+      },
       editBulletinModal: false,
       editAwardsModal: false,
+      addContestModal:false,
     }
   },
   beforeMount(){
@@ -228,7 +303,130 @@ export default {
         console.log(data);
         this.editAwardsModal = false;
       })
-    }
+    },
+    addContest(){
+      // console.log(this.newContest);
+      var gameArr = [];
+      for(let i=0; i<this.newContest.gamesNum;i++){
+        gameArr.push(this.emptyGame);
+      }
+      var emptyContest = {
+        opponent: this.newContest.opponent,
+        contest: this.newContest.contest,
+        date: this.newContest.date,
+        score: this.newContest.score,
+        games: gameArr,
+      }
+      var singleContest = {
+        key: '',
+        opponent: this.newContest.opponent,
+        contest: this.newContest.contest,
+        date: this.newContest.date,
+        score: this.newContest.score,
+      }
+      this.$http.post(this.db + 'contest.json',emptyContest).then(function(data){
+        singleContest.key = data.body.name;
+        // update contest record
+        if(this.teamInfo.contestRecords[0] == ''){
+          this.teamInfo.contestRecords[0] = singleContest;
+        }else{
+          this.teamInfo.contestRecords.push(singleContest);
+        }
+        this.teamInfo.contestRecords.sort(function(a,b){
+          return new Date(a.date) - new Date(b.date);
+        }).reverse();
+        this.$http.patch(this.db + 'team/' + this.teamid + '.json', {contestRecords: this.teamInfo.contestRecords});
+        // clear
+        this.newContest = {
+          opponent: '',
+          contest: '',
+          date:'',
+          score: '0:0',
+          gamesNum: 3,
+        }
+      })
+      this.addContestModal = false;
+    },
+    
+    addPoint(){
+      var newPlayer1 = {
+        name: "蘇名偉",
+        pos: 'OH',
+        number: '27',
+        attackPoint: 4,
+        blockPoint: 1,
+        servicePoint: 2,
+        attackError: 1,
+        tossError: 0,
+        blockError: 0,
+        receiveError: 1,
+        serviceError: 1,
+      }
+      var newPlayer2 = {
+        name: "蘇名",
+        pos: 'O',
+        number: '20',
+        attackPoint: 3,
+        blockPoint: 1,
+        servicePoint: 3,
+        attackError: 1,
+        tossError: 1,
+        blockError: 2,
+        receiveError: 0,
+        serviceError: 1,
+      }
+      var ourteam1 = [newPlayer1,newPlayer2];
+      var placement1 = {
+        1: [{pos: 'OH',number: '12'},{pos: 'MB',number: '1'}],
+        2: [{pos: 'MB',number: '1'}],
+        3: [''],
+        4: [''],
+        5: [''],
+        6: [{pos: 'MB',number: '1'},{pos: 'OH',number: '12'}],
+        7: [''],
+        8: [''],
+        9: [''],
+        'touchout': [''],
+      }
+      var placement2 = {
+        1: [{pos: 'OH',number: '12'},{pos: 'MB',number: '1'},{pos: 'MB',number: '1'},{pos: 'MB',number: '1'},{pos: 'MB',number: '1'},{pos: 'MB',number: '1'}],
+        2: [{pos: 'MB',number: '1'}],
+        3: [''],
+        4: [''],
+        5: [''],
+        6: [{pos: 'MB',number: '1'},{pos: 'OH',number: '12'}],
+        7: [''],
+        8: [''],
+        9: [''],
+        'touchout': [''],
+      }
+      var game = {
+        0: {
+          ourTeam: ourteam1,
+          placement: placement1,
+        },
+        1:{
+          ourTeam: ourteam1,
+          placement: placement2,
+        },
+        2:{
+          ourTeam: [''],
+          placement:{
+            1: [''],
+            2: [''],
+            3: [''],
+            4: [''],
+            5: [''],
+            6: [''],
+            7: [''],
+            8: [''],
+            9: [''],
+            'touchout': [''],
+          }
+        }
+      }
+      this.$http.patch(this.db + 'contest/' + this.teamInfo.contestRecords[0].key + '.json', {games: game})
+    },
   }
 
 }
@@ -239,9 +437,12 @@ export default {
   background-color:#2c3e50; 
   color:white;
 }
+.bg-main {
+  background-color:#2c3e50; 
+}
 .modal-mask {
   position: fixed;
-  z-index: 9998;
+  z-index: 999;
   top: 0;
   left: 0;
   width: 100%;

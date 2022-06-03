@@ -6,7 +6,7 @@
     </div>
     <div class="col-lg-5 m-auto bg-light-gray">
       <div class="text-center mb-4">
-        <h1 class="mt-4">Log In</h1>
+        <h1 class="mt-4">登入</h1>
       </div>
       <div v-if="errorMessage !== ''" class="alert alert-danger mx-4" role="alert">
         <span>{{ errorMessage }}</span>
@@ -14,18 +14,18 @@
       <form id="login-form">
         <div class="row justify-content-center">
           <div class="col-sm-10 mb-4 form-group">
-            <label class="fs-5 mb-1" for="account">Account</label>
+            <label class="fs-5 mb-1" for="account">帳號</label>
             <input type="text" id="account" v-model="user.account" class="form-control form-control-lg">
           </div>
           <div class="col-sm-10 mb-4 form-group">
-            <label class="fs-5 mb-1" for="password">Password</label>
+            <label class="fs-5 mb-1" for="password">密碼</label>
             <input type="password" id="password" v-model="user.password" class="form-control form-control-lg">
           </div>
           <div class="col-sm-12 mb-4 form-group">
-            <button :disabled="user.account == '' || user.password == ''" @click.prevent="loginRequest" class="btn btn-primary btn-lg col-sm-4">Log In</button>
+            <button :disabled="user.account == '' || user.password == ''" @click.prevent="loginRequest" class="btn btn-primary btn-lg col-sm-4">登入</button>
           </div>
           <div class="col-sm-12 form-group">
-          <p>Don't have an account? <router-link to="/signup">Sign Up</router-link></p>
+          <p>還沒有帳號嗎? <router-link to="/signup">註冊</router-link></p>
         </div>
         </div>
       </form>
@@ -66,7 +66,7 @@ export default{
       this.errorMessage = '';
       var matchAcc = this.allUser.find(element => element.account == this.user.account);
       if(matchAcc == undefined){
-        this.errorMessage = 'No Such User !';
+        this.errorMessage = '沒有這個使用者!';
       }else{
         if(matchAcc.password == this.user.password){
           this.errorMessage = '';
@@ -81,7 +81,7 @@ export default{
             }
           })
         }else{
-          this.errorMessage = 'Wrong Password !';
+          this.errorMessage = '密碼錯誤!';
         }
       }
     },
