@@ -1,8 +1,18 @@
 <template>
   <div>
     <div class="card text-center">
+      <div class="col-md-12 col-lg-12">
+        <div class="d-flex mt-2 align-items-center">
+          <!-- <form class="mt-2 mb-1 text-center"> -->
+            <router-link to="/singleteam" class="btn d-flex align-items-center fs-4 " style="color:#495057">
+              <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;回隊伍頁面
+            </router-link>
+          <!-- </form> -->
+        </div>
+      </div>
+
       <!-- 計分表 -->
-      <div class="card-body mx-1">
+      <div class="card-body pt-1 pb-1 mx-1">
         <div class="card" style="border: none">
           <!-- 隊伍 & 局數 & 分數 -->
           <div class="d-grid score-board text-center">
@@ -19,7 +29,7 @@
 
             <!-- 下一局 & 結束比賽 -->
             <div class="d-grid round-controls text-center">
-              <button class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888" v-on:click="nextGame()">下一局</button>
+              <button class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888" v-on:click="nextGame(false)">下一局</button>
               <button class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888"
                       data-bs-toggle="modal" data-bs-target="#endGameCheck">結束比賽</button>
             </div>
@@ -38,7 +48,7 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" v-on:click="endGame()" data-bs-dismiss="modal">確定</button>
+                    <button type="button" class="btn btn-primary" v-on:click="endGame(true)" data-bs-dismiss="modal">確定</button>
                   </div>
                 </div>
               </div>
@@ -80,7 +90,7 @@
                   <!-- 上場人員九宮格 -->
                   <button v-for="(member, index) in selected_members" :key="index" type="button" class="btn btn-outline-secondary team-member" 
                           v-bind:style="[ index == 6 ? {gridColumnStart: 2} : {} ]"
-                          v-on:click="selected_button['name'] = member['name']; selected_button['number'] = member['number']">
+                          v-on:click="selected_button['name'] = member['name']; selected_button['number'] = member['number']; selected_button['position'] = member['position']">
                     <span :class="setPositionTag(member)" style="width:30px">{{ member['number'] }}</span>{{ member['name'] }}
                   </button>
 
@@ -113,7 +123,8 @@
 
                       <div class="modal-body">
                         <!-- quickly set on-court members -->
-                        <button :click="setCourtMem()" class="py-1">設定上場人員</button>
+                        <button v-on:click="setCourtMem()" class="py-1">設定上場人員</button>
+                        <button v-on:click="checkSetCourtMem()">Test Check</button>
                         <!-- <button v-on:click="setCourtMem()">Set Court Member</button> -->
                         <div class="d-grid mx-1 my-1 team-members-grid">
                           <div v-for="n in 7" :key="n" v-bind:style="[ n == 7 ? {gridColumnStart: 2} : {} ]">
@@ -158,38 +169,38 @@
                     <div class="d-grid" style="grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 5px 5px">
                       <!-- 得分 -->
                       <button type="button" class="btn btn-outline-secondary" style="background-color: #90be6d; border-color: #90be6d; color: #FFF"
-                              v-on:click="selected_button['record_type'] = '攻擊得分'">
+                              v-on:click="selected_button['record_type'] = 'attackPoint'">
                               攻擊得分
                       </button>
                       <button type="button" class="btn btn-outline-secondary" style="background-color: #90be6d; border-color: #90be6d; color: #FFF"
-                              v-on:click="selected_button['record_type'] = '攔網得分'">
+                              v-on:click="selected_button['record_type'] = 'blockPoint'">
                               攔網得分
                       </button>
                       <button type="button" class="btn btn-outline-secondary" style="background-color: #90be6d; border-color: #90be6d; color: #FFF"
-                              v-on:click="selected_button['record_type'] = '發球得分'">
+                              v-on:click="selected_button['record_type'] = 'servicePoint'">
                               發球得分
                       </button>
                       <!-- 失誤 & 失分 -->
                       <button type="button" class="btn btn-outline-secondary" style="background-color: #f08080; border-color: #f08080; color: #FFF"
-                              v-on:click="selected_button['record_type'] = '攻擊失誤'">
+                              v-on:click="selected_button['record_type'] = 'attackError'">
                               攻擊失誤
                       </button>
                       <button type="button" class="btn btn-outline-secondary" style="background-color: #f08080; border-color: #f08080; color: #FFF"
-                              v-on:click="selected_button['record_type'] = '舉球失誤'">
+                              v-on:click="selected_button['record_type'] = 'tossError'">
                               舉球失誤
                       </button>
                       <button type="button" class="btn btn-outline-secondary" style="background-color: #f08080; border-color: #f08080; color: #FFF"
-                              v-on:click="selected_button['record_type'] = '觸網失誤'">
+                              v-on:click="selected_button['record_type'] = 'blockError'">
                               觸網失誤
                       </button>
                     </div>
                     <div class="d-grid" style="grid-template-columns: 1fr 1fr;; grid-template-rows: 1fr; gap: 5px">
                       <button type="button" class="btn btn-outline-secondary" style="background-color: #f08080; border-color: #f08080; color: #FFF"
-                              v-on:click="selected_button['record_type'] = '接發失誤'">
+                              v-on:click="selected_button['record_type'] = 'receiveError'">
                               接發失誤
                       </button>
                       <button type="button" class="btn btn-outline-secondary" style="background-color: #f08080; border-color: #f08080; color: #FFF"
-                              v-on:click="selected_button['record_type'] = '發球失誤'">
+                              v-on:click="selected_button['record_type'] = 'serviceError'">
                               發球失誤
                       </button>
                     </div>
@@ -198,12 +209,12 @@
                   <!-- 送出按鈕 -->
                   <div class="d-grid" style="grid-template-columns: 1fr 1fr; gap: 5px 5px">
                     <button type="button" class="btn btn-outline-secondary" style="background-color: #219ebc; border-color: #219ebc; color: #FFF"
-                            v-on:click="sentRecord('upper')">
+                            v-on:click="record('upper')">
                             <span>送出紀錄</span>
                     </button>
                     <!-- 對方得分：用於記錄落點 -->
                     <button type="button" class="btn btn-outline-secondary" style="background-color: #219ebc; border-color: #219ebc; color: #FFF"
-                            v-on:click="isOpponentScore = true">
+                            v-on:click="selected_button['record_type'] = 'oppoScore'; isOpponentScore = true">
                             對方得分
                     </button>
                   </div>
@@ -226,19 +237,19 @@
                 <div class="container border border-2 border-dark" style="width: 272px; height: 272px">
                   <div class="row border-bottom border-2 border-dark" style="width: 270px">
                     <div  v-for="n in 3" :key="n" class="d-flex col landing-spots" style="height: 90px" 
-                          v-on:click="selected_button['landing'] = n.toString()">
+                          v-on:click="selected_button['landing'] = n-1">
                       <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> {{ n }} </button>
                     </div>
                   </div>
                   <div class="row border-bottom border-2 border-dark-80" style="width: 270px">
                     <div  v-for="n in 3" :key="n" class="d-flex col landing-spots" style="height: 90px"
-                          v-on:click="selected_button['landing'] = (n+3).toString()">
+                          v-on:click="selected_button['landing'] = (n-1+3)">
                       <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> {{ n+3 }} </button>
                     </div>
                   </div>
                   <div class="row" style="width: 270px">
                     <div  v-for="n in 3" :key="n" class="d-flex col landing-spots" style="height: 90px"
-                          v-on:click="selected_button['landing'] = (n+6).toString()">
+                          v-on:click="selected_button['landing'] = (n-1+6)">
                       <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> {{ n+6 }} </button>
                     </div>
                   </div>
@@ -249,7 +260,7 @@
                   <!-- 界外按鈕 -->
                   <div class="landing-spots">
                     <button type="button" class="btn btn-outline-secondary" style="padding: auto auto; height: 80px; width: 80px"
-                            v-on:click="selected_button['landing'] = 'TouchOut'"> 
+                            v-on:click="selected_button['landing'] = 9"> 
                       Touch Out
                     </button>
                   </div>
@@ -258,8 +269,8 @@
                     <div class="d-grid" style="grid-template-rows: 0.75fr 1fr; grid-template-columns: 1fr 1fr">
                       <p class="" style="margin: auto auto">敵方背號</p>
                       <p class="" style="margin: auto auto">敵方位置</p>
-                      <input type="text" v-model="opponent['num']" size="1" class="mx-1 my-1">
-                      <select class="form-select text-center mx-1 my-1"  v-model="opponent['pos']">
+                      <input type="text" v-model="selected_button['opponent']['num']" size="1" class="mx-1 my-1">
+                      <select class="form-select text-center mx-1 my-1"  v-model="selected_button['opponent']['pos']">
                         <option selected> 選擇位置</option>
                         <option v-for="(item, index) in positions" :key="index" :value="item"> 
                           <p> {{ item }} </p>
@@ -268,7 +279,7 @@
                     </div>
                     <button type="button" class="btn btn-outline-secondary mx-1 my-1"
                             style="background-color: #90be6d; border-color: #90be6d !important; color: #FFF"
-                            v-on:click="sentRecord('lower')"> 
+                            v-on:click="record('lower')"> 
                           送出
                     </button>
                   </div>
@@ -296,31 +307,31 @@
             <table class="table table-striped align-middle text-nowrap">
               <thead class="sticky-top">
                 <tr style="background-color:#2c3e50; color:white">
-                  <th scope="col" style="position:fixed">球員</th>
+                  <th scope="col" style="">球員</th>
                   <th scope="col" style="" >內容</th>
-                  <th scope="col">敵方</th>
                   <th scope="col">落點</th>
                   <th scope="col">局數</th>
                   <th scope="col">功能</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(record, index) in records" :key="index">
-                  <td class="" style="position:fixed">
+                <tr v-for="(record, index) in records_local" :key="index">
+                  <td class="" style="">
                     <div class="col-auto d-flex align-items-center">
                       <span :class="setPositionTag(record)" style="width:35px"> {{ record['num'] }} </span>
                       <span class="text-nowrap"> {{ record['name'] }} </span>
                     </div>
                   </td>
-                  <td class="border-start" style=""> {{ record['record'] }} </td>
-                  <td class="border-start" style="">
-                    <span v-if="record['opponent'] != 'none'"> {{ record['opponent'] }} </span>
-                    <span v-else> X </span>
+                  <td class="border-start" style=""> {{ record['record_type'] }} </td>
+                  <td class="border-start"> 
+                    <span v-if="record['landing'] == 10">Touch Out</span>
+                    <span v-else-if="record['landing'] != -1">{{ record['landing'] }}</span>
+                    <span v-else>X</span>
                   </td>
-                  <td class="border-start"> {{ record['landing'] }} </td>
                   <td class="border-start"> {{ record['game'] }} </td>
                   <td class="border-start"> 
-                    <button style="border-color: red; border-style: solid; border-radius: 20%">
+                    <button style="border-color: red; border-style: solid; border-radius: 20%"
+                            v-on:click="deleteLocalRecord(record)">
                       <i class="fas fa-trash-alt" style="color: red"></i>
                     </button>
                   </td>
@@ -338,41 +349,61 @@
 
 <script>
 export default {
+  props: ['uid'],
   data() {
     return {
       cur_game: 1,
-      opponent: {'num': 0, 'pos': ''}, // bind to opponent input box & dropdown list
       isCourtMemSet: false, // bind to court member section
-      isOpponentScore: false,
+      isOpponentScore: false, // bind to button, '對方得分'
       positions: ['OH', 'OP', 'MB', 'S', 'L'],
-      records: [{'num': 22, 'name': '張祐誠', 'position': 'MB', 'record': '攻擊得分', 'opponent': 'none', 'landing': '3', 'game': 1},
-                {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record': '攔網失誤', 'opponent': '43', 'landing': '7', 'game': 1},
-                {'num': 2, 'name': '張張張', 'position': 'S', 'record': '舉球得分', 'opponent': 'none', 'landing': '8', 'game': 1}],
+      translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
+                      'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '攔網失誤',
+                      'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
+      translateType2Eng: {'攻擊得分': 'attackPoint', '攔網得分': 'blockPoint','發球得分': 'servicePoint',
+                      '攻擊失誤': 'attackError', '舉球失誤': 'tossError', '攔網失誤': 'blockError',
+                      '接發失誤': 'receiveError', '發球失誤': 'serviceError', '對方得分': 'oppoScore'},
+      records_pushed: [{
+        'ourteam': {
+          '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
+                    attackPoint: 1, blockPoint: 0, servicePoint: 0,
+                    attackError: 0, tossError: 0, blockError: 0,
+                    receiveError: 0, serviceError: 0 },
+          '張祐誠': {name: '張祐誠', pos: 'MB', number: '22',
+                    attackPoint: 0, blockPoint: 0, servicePoint: 0,
+                    attackError: 0, tossError: 0, blockError: 1,
+                    receiveError: 0, serviceError: 0 },
+        }, 
+        'placement': [[], [], [{'num': 2, 'pos': 'S'}], [], [], [], [], [], [], []] // 0~8: 1~9 九號位置 ; 9: touch out
+      }],
+      // landing: 呈現在表格 --> 1~9 + touch-out
+      records_local: [{'num': 22, 'name': '張祐誠', 'position': 'MB', 'record_type': '攻擊得分', 'landing': -1, 'game': 1},
+                      {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record_type': '攔網失誤', 'landing': -1, 'game': 1},
+                      {'num': 2, 'name': '土木系', 'position': 'S', 'record_type': '對方得分', 'landing': 3, 'game': 1}],
       scoring: {
-        host: {'name': '資訊系', 'winned_game': 2, 'cur_score': 19},
-        opponent: {'name': '土木系', 'winned_game': 1, 'cur_score': 15}
+        host: {'name': '資訊系', 'winned_game': 0, 'cur_score': 1},
+        opponent: {'name': '土木系', 'winned_game': 0, 'cur_score': 2}
       },
       selected_button: {
         'name': '',
-        'number': 0,
+        'number': -1,
+        'position': '',
         'record_type': '',
-        'pointed': '',  // 得分或失誤
-        'landing': '',
-        'opponent': '',
+        'landing': -1,  // 依照 placement 的 index (0~9)
+        'opponent': {'num': -1, 'pos': ''},
         'game': this.cur_game
       },
       selected_members: [{}, {}, {}, {}, {}, {}, {}],     // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
-      team_members:[{'name': '張祐誠', 'number': 22, 'position': 'MB'},
-                        {'name': '張祐誠', 'number': 23, 'position': 'S'},
-                        {'name': '張祐誠', 'number': 24, 'position': 'OP'},
-                        {'name': '張祐誠', 'number': 25, 'position': 'L'},
-                        {'name': '張祐誠', 'number': 26, 'position': 'OH'},
-                        {'name': '張祐誠', 'number': 27, 'position': 'OH'},
-                        {'name': '張祐誠', 'number': 28, 'position': 'MB'},
-                        {'name': '張祐誠', 'number': 29, 'position': 'S'}], // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+      team_members:[{'name': '張祐1', 'number': 22, 'position': 'MB'},
+                    {'name': '張祐2', 'number': 23, 'position': 'S'},
+                    {'name': '張祐3', 'number': 24, 'position': 'OP'},
+                    {'name': '張祐4', 'number': 25, 'position': 'L'},
+                    {'name': '張祐5', 'number': 26, 'position': 'OH'},
+                    {'name': '張祐6', 'number': 27, 'position': 'OH'},
+                    {'name': '張祐7', 'number': 28, 'position': 'MB'},
+                    {'name': '張祐L', 'number': 29, 'position': 'S'}], // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
 
 
-      // records: [{'num': 22, 'name': '張祐誠', 'position': 'MB', 'record': '攻擊得分', 'opponent': 'none', 'landing': '3', 'game': 1},
+      // records_local: [{'num': 22, 'name': '張祐誠', 'position': 'MB', 'record': '攻擊得分', 'opponent': 'none', 'landing': '3', 'game': 1},
       //           {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record': '攔網失誤', 'opponent': '43', 'landing': '7', 'game': 1},
       //           {'num': 2, 'name': '張張張', 'position': 'S', 'record': '舉球得分', 'opponent': 'none', 'landing': '8', 'game': 1}],
       // team_members:[{'name': '張祐誠', 'number': 22, 'position': 'MB'},
@@ -409,28 +440,143 @@ export default {
       else 
         return tag + 'bg-warning';
     },
-    sentRecord(whichBtn) {
+    clearSelected() {
+      this.selected_button = {'name': '',
+                              'number': -1,
+                              'position': '',
+                              'record_type': '',
+                              'landing': -1,
+                              'opponent': {'num': -1, 'pos': ''},
+                              'game': this.cur_game};
+    },
+    checkOptionAllSelected(whichBtn) {
+      console.log('[checkOptionAllSelected]', this.selected_button);
+      if (whichBtn == 'upper') {
+        if (this.selected_button.name == '' || this.selected_button.record_type == '')
+          return false;
+        else
+          return true;
+      } else {
+        if (this.selected_button.opponent.num == -1 || this.selected_button.opponent.pos == '' || this.selected_button.landing == -1) {
+          console.log('[checkOptionAllSelected] Lower False');
+          return false;
+        } else {
+          console.log('[checkOptionAllSelected] Lower True');
+          return true;
+        }
+      }
+    },    record(whichBtn) {
+      if (whichBtn == 'upper' && this.checkOptionAllSelected('upper')) {
+        // score adjustment
+        if (this.selected_button.record_type.indexOf('Point') != -1)
+          this.scoring.host.cur_score++;
+        else
+          this.scoring.opponent.cur_score++;
+
+        // record ajustment
+        this.records_pushed[this.cur_game-1].ourteam[this.selected_button['name']][this.selected_button['record_type']]++;
+        this.records_local.unshift({'num': this.selected_button.number,
+                                    'name': this.selected_button.name,
+                                    'position': this.selected_button.position,
+                                    'record_type': this.translateType2Man[this.selected_button.record_type],
+                                    'landing': -1,
+                                    'game': this.cur_game});
+      } else if (whichBtn == 'lower' && this.isOpponentScore && this.checkOptionAllSelected('lower')) { 
+        // whichBtn == 'lower'
+        this.scoring.opponent.cur_score++;  // score adjustment
+        this.isOpponentScore = false;
+
+        this.records_pushed[this.cur_game-1].placement[this.selected_button.landing].push(this.selected_button.opponent);
+        this.records_local.unshift({'num': this.selected_button.opponent.num,
+                                    'name': this.scoring.opponent.name,
+                                    'position': this.selected_button.opponent.pos,
+                                    'record_type': this.translateType2Man[this.selected_button.record_type],
+                                    'landing': this.selected_button.landing+1 == 10 ? 'Touch Out' : this.selected_button.landing+1,
+                                    'game': this.cur_game});
+      }
+
+      // 無論如何只要按下送出都要清空選取項目
+      this.clearSelected();
+    },
+    deleteLocalRecord(record2delete){
+      // delete from local record
+      let indexOfTarget = this.records_local.indexOf(record2delete);
+      this.records_local.splice(indexOfTarget, 1);
+      
+      // delete from record to be pushed
+      if (record2delete.record_type == '對方得分' && record2delete.game == this.cur_game) {
+        this.scoring.opponent.cur_score--; // score adjustment
+        
+        // change "touch out" to numberic number
+        if (record2delete.landing == 'Touch Out')
+          record2delete.landing = 10;
+
+        let opponent = this.records_pushed[record2delete.game-1].placement[record2delete.landing-1].find(x => x.num == record2delete.num && x.pos == record2delete.position),
+            indexOfOpponent = this.records_pushed[record2delete.game-1].placement[record2delete.landing-1].indexOf(opponent);
+        
+        this.records_pushed[record2delete.game-1].placement[record2delete.landing-1].splice(indexOfOpponent, 1);
+      } else {
+        // score adjustment
+        if (record2delete.record_type.indexOf('失誤') != -1  && record2delete.game == this.cur_game)
+          this.scoring.opponent.cur_score--;
+        else if (record2delete.game == this.cur_game) // 刪掉我們得分的紀錄
+          this.scoring.host.cur_score--;
+
+        // record deletion
+        let engType = this.translateType2Eng[record2delete.record_type];
+        this.records_pushed[record2delete.game-1].ourteam[record2delete.name][engType]--;
+      }
+    },
+    sendRecord(whichBtn) {
       if (whichBtn == 'lower' && this.isOpponentScore) {
-        this.selected_button['opponent'] = this.opponent == '' ? 'none' : this.opponent;
+        // this.selected_button['opponent'] = this.opponent == '' ? 'none' : this.opponent;
         this.isOpponentScore = false;
           
-        console.log(this.selected_button);
         console.log(this.cur_game);
+        for (const [key, value] of Object.entries(this.selected_button))
+          console.log(key, value);
+
+        this.selected_button = {
+          'name': '',
+          'number': -1,
+          'position': '',
+          'record_type': '',
+          'landing': -1,  // 依照 placement 的 index (0~9)
+          'opponent': {'num': -1, 'pos': ''},
+          'game': this.cur_game
+        }
       } else { // whichBtn == upper
+        this.isOpponentScore = false;
+
+        console.log(this.cur_game);
+        for (const [key, value] of Object.entries(this.selected_button))
+          console.log(key, value);
+
+        this.selected_button = {
+          'name': '',
+          'number': -1,
+          'position': '',
+          'record_type': '',
+          'landing': -1,  // 依照 placement 的 index (0~9)
+          'opponent': {'num': -1, 'pos': ''},
+          'game': this.cur_game
+        }
         return;
       }
     },
     setCourtMem() {
-      this.selected_members = [{'name': '張祐誠', 'number': 27, 'position': 'OH'},
-                              {'name': '張祐誠', 'number': 22, 'position': 'MB'},
-                              {'name': '張祐誠', 'number': 23, 'position': 'S'},
-                              {'name': '張祐誠', 'number': 24, 'position': 'OP'},
-                              {'name': '張祐誠', 'number': 28, 'position': 'MB'},
-                              {'name': '張祐誠', 'number': 26, 'position': 'OH'},
-                              {'name': '張祐誠', 'number': 25, 'position': 'L'}];
+      this.selected_members = [{'name': '張祐1', 'number': 27, 'position': 'OH'},
+                              {'name': '張祐2', 'number': 22, 'position': 'MB'},
+                              {'name': '張祐3', 'number': 23, 'position': 'S'},
+                              {'name': '張祐4', 'number': 24, 'position': 'OP'},
+                              {'name': '張祐5', 'number': 28, 'position': 'MB'},
+                              {'name': '張祐6', 'number': 26, 'position': 'OH'},
+                              {'name': '張祐L', 'number': 25, 'position': 'L'}];
       console.log(this.selected_members);
+
     },
     checkSetCourtMem() {
+      // modal check
       for (let i = 0; i < 7; ++i) {
         if (Object.entries(this.selected_members[i]).length == 0) {
           this.isCourtMemSet = false;
@@ -439,43 +585,45 @@ export default {
       }
       this.isCourtMemSet = true;
 
-      for (let i = 0; i < 7; ++i)
-        console.log(this.selected_members[i]);
-      console.log(this.isCourtMemSet);
+      // add personal entry to "records_pushed"
+      for (let entry of Object.entries(this.selected_members)) {
+        if (!(entry[1].name in this.records_pushed[this.cur_game-1].ourteam)) {
+          this.records_pushed[this.cur_game-1].ourteam[entry[1].name] = { 
+            name: entry[1].name, pos: entry[1].position, number: entry[1].number,
+            attackPoint: 0, blockPoint: 0, servicePoint: 0,
+            attackError: 0, tossError: 0, blockError: 0, receiveError: 0, serviceError: 0
+          };
+        }
+      }
+      console.log(this.records_pushed[this.cur_game-1]);
     },
-    resetGame() {
-      this.cur_game = 1;
-      this.scoring['host']['cur_score'] = this.scoring['opponent']['cur_score'] = 0;
-      this.isCourtMemSet = false;
-      this.selected_button = {
-        'name': '',
-        'number': 0,
-        'record_type': '',
-        'pointed': '',  // 得分或失誤
-        'landing': '',
-        'opponent': '',
-        'game': this.cur_game
-      };
-      
-      // this.team_members = this.selected_members = [{}];
-    },
-    nextGame() {
+    nextGame(isEndGame) {
+      console.log('[nextGame]', this.cur_game);
       this.cur_game += 1;
+      console.log('[nextGame]', this.cur_game);
       
+      // judge who wins
       if (this.scoring['host']['cur_score'] > this.scoring['opponent']['cur_score'])
         this.scoring['host']['winned_game'] += 1;
       else 
         this.scoring['opponent']['winned_game'] += 1;
       
-      // send info & clear the record
-
-      // reset game
-      this.resetGame();
+      // reset variables
+      this.isCourtMemSet = false;
+      this.isOpponentScore = false;
+      this.clearSelected();
+      this.scoring.host.cur_score = this.scoring.opponent.cur_score = 0;
+      if (!isEndGame) { // 如果是最後一場就不用再新增了
+        this.records_pushed.push({ 
+          'ourteam': {},
+          'placement': [[], [], [], [], [], [], [], [], [], []] // 0~8: 1~9 九號位置 ; 9: touch out
+        });
+      }
     },
     endGame() {
-      this.nextGame();
-      this.scoring['host']['winned_game'] = this.scoring['opponent']['winned_game'] = 0;
-      this.selected_members = [{}, {}, {}, {}, {}, {}, {}];
+      this.nextGame(true);
+
+
     }
 
   }
