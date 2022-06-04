@@ -52,7 +52,7 @@
                   <i class="fa-regular fa-face-laugh"></i>&nbsp;我方得失紀錄
                 </span>
               </div>
-              <div class="card-body text-center">
+              <div class="card-body text-center" style="height: 250px; overflow-y:scroll">
                 <div class="table-responsive">
                   <table class="table table-striped align-middle text-nowrap">
                     <thead>
@@ -71,7 +71,7 @@
                         <th scope="col">總失<br>分</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="contestInfo.games[idx-1].ourTeam[0]!=''">
                       <tr v-for="(member,idx2) in contestInfo.games[idx-1].ourTeam" :key="idx2">
                         <td>
                           <div class="col-auto mx-2 my-2 d-flex align-items-center">
@@ -94,6 +94,11 @@
                         <td>{{member.receiveError}}</td>
                         <td>{{member.serviceError}}</td>
                         <td class="border-start">{{member.attackError + member.tossError + member.blockError + member.receiveError + member.serviceError}}</td>
+                      </tr>
+                    </tbody>
+                    <tbody v-else>
+                      <tr>
+                        <td v-for="idx in 12" :key="idx"> - </td>
                       </tr>
                     </tbody>
                   </table>

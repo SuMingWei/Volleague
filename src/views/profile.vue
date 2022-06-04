@@ -4,7 +4,7 @@
       <div class="col-md-3">  
         <div class="card border-0">
           <div class="card-body">
-            {{this.profile}}
+            <!-- {{this.profile}} -->
             <div >
               <img src="https://bootdey.com/img/Content/avatar/avatar7.png" class="img-radius rounded-circle img-thumbnail my-3 mx-3 align-self-middle" style="width:150px" alt="User-Profile-Image">
               <h5 class="fw-bold my-2">{{profile.name}}</h5>
@@ -62,62 +62,46 @@
             <div class="table-responsive">
               <table class="table table-striped align-middle text-nowrap">
                 <thead>
-                  <tr style="color:#2c3e50;">
-                    <th colspan="1"></th>
-                    <th colspan="4">得分</th>
-                    <th colspan="5">失誤</th>
-                  </tr>
-                  <tr style="background-color:#2c3e50; color:white">
+                  <tr class="align-middle" style="background-color:#2c3e50; color:white">
                     <th scope="col">比賽</th>
-                    <th scope="col">攻擊得分</th>
-                    <th scope="col">攔網得分</th>
-                    <th scope="col">發球得分</th>
-                    <th scope="col">總得分</th>
-                    <th scope="col">攻擊失誤</th>
-                    <th scope="col">攔網失誤</th>
-                    <th scope="col">發球失誤</th>
-                    <th scope="col">舉球失誤</th>
-                    <th scope="col">總失分</th>
+                    <th scope="col">攻擊<br>得分</th>
+                    <th scope="col">攔網<br>得分</th>
+                    <th scope="col">發球<br>得分</th>
+                    <th scope="col">總得<br>分</th>
+                    <th scope="col">攻擊<br>失誤</th>
+                    <th scope="col">舉球<br>失誤</th>
+                    <th scope="col">觸網<br>失誤</th>
+                    <th scope="col">接發<br>失誤</th>
+                    <th scope="col">發球<br>失誤</th>
+                    <th scope="col">總失<br>分</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
+                <tbody v-if="profile.StatisticsList[0]!=''">
+                  <tr v-for="(statistic,idx) in profile.StatisticsList" :key="idx">
                     <td>
-                      <div class=" text-center">
-                        <p class="mb-1">NCKU CSIE <span class="badge bg-main">VS</span> NCKU CE</p>
-                        <p class="mb-0 opacity-75">2022-01-02</p>
-                        <p class="mb-0 opacity-75">2:0</p> 
+                      <div class="text-center">
+                        <p class="mb-0">{{statistic.contest}}</p>
+                        <p class="mb-1">{{statistic.teamName}}&nbsp;<span class="badge bg-main">vs</span>&nbsp;{{statistic.opponent}}</p>
+                        <p class="mb-0 opacity-75">{{statistic.date}}</p>
+                        <p class="mb-0 opacity-75">{{statistic.score}}</p> 
                       </div>
                     </td>
-                    <td class="border-start">4</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>6</td>
-                    <td class="border-start">1</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>2</td>
+                    <td class="border-start">{{statistic.attackPoint}}</td>
+                    <td>{{statistic.blockPoint}}</td>
+                    <td>{{statistic.servicePoint}}</td>
+                    <td class="border-start">{{statistic.attackPoint + statistic.blockPoint + statistic.servicePoint}}</td>
+                    <td class="border-start">{{statistic.attackError}}</td>
+                    <td>{{statistic.tossError}}</td>
+                    <td>{{statistic.blockError}}</td>
+                    <td>{{statistic.receiveError}}</td>
+                    <td>{{statistic.serviceError}}</td>
+                    <td class="border-start">{{statistic.attackError + statistic.tossError + statistic.blockError + statistic.receiveError + statistic.serviceError}}</td>
                   </tr>
+                </tbody>
+                <tbody v-else>
                   <tr>
-                    <td>
-                      <div class=" text-center">
-                        <p class="mb-1">NCKU CSIE <span class="badge bg-main">VS</span> NCKU EE</p>
-                        <p class="mb-0 opacity-75">2022-01-03</p>
-                        <p class="mb-0 opacity-75">2:1</p> 
-                      </div>
-                    </td>
-                    <td class="border-start">3</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>4</td>
-                    <td class="border-start">1</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>1</td>
+                    <td v-for="idx in 10" :key="idx"> - </td>
                   </tr>
-                  
                 </tbody>
               </table>
             </div>
@@ -469,6 +453,9 @@ export default {
       this.personalInfo.name = this.profile.name;
       this.personalInfo.uid = this.id;
       this.teamInfo.members.push(this.personalInfo);
+      this.teamInfo.members.sort(function(a,b){
+        return a.number - b.number;
+      })
       var team = this.options.find(element => element["name"] == teamname);
       this.$http.patch(this.db + 'team/' + team["teamid"] + '.json',{members: this.teamInfo.members});
       // clear
