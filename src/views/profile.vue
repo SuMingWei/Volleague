@@ -100,7 +100,7 @@
                 </tbody>
                 <tbody v-else>
                   <tr>
-                    <td v-for="idx in 10" :key="idx"> - </td>
+                    <td v-for="idx in 11" :key="idx"> - </td>
                   </tr>
                 </tbody>
               </table>
