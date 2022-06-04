@@ -3,13 +3,13 @@
     <div class="card text-center">
       <div class="d-flex align-items-center text-start mx-3 my-3 justify-content-between">
         <router-link :to="`/home/${uid}/team/${teamid}`" class="btn d-flex align-items-center fs-5" style="color:#2c3e50">
-          <i class="fa-solid fa-arrow-left fs-2" style="color:#2c3e50"></i>&nbsp;返回
+          <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
         </router-link>
         <div class="text-center">
           <p class="mb-0 fs-5 fw-bolder">{{contestInfo.contest}}</p>
           <p class="mb-0 fw-bold">{{contestInfo.date}}</p>
         </div>
-        <router-link to="/scoring" class="btn btn-outline-dark">
+        <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn btn-outline-dark">
           前往計分
         </router-link>
       </div>

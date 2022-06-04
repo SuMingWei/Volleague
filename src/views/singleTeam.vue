@@ -1,46 +1,17 @@
 <template>
   <div class="row py-4 px-4" style="background-color:#EAECEE"> 
     <div class="d-flex align-items-center justify-content-between text-start mb-3">
-      <button class="btn d-flex align-items-center fs-5" style="color:#2c3e50" @click="$router.push('/home/'+ uid + '/profile')"><i class="fa-solid fa-arrow-left fs-2" style="color:#2c3e50"></i>&nbsp;返回</button>
+      <button class="btn d-flex align-items-center fs-5" style="color:#2c3e50" @click="$router.push('/home/'+ uid + '/profile')">
+        <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
+      </button>
       <span class="fs-2 fw-bolder">{{teamInfo.teamName}}</span>
       <button class="btn align-center" style="color:#EAECEE" :disabled="true"><i class="fa-solid fa-arrow-left fs-2" style="color:#EAECEE"></i>&nbsp;返回</button>
     </div>
     <div class="col-md-8 col-lg-8 mx-auto "> 
-      
       <!-- {{teamid}}
       {{teamInfo}} -->
       <div class="card" >
         <div class="card-body"> 
-          <div class="my-3 mx-3 card fw-bold">
-            <div class="card-head py-2" style="background-color:#E5E8E8">
-              <span class="fw-bolder fs-5">
-                <i class="fa-solid fa-bullhorn mx-2"></i> 佈告欄
-              </span>
-            </div>
-            <div class="card-body text-start">
-              <p style="white-space: pre-line;">{{teamInfo.bulletin}}</p>
-            </div>
-            <div class="d-block text-end ">
-              <button @click="editBulletinModal=true" class="btn text-black-50 me-2 mb-2" ><i class="fa-solid fa-pencil fs-5"></i></button>
-            </div>
-          </div>
-          <div class="my-3 mx-3 card fw-bold">
-            <div class="card-head py-2" style="background-color:#E5E8E8">
-              <span class="fw-bolder fs-5">
-                <i class="fa-solid fa-trophy mx-2"></i> 比賽得名
-              </span>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-auto mx-2 my-2 d-flex align-items-center" v-for="award in teamInfo.awards" :key="award">
-                  <span class="badge bg-light text-dark text-nowrap fs-6">{{award}}</span>
-                </div>
-              </div>
-            </div>
-            <div class="d-block text-end ">
-              <button @click="editAwardsModal=true" class="btn text-black-50 me-2 mb-2"><i class="fa-solid fa-pencil fs-5"></i></button>
-            </div>
-          </div>
           <div class="my-3 mx-3 card fw-bold">
             <div class="card-head py-2" style="background-color:#E5E8E8">
               <span class="fw-bolder fs-5">
@@ -94,61 +65,6 @@
               </div>
             </div>
           </div>  
-        </div>
-      </div>
-    </div>
-    <!-- Modal edit bulletin-->
-    <div v-if="editBulletinModal">
-      <div name="modal fade">
-        <div class="modal-mask">
-          <div class="modal-wrapper">
-            <div class="modal-dialog"> 
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title">編輯佈告欄</h4>
-                  <button type="button" class="btn-close" @click="editBulletinModal=false"></button>
-                </div>
-                <div class="modal-body">
-                  <div class="form-group mb-2">
-                    <textarea class="form-control" v-model="teamInfo.bulletin" />
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button class="btn teambtn" @click="editBulletin">儲存</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Modal edit awards-->
-    <div v-if="editAwardsModal">
-      <div name="modal fade">
-        <div class="modal-mask">
-          <div class="modal-wrapper">
-            <div class="modal-dialog"> 
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title">新增比賽得名</h4>
-                  <button type="button" class="btn-close" @click="editAwardsModal=false"></button>
-                </div>
-                <div class="modal-body">
-                  <div class="form-group mb-2">
-                    <label>獎項</label>
-                    <div class="d-flex gap-3">
-                      <input type="text" class="form-control col" v-model="newAward.year" placeholder="年份"/>
-                      <input type="text" class="form-control col" v-model="newAward.contest" placeholder="比賽"/>
-                      <input type="text" class="form-control col" v-model="newAward.award" placeholder="名次"/>
-                    </div>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button class="btn teambtn" @click="editAwards" :disabled="newAward.year=='' || newAward.contest=='' || newAward.award==''">新增</button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -219,17 +135,10 @@ export default {
       db: 'https://volleague-default-rtdb.firebaseio.com/',
       teamInfo:{
         teamName: '',
-        bulletin: '',
-        awards: [''],
         members: [],
         contestRecords: [''],
       },
       allContest: [],
-      newAward: {
-        year: '',
-        contest: '',
-        award: '',
-      },
       newContest: {
         opponent: '',
         contest: '',
@@ -269,8 +178,6 @@ export default {
           'touchout': [''],
         }
       },
-      editBulletinModal: false,
-      editAwardsModal: false,
       addContestModal:false,
     }
   },
@@ -283,25 +190,6 @@ export default {
     })
   },
   methods: {
-    editBulletin(){
-      // console.log(this.teamInfo.bulletin);
-      this.$http.patch(this.db + 'team/' + this.teamid + '.json', {bulletin: this.teamInfo.bulletin}).then(function(data){
-        console.log(data);
-        this.editBulletinModal = false;
-      })
-    },
-    editAwards(){
-      var awardTitle = this.newAward.year + ' ' + this.newAward.contest + ' ' + this.newAward.award;
-      if(this.teamInfo.awards[0] == ''){
-        this.teamInfo.awards[0] = awardTitle;
-      }else{
-        this.teamInfo.awards.push(awardTitle);
-      }
-      this.$http.patch(this.db + 'team/' + this.teamid + '.json', {awards: this.teamInfo.awards}).then(function(data){
-        console.log(data);
-        this.editAwardsModal = false;
-      })
-    },
     addContest(){
       // console.log(this.newContest);
       var gameArr = [];

@@ -207,10 +207,6 @@
                     <label>隊名</label>
                     <input type="text" class="form-control" v-model="newTeam.teamName" />
                   </div>
-                  <div class="form-group mb-2">
-                    <label>佈告欄</label>
-                    <textarea class="form-control" v-model="newTeam.bulletin" />
-                  </div>
                   <div class="form-group">
                     <label>個人資訊</label>
                   </div>
@@ -327,8 +323,6 @@ export default {
       errorMessage: '',
       newTeam:{
         teamName: '',
-        bulletin: '',
-        awards: [''],
         members: [],
         contestRecords: [''],
       },
@@ -336,6 +330,7 @@ export default {
         number: '',
         position: '',
         name: '',
+        uid: '',
       },
       teamInfo: {
         teamName: '',
@@ -391,6 +386,7 @@ export default {
         }else{
           // create team
           this.personalInfo.name = this.profile.name;
+          this.personalInfo.uid = this.id;
           this.newTeam.members.push(this.personalInfo);
           this.$http.post(this.db + 'team.json',this.newTeam).then(function(data){
             console.log(data);
@@ -405,8 +401,6 @@ export default {
             // clear 
             this.newTeam = {
               teamName: '',
-              bulletin: '',
-              awards: [''],
               members: [],
               contestRecords: [''],
             };
@@ -414,6 +408,7 @@ export default {
               number: '',
               position: '',
               name: '',
+              id: '',
             };
             this.createTeamModal=false;
             //update options
@@ -454,6 +449,7 @@ export default {
       this.$http.patch(this.db + 'user/' + this.id + '.json', {teamList: this.profile.teamList});
       // add new member to this team 
       this.personalInfo.name = this.profile.name;
+      this.personalInfo.uid = this.id;
       this.teamInfo.members.push(this.personalInfo);
       var team = this.options.find(element => element["name"] == teamname);
       this.$http.patch(this.db + 'team/' + team["teamid"] + '.json',{members: this.teamInfo.members});
@@ -462,6 +458,7 @@ export default {
         number: '',
         position: '',
         name: '',
+        id: '',
       };
       this.teamInfoModal = false;
       
