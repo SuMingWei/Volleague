@@ -43,10 +43,10 @@
                   <i class="fa-solid fa-plus"></i> 新增比賽
                 </button>
               </div>
-              <div class="d-flex gap-3 justify-content-center mb-2">
+              <!-- <div class="d-flex gap-3 justify-content-center mb-2">
                 <button @click="addPoint" class="btn btn-warning">紀錄得分</button>
-              </div>
-              <div class="list-group" style="height: 230px; overflow-y:scroll">
+              </div> -->
+              <div v-if="teamInfo.contestRecords[0] != ''" class="list-group" style="height: 230px; overflow-y:scroll">
                 <div v-for="(item,idx) in teamInfo.contestRecords" :key="idx" class="list-group-item d-flex justify-content-between list-group-item-action">
                   <div class=" text-center">
                     <p class="mb-0">{{item.contest}}</p>
@@ -62,6 +62,9 @@
                     <router-link :to="`/home/${uid}/team/${teamid}/record/${item.key}`" class="btn btn-sm btn-success">紀錄</router-link>
                   </div>
                 </div>
+              </div>
+              <div v-else class="list-group-item d-flex justify-content-center align-items-center list-group-item-action">
+                <p class="my-2 text-secondary">現在還沒有比賽</p>
               </div>
             </div>
           </div>  
