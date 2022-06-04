@@ -1,10 +1,11 @@
 <template>
   <div>
     <div class="card text-center">
+      <!-- 返回按鈕 -->
       <div class="col-md-12 col-lg-12">
         <div class="d-flex mt-2 align-items-center">
           <!-- <form class="mt-2 mb-1 text-center"> -->
-            <router-link to="/singleteam" class="btn d-flex align-items-center fs-4 " style="color:#495057">
+            <router-link :to="`/home/${id}/team/-N3Y9keHSq7-qsPq57AU`" class="btn d-flex align-items-center fs-4 " style="color:#495057">
               <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;回隊伍頁面
             </router-link>
           <!-- </form> -->
@@ -12,7 +13,7 @@
       </div>
 
       <!-- 計分表 -->
-      <div class="card-body pt-1 pb-1 mx-1">
+      <div class="card-body py-2 mx-1">
         <div class="card" style="border: none">
           <!-- 隊伍 & 局數 & 分數 -->
           <div class="d-grid score-board text-center">
@@ -342,17 +343,17 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 
 <script>
 export default {
-  props: ['uid'],
   data() {
     return {
       cur_game: 1,
+      id: this.uid,
+      db: 'https://volleague-default-rtdb.firebaseio.com/',
       isCourtMemSet: false, // bind to court member section
       isOpponentScore: false, // bind to button, '對方得分'
       positions: ['OH', 'OP', 'MB', 'S', 'L'],
@@ -401,26 +402,6 @@ export default {
                     {'name': '張祐6', 'number': 27, 'position': 'OH'},
                     {'name': '張祐7', 'number': 28, 'position': 'MB'},
                     {'name': '張祐L', 'number': 29, 'position': 'S'}], // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
-
-
-      // records_local: [{'num': 22, 'name': '張祐誠', 'position': 'MB', 'record': '攻擊得分', 'opponent': 'none', 'landing': '3', 'game': 1},
-      //           {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record': '攔網失誤', 'opponent': '43', 'landing': '7', 'game': 1},
-      //           {'num': 2, 'name': '張張張', 'position': 'S', 'record': '舉球得分', 'opponent': 'none', 'landing': '8', 'game': 1}],
-      // team_members:[{'name': '張祐誠', 'number': 22, 'position': 'MB'},
-      //               {'name': '張祐誠', 'number': 23, 'position': 'S'},
-      //               {'name': '張祐誠', 'number': 24, 'position': 'OP'},
-      //               {'name': '張祐誠', 'number': 25, 'position': 'L'},
-      //               {'name': '張祐誠', 'number': 26, 'position': 'OH'},
-      //               {'name': '張祐誠', 'number': 27, 'position': 'OH'},
-      //               {'name': '張祐誠', 'number': 28, 'position': 'MB'},
-      //               {'name': '張祐誠', 'number': 29, 'position': 'S'}],
-      // selected_members:[{'name': '張祐誠', 'number': 27, 'position': 'OH'},
-      //                   {'name': '張祐誠', 'number': 23, 'position': 'S'},
-      //                   {'name': '張祐誠', 'number': 24, 'position': 'OP'},
-      //                   {'name': '張祐誠', 'number': 26, 'position': 'OH'},
-      //                   {'name': '張祐誠', 'number': 22, 'position': 'MB'},
-      //                   {'name': '張祐誠', 'number': 28, 'position': 'MB'},
-      //                   {'name': '張祐誠', 'number': 25, 'position': 'L'}],
     }
   },
   methods: {
@@ -623,9 +604,7 @@ export default {
     endGame() {
       this.nextGame(true);
 
-
     }
-
   }
 }
 
