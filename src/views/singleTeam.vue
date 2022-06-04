@@ -1,117 +1,118 @@
 <template>
-  <div class="row py-4 px-4" style="background-color:#EAECEE"> 
-    <div class="d-flex align-items-center justify-content-between text-start mb-3">
-      <button class="btn d-flex align-items-center fs-5" style="color:#2c3e50" @click="$router.push('/home/'+ uid + '/profile')">
-        <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
-      </button>
-      <span class="fs-2 fw-bolder">{{teamInfo.teamName}}</span>
-      <button class="btn align-center" style="color:#EAECEE" :disabled="true"><i class="fa-solid fa-arrow-left fs-2" style="color:#EAECEE"></i>&nbsp;返回</button>
-    </div>
-    <div class="col-md-8 col-lg-8 mx-auto "> 
+  <div>
+    <div class="card text-center border-0"> 
+      <div class="d-flex align-items-center text-start mx-3 mt-3 justify-content-between">
+        <button class="btn d-flex align-items-center fs-5" style="color:#2c3e50" @click="$router.push('/home/'+ uid + '/profile')">
+          <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
+        </button>
+        <span class="fs-2 fw-bolder">{{teamInfo.teamName}}</span>
+        <button class="btn align-center" style="color:white" :disabled="true"><i class="fa-solid fa-arrow-left fs-2" style="color:white"></i>&nbsp;返回</button>
+      </div>
       <!-- {{teamid}}
       {{teamInfo}} -->
-      <div class="card" >
-        <div class="card-body"> 
-          <div class="my-3 mx-3 card fw-bold">
-            <div class="card-head py-2" style="background-color:#E5E8E8">
-              <span class="fw-bolder fs-5">
-                <i class="fa-solid fa-person mx-2"></i> 成員
-              </span>
-            </div>
-            <div class="card-body text-start">
-              <div  class="row">
-                <div class=" col-auto mx-2 my-2 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
-                  <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                  <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                  <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
-                  <span v-else-if="mem.position=='O'" class="badge bg-primary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                  <span v-else-if="mem.position=='L'" class="badge bg-secondary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                  <span class="text-nowrap">{{mem.name}}</span>
-                </div>
+      <div class="card border-0" >
+        <div class="my-3 mx-3 card fw-bold">
+          <div class="card-head py-2" style="background-color:#E5E8E8">
+            <span class="fw-bolder fs-5">
+              <i class="fa-solid fa-person mx-2"></i> 成員
+            </span>
+          </div>
+          <div class="card-body text-start">
+            <div  class="row">
+              <div class=" col-auto mx-0 my-1 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
+                <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
+                <span v-else-if="mem.position=='O'" class="badge bg-primary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                <span v-else-if="mem.position=='L'" class="badge bg-secondary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                <span class="text-nowrap">{{mem.name}}</span>
               </div>
             </div>
           </div>
-          <div class="my-3 mx-3 card fw-bold">
-            <div class="card-head py-2" style="background-color:#E5E8E8">
-              <span class="fw-bolder fs-5">
-                <i class="fa-solid fa-clipboard mx-2"></i> 比賽紀錄
-              </span>
-            </div>
-            <div class="card-body text-start">
-              <div class="d-block text-end mb-0">
-                <button @click="addContestModal=true" class="btn btn-outline-dark">
-                  <i class="fa-solid fa-plus"></i> 新增比賽
-                </button>
-              </div>
-              <!-- <div class="d-flex gap-3 justify-content-center mb-2">
-                <button @click="addPoint" class="btn btn-warning">紀錄得分</button>
-              </div> -->
-              <div v-if="teamInfo.contestRecords[0] != ''" class="list-group" style="height: 230px; overflow-y:scroll">
-                <div v-for="(item,idx) in teamInfo.contestRecords" :key="idx" class="list-group-item d-flex justify-content-between list-group-item-action">
-                  <div class=" text-center">
-                    <p class="mb-0">{{item.contest}}</p>
-                    <!-- <p class="mb-1"><i class="fa-solid fa-hand-fist"></i> {{item.opponent}}</p> -->
-                    <p class="mb-0">vs <span class="badge bg-main">{{item.opponent}}</span></p>
-                    <p class="mb-0 opacity-75">{{item.date}}</p>
-                  </div>
-                  <div class="d-flex align-items-center">
-                    <p class="mb-0">{{item.score}}</p> 
-                  </div>
-                  <div class="d-grid gap-2 text-center">
-                    <router-link :to="`/home/${uid}/team/${teamid}/scoring/${item.key}`" class="btn btn-sm btn-primary">計分</router-link>
-                    <router-link :to="`/home/${uid}/team/${teamid}/record/${item.key}`" class="btn btn-sm btn-success">紀錄</router-link>
-                  </div>
-                </div>
-              </div>
-              <div v-else class="list-group-item d-flex justify-content-center align-items-center list-group-item-action">
-                <p class="my-2 text-secondary">現在還沒有比賽</p>
-              </div>
-            </div>
-          </div>  
         </div>
+        <div class="my-3 mx-3 card fw-bold">
+          <div class="card-head py-2" style="background-color:#E5E8E8">
+            <span class="fw-bolder fs-5">
+              <i class="fa-solid fa-clipboard mx-2"></i> 比賽紀錄
+            </span>
+          </div>
+          <div class="card-body text-start">
+            <div class="d-block text-end mb-3">
+              <button @click="addContestModal=true" class="btn btn-outline-dark">
+                <i class="fa-solid fa-plus"></i> 新增比賽
+              </button>
+            </div>
+            <!-- <div class="d-flex gap-3 justify-content-center mb-2">
+              <button @click="addPoint" class="btn btn-warning">紀錄得分</button>
+            </div> -->
+            <div v-if="teamInfo.contestRecords[0] != ''" class="list-group" style="height: 350px; overflow-y:scroll">
+              <div v-for="(item,idx) in teamInfo.contestRecords" :key="idx" class="list-group-item d-flex justify-content-between list-group-item-action">
+                <div class=" text-center">
+                  <p class="mb-0 fs-5">{{item.contest}}</p>
+                  <!-- <p class="mb-1"><i class="fa-solid fa-hand-fist"></i> {{item.opponent}}</p> -->
+                  <p class="mb-1">vs <span class="badge bg-main">{{item.opponent}}</span></p>
+                  <p class="mb-0 opacity-75">{{item.date}}</p>
+                </div>
+                <div class="d-flex align-items-center">
+                  <p class="mb-0 fs-4">{{item.score}}</p> 
+                </div>
+                <div class="d-grid gap-2 text-center">
+                  <router-link :to="`/home/${uid}/team/${teamid}/scoring/${item.key}`" class="btn btn-primary">計分</router-link>
+                  <router-link :to="`/home/${uid}/team/${teamid}/record/${item.key}`" class="btn btn-success">紀錄</router-link>
+                </div>
+              </div>
+            </div>
+            <div v-else class="list-group-item d-flex justify-content-center align-items-center list-group-item-action">
+              <p class="my-2 text-secondary">現在還沒有比賽</p>
+            </div>
+          </div>
+        </div>  
       </div>
-    </div>
-    <!-- Modal add contest-->
-    <div v-if="addContestModal">
-      <div name="modal fade">
-        <div class="modal-mask">
-          <div class="modal-wrapper">
-            <div class="modal-dialog"> 
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title"><i class="fa-solid fa-volleyball fs-4"></i>&nbsp;&nbsp;新比賽</h4>
-                  <button type="button" class="btn-close" @click="addContestModal=false"></button>
-                </div>
-                <div class="modal-body">
-                  <div class="form-group mb-2">
-                    <label>對手</label>
-                    <input type="text" class="form-control" v-model="newContest.opponent" />
+      <!-- Modal add contest-->
+      <div v-if="addContestModal">
+        <div name="modal fade">
+          <div class="modal-mask">
+            <div class="modal-wrapper">
+              <div class="modal-dialog"> 
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title"><i class="fa-solid fa-volleyball fs-4"></i>&nbsp;&nbsp;新比賽</h4>
+                    <button type="button" class="btn-close" @click="addContestModal=false"></button>
                   </div>
-                  <div class="d-flex gap-3 mb-2">
-                    <div class="col">
-                      <label>盃賽</label>
-                      <input type="text" class="form-control" v-model="newContest.contest" />
+                  <div class="modal-body">
+                    <div class="form-group mb-2">
+                      <label>對手</label>
+                      <input type="text" class="form-control" v-model="newContest.opponent" />
                     </div>
-                    <div class="col">
-                      <label>局數</label>
-                      <select class="form-select" v-model="newContest.gamesNum">
-                        <option>1</option>
-                        <option>2</option>
-                        <option selected>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                      </select>
+                    <div class="d-flex gap-3 mb-2">
+                      <div class="col">
+                        <label>盃賽</label>
+                        <input type="text" class="form-control" v-model="newContest.contest" />
+                      </div>
+                      <div class="col">
+                        <label>局數</label>
+                        <select class="form-select" v-model="newContest.gamesNum">
+                          <option>1</option>
+                          <option>2</option>
+                          <option selected>3</option>
+                          <option>4</option>
+                          <option>5</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>日期</label>
+                    </div>
+                    <div class="form-group">
+                      <date-picker v-model="newContest.date" valueType="format"></date-picker>
                     </div>
                   </div>
-                  <div class="form-group">
-                    <label>日期</label>
+                  <div class="modal-footer">
+                    <button class="btn teambtn"
+                            @click="addContest"
+                            :disabled="newContest.opponent=='' || newContest.contest=='' || 
+                              newContest.gamesNum=='' || newContest.date==''" >新增</button>
                   </div>
-                  <div class="form-group">
-                    <date-picker v-model="newContest.date" valueType="format"></date-picker>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button @click="addContest" class="btn teambtn">新增</button>
                 </div>
               </div>
             </div>

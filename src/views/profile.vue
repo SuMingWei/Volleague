@@ -1,129 +1,125 @@
 <template>
-  <div class="row py-4 px-4" style="background-color:#EAECEE"> 
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-3">  
-          <div class="card" >
-            <div class="card-body">
-              {{this.profile}}
-              <div >
-                <img src="https://bootdey.com/img/Content/avatar/avatar7.png" class="img-radius rounded-circle img-thumbnail my-3 mx-3 align-self-middle" style="width:150px" alt="User-Profile-Image">
-                <h5 class="fw-bold my-2">{{profile.name}}</h5>
-                <h6 class=" my-2">{{profile.birthday.year}} | {{profile.birthday.month}} | {{profile.birthday.day}}</h6>
-                <span v-for="pos in profile.position" :key="pos">
-                  <span v-if="pos=='OH'" class="badge bg-danger text-wrap mx-1">Outside Hitter</span>
-                  <span v-else-if="pos=='MB'" class="badge bg-warning text-wrap mx-1">Middle Blocker</span>
-                  <span v-else-if="pos=='S'" class="badge bg-success text-w rap mx-1">Setter</span>
-                  <span v-else-if="pos=='O'" class="badge bg-primary text-wrap mx-1">Opposite</span>
-                  <span v-else-if="pos=='L'" class="badge bg-secondary text-wrap mx-1">Libero</span>
-                </span>
-              </div>
-              <div>
-                <button class="btn border-secondary text-secondary text-muted mt-3" style="width:150px" @click="editProfileModal=true">編輯個人檔案</button>
-              </div>
+  <div class="card border-0"> 
+    <div class="row justify-content-center">
+      <div class="col-md-3">  
+        <div class="card border-0">
+          <div class="card-body">
+            {{this.profile}}
+            <div >
+              <img src="https://bootdey.com/img/Content/avatar/avatar7.png" class="img-radius rounded-circle img-thumbnail my-3 mx-3 align-self-middle" style="width:150px" alt="User-Profile-Image">
+              <h5 class="fw-bold my-2">{{profile.name}}</h5>
+              <h6 class=" my-2">{{profile.birthday.year}} | {{profile.birthday.month}} | {{profile.birthday.day}}</h6>
+              <span v-for="pos in profile.position" :key="pos">
+                <span v-if="pos=='OH'" class="badge bg-danger text-wrap mx-1">Outside Hitter</span>
+                <span v-else-if="pos=='MB'" class="badge bg-warning text-wrap mx-1">Middle Blocker</span>
+                <span v-else-if="pos=='S'" class="badge bg-success text-w rap mx-1">Setter</span>
+                <span v-else-if="pos=='O'" class="badge bg-primary text-wrap mx-1">Opposite</span>
+                <span v-else-if="pos=='L'" class="badge bg-secondary text-wrap mx-1">Libero</span>
+              </span>
+            </div>
+            <div>
+              <button class="btn border-secondary text-secondary text-muted mt-3" style="width:150px" @click="editProfileModal=true">編輯個人檔案</button>
             </div>
           </div>
         </div>
-        <div class="col-md-7">  
-          <div class="card" >
-            <div class="my-3 mx-3 card fw-bold">
-              <div class="card-head py-2" style="background-color:#E5E8E8">
-                <span>
-                  <i class="fa-solid fa-people-group mx-2"/> 隊伍資訊
-                </span>
-              </div>
-              <div class="card-body fs-3 text-start">
-                <div>
-                  <div class="d-flex my-2">
-                    <button class="btn btn-outline-dark me-3 text-nowrap" @click="createTeamModal=true">
-                      <i class="fa-solid fa-plus"></i> 建立隊伍
-                    </button>
-                    <dropSearch class="form-control" 
-                                :options="options"
-                                :disabled="false"
-                                :placeholder="'搜尋隊伍...'"
-                                v-on:selected="validateSelection">
-                    </dropSearch>
-                  </div>
-                </div>
-                <hr>
-                <div>
-                  <span v-for="team in profile.teamList" :key="team">
-                    <router-link :to="`/home/${id}/team/${getTeamID(team)}`" v-if="team!=''" class="btn teambtn me-2 mb-2 fw-bolder">{{team}}</router-link>
-                  </span>
-                </div>
+      </div>
+      <div class="card border-0">  
+        <div class="my-3 mx-3 card fw-bold">
+          <div class="card-head py-2" style="background-color:#E5E8E8">
+            <span>
+              <i class="fa-solid fa-people-group mx-2"/> 隊伍資訊
+            </span>
+          </div>
+          <div class="card-body fs-3 text-start">
+            <div>
+              <div class="d-flex my-2">
+                <button class="btn btn-outline-dark me-3 text-nowrap" @click="createTeamModal=true">
+                  <i class="fa-solid fa-plus"></i> 建立隊伍
+                </button>
+                <dropSearch class="form-control" 
+                            :options="options"
+                            :disabled="false"
+                            :placeholder="'搜尋隊伍...'"
+                            v-on:selected="validateSelection">
+                </dropSearch>
               </div>
             </div>
-            <div class="my-3 mx-3 card fw-bold">
-              <div class="card-head py-2" style="background-color:#E5E8E8">
-                <span>
-                  <i class="fa-solid fa-chart-simple mx-2"/> 個人數據紀錄
-                </span>
-              </div>
-              <div class="card-body" style="height: 500px; overflow-y:scroll">
-                <div class="table-responsive">
-                  <table class="table table-striped align-middle text-nowrap">
-                    <thead>
-                      <tr style="color:#2c3e50;">
-                        <th colspan="1"></th>
-                        <th colspan="4">得分</th>
-                        <th colspan="5">失誤</th>
-                      </tr>
-                      <tr style="background-color:#2c3e50; color:white">
-                        <th scope="col">比賽</th>
-                        <th scope="col">攻擊得分</th>
-                        <th scope="col">攔網得分</th>
-                        <th scope="col">發球得分</th>
-                        <th scope="col">總得分</th>
-                        <th scope="col">攻擊失誤</th>
-                        <th scope="col">攔網失誤</th>
-                        <th scope="col">發球失誤</th>
-                        <th scope="col">舉球失誤</th>
-                        <th scope="col">總失分</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>
-                          <div class=" text-center">
-                            <p class="mb-1">NCKU CSIE <span class="badge bg-main">VS</span> NCKU CE</p>
-                            <p class="mb-0 opacity-75">2022-01-02</p>
-                            <p class="mb-0 opacity-75">2:0</p> 
-                          </div>
-                        </td>
-                        <td class="border-start">4</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>6</td>
-                        <td class="border-start">1</td>
-                        <td>1</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>2</td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class=" text-center">
-                            <p class="mb-1">NCKU CSIE <span class="badge bg-main">VS</span> NCKU EE</p>
-                            <p class="mb-0 opacity-75">2022-01-03</p>
-                            <p class="mb-0 opacity-75">2:1</p> 
-                          </div>
-                        </td>
-                        <td class="border-start">3</td>
-                        <td>0</td>
-                        <td>1</td>
-                        <td>4</td>
-                        <td class="border-start">1</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>1</td>
-                      </tr>
-                      
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+            <hr>
+            <div>
+              <span v-for="team in profile.teamList" :key="team">
+                <router-link :to="`/home/${id}/team/${getTeamID(team)}`" v-if="team!=''" class="btn teambtn me-2 mb-2 fw-bolder">{{team}}</router-link>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="my-3 mx-3 card fw-bold">
+          <div class="card-head py-2" style="background-color:#E5E8E8">
+            <span>
+              <i class="fa-solid fa-chart-simple mx-2"/> 個人數據紀錄
+            </span>
+          </div>
+          <div class="card-body" style="height: 500px; overflow-y:scroll">
+            <div class="table-responsive">
+              <table class="table table-striped align-middle text-nowrap">
+                <thead>
+                  <tr style="color:#2c3e50;">
+                    <th colspan="1"></th>
+                    <th colspan="4">得分</th>
+                    <th colspan="5">失誤</th>
+                  </tr>
+                  <tr style="background-color:#2c3e50; color:white">
+                    <th scope="col">比賽</th>
+                    <th scope="col">攻擊得分</th>
+                    <th scope="col">攔網得分</th>
+                    <th scope="col">發球得分</th>
+                    <th scope="col">總得分</th>
+                    <th scope="col">攻擊失誤</th>
+                    <th scope="col">攔網失誤</th>
+                    <th scope="col">發球失誤</th>
+                    <th scope="col">舉球失誤</th>
+                    <th scope="col">總失分</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class=" text-center">
+                        <p class="mb-1">NCKU CSIE <span class="badge bg-main">VS</span> NCKU CE</p>
+                        <p class="mb-0 opacity-75">2022-01-02</p>
+                        <p class="mb-0 opacity-75">2:0</p> 
+                      </div>
+                    </td>
+                    <td class="border-start">4</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>6</td>
+                    <td class="border-start">1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>2</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class=" text-center">
+                        <p class="mb-1">NCKU CSIE <span class="badge bg-main">VS</span> NCKU EE</p>
+                        <p class="mb-0 opacity-75">2022-01-03</p>
+                        <p class="mb-0 opacity-75">2:1</p> 
+                      </div>
+                    </td>
+                    <td class="border-start">3</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>4</td>
+                    <td class="border-start">1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -228,7 +224,9 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button class="btn teambtn" @click="createTeam">建立</button>
+                  <button class="btn teambtn" 
+                          :disabled="newTeam.teamName=='' || personalInfo.number=='' || personalInfo.position==''" 
+                          @click="createTeam">建立</button>
                 </div>
               </div>
             </div>
@@ -252,14 +250,18 @@
                   <div class="form-group">
                     <label>成員</label>
                   </div>
-                  <div  class="row">
-                    <div class=" col-auto mx-2 my-2 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
-                      <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                      <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                      <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
-                      <span v-else-if="mem.position=='O'" class="badge bg-primary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                      <span v-else-if="mem.position=='L'" class="badge bg-secondary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                      <span class="text-nowrap">{{mem.name}}</span>
+                  <div class="card mb-2">
+                    <div class="container">
+                    <div class="row my-2">
+                      <div class="col-auto mx-0 my-1 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
+                        <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                        <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                        <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
+                        <span v-else-if="mem.position=='O'" class="badge bg-primary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                        <span v-else-if="mem.position=='L'" class="badge bg-secondary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                        <span class="text-nowrap">{{mem.name}}</span>
+                      </div>
+                    </div>
                     </div>
                   </div>
                   <div class="form-group">
@@ -283,7 +285,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button class="btn teambtn" :disabled="profile.teamList.includes(teamInfo.teamName)" @click="JoinTeam(teamInfo.teamName)">加入</button>
+                  <button class="btn teambtn" :disabled="profile.teamList.includes(teamInfo.teamName) || (personalInfo.number == '' || personalInfo.position == '')" @click="JoinTeam(teamInfo.teamName)">加入</button>
                 </div>
               </div>
             </div>
@@ -354,6 +356,12 @@ export default {
     this.getAllTeam();
   },
   methods: {
+    getTeamID(teamname){
+      var team = this.options.find(element => element["name"] == teamname);
+      if(team != undefined){
+        return team["teamid"];
+      }
+    },
     changeProfile(){
       var updateData = {
         name: this.profile.name,
@@ -364,10 +372,26 @@ export default {
         },
         position: this.profile.position,
       }
-      this.$http.patch(this.db + 'user/' + this.id + '.json', updateData).then(function(data){
-        console.log(data);
-        this.editProfileModal=false;
-      })
+      this.$http.patch(this.db + 'user/' + this.id + '.json', updateData);
+
+      var tempTeam = {};
+      var tempID = this.id;
+      var tempName = this.profile.name;
+      for(let key in this.profile.teamList){
+        this.$http.get(this.db + 'team/' + this.getTeamID(this.profile.teamList[key])+ '.json').then(function(data){
+          return data.json();
+        }).then(function(data){
+          tempTeam = data;
+          tempTeam.members.find(function(value,index){
+            if(value.uid == tempID){
+              tempTeam.members[index].name = tempName;
+            }
+          });
+        }).then(function(){
+          this.$http.patch(this.db + 'team/' + this.getTeamID(this.profile.teamList[key]) + '.json', {members: tempTeam.members});
+        })
+      }
+      this.editProfileModal=false;
     },
     createTeam(){
       // get all team
@@ -431,12 +455,6 @@ export default {
         teamArr.sort();
         this.options = teamArr;
       })
-    },
-    getTeamID(teamname){
-      var team = this.options.find(element => element["name"] == teamname);
-      if(team != undefined){
-        return team["teamid"];
-      }
     },
     JoinTeam(teamname){
       // console.log(teamname);
