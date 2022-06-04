@@ -604,6 +604,9 @@ export default {
     endGame() {
       this.nextGame(true);
 
+      // push to two place:
+      // 1. contest games
+      // 2. member: statistic list
     }
   }
 }
