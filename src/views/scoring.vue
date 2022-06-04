@@ -1,15 +1,21 @@
 <template>
   <div>
     <div class="card text-center">
+      <div>
+        <!-- {{ uid }} | {{ teamid }} | {{ teamInfo }} -->
+      </div>
       <!-- 返回按鈕 -->
-      <div class="col-md-12 col-lg-12">
-        <div class="d-flex mt-2 align-items-center">
-          <!-- <form class="mt-2 mb-1 text-center"> -->
-            <router-link :to="`/home/${id}/team/-N3Y9keHSq7-qsPq57AU`" class="btn d-flex align-items-center fs-4 " style="color:#495057">
-              <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;回隊伍頁面
-            </router-link>
-          <!-- </form> -->
+      <div class="d-flex align-items-center text-start mx-3 mt-3 justify-content-between">
+        <router-link :to="`/home/${uid}/team/${teamid}`" class="btn d-flex align-items-center fs-5" style="color:#2c3e50">
+          <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
+        </router-link>
+        <div class="text-center">
+          <p class="mb-0 fs-5 fw-bolder">{{teamInfo.contestRecords[0].contest}}</p>
+          <p class="mb-0 fw-bold">{{teamInfo.contestRecords[0].date}}</p>
         </div>
+        <router-link :to="`/home/${uid}/team/${teamid}/record/${contestid}`" class="btn btn-outline-dark">
+          查看分析
+        </router-link>
       </div>
 
       <!-- 計分表 -->
@@ -134,7 +140,7 @@
                                 <p v-if="n != 7">人員 {{ n }}</p>
                                 <p v-else>自由</p>
                               </option>
-                              <option v-for="(item, index) in team_members" :key="index" :value="item"> 
+                              <option v-for="(item, index) in teamInfo.member" :key="index" :value="item"> 
                                 <p>{{ item['number'] }} | {{ item['name'] }} | {{ item['position'] }}</p>
                               </option>
                             </select>
@@ -300,7 +306,6 @@
             <span class="badge bg-danger text-wrapm mx-1" style="width:35px">OH</span>
             <span class="badge bg-warning text-wrapm mx-1" style="width:35px">MB</span>
             <span class="badge bg-success text-wrapm mx-1" style="width:35px">S</span>
-            <router-link to="/singlerecord" class="btn btn-sm btn-outline-dark mx-1" style="color: #888; border-color: #888">查看分析</router-link>
           </div>
 
           <!-- 表格 -->
@@ -349,11 +354,21 @@
 
 <script>
 export default {
+  props: ['uid'],
   data() {
     return {
       cur_game: 1,
       id: this.uid,
+      teamid: this.$route.params.teamid,
+      contestid: this.$route.params.contestid,
       db: 'https://volleague-default-rtdb.firebaseio.com/',
+      teamInfo:{
+        teamName: '',
+        bulletin: '',
+        awards: [''],
+        members: [],
+        contestRecords: [''],
+      },
       isCourtMemSet: false, // bind to court member section
       isOpponentScore: false, // bind to button, '對方得分'
       positions: ['OH', 'OP', 'MB', 'S', 'L'],
@@ -394,15 +409,24 @@ export default {
         'game': this.cur_game
       },
       selected_members: [{}, {}, {}, {}, {}, {}, {}],     // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
-      team_members:[{'name': '張祐1', 'number': 22, 'position': 'MB'},
-                    {'name': '張祐2', 'number': 23, 'position': 'S'},
-                    {'name': '張祐3', 'number': 24, 'position': 'OP'},
-                    {'name': '張祐4', 'number': 25, 'position': 'L'},
-                    {'name': '張祐5', 'number': 26, 'position': 'OH'},
-                    {'name': '張祐6', 'number': 27, 'position': 'OH'},
-                    {'name': '張祐7', 'number': 28, 'position': 'MB'},
-                    {'name': '張祐L', 'number': 29, 'position': 'S'}], // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+
+      // team_members:[{'name': '張祐1', 'number': 22, 'position': 'MB'},
+      //               {'name': '張祐2', 'number': 23, 'position': 'S'},
+      //               {'name': '張祐3', 'number': 24, 'position': 'OP'},
+      //               {'name': '張祐4', 'number': 25, 'position': 'L'},
+      //               {'name': '張祐5', 'number': 26, 'position': 'OH'},
+      //               {'name': '張祐6', 'number': 27, 'position': 'OH'},
+      //               {'name': '張祐7', 'number': 28, 'position': 'MB'},
+      //               {'name': '張祐L', 'number': 29, 'position': 'S'}], // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
     }
+  },
+  beforeMount(){
+    // console.log(this.teamid);
+    this.$http.get(this.db + 'team/' + this.teamid + '.json').then(function(data){
+      return data.json();
+    }).then(function(data){
+      this.teamInfo = data;
+    })
   },
   methods: {
     setPositionTag(record) {
