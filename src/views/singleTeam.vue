@@ -38,8 +38,8 @@
               </span>
             </div>
             <div class="card-body text-start">
-              <div class="d-block text-end ">
-                <button @click="addContestModal=true" class="btn btn-outline-dark me-2 mb-2 ">
+              <div class="d-block text-end mb-0">
+                <button @click="addContestModal=true" class="btn btn-outline-dark">
                   <i class="fa-solid fa-plus"></i> 新增比賽
                 </button>
               </div>
