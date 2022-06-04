@@ -38,15 +38,33 @@
               </span>
             </div>
             <div class="card-body text-start">
-              <div class="d-block text-end ">
-                <button @click="addContestModal=true" class="btn btn-outline-dark me-2 mb-2 ">
+              <div class="d-block text-end mb-0">
+                <button @click="addContestModal=true" class="btn btn-outline-dark">
                   <i class="fa-solid fa-plus"></i> 新增比賽
                 </button>
               </div>
-              <div class="d-flex gap-3 justify-content-center mb-2">
+              <!-- <div class="d-flex gap-3 justify-content-center mb-2">
                 <button @click="addPoint" class="btn btn-warning">紀錄得分</button>
+              </div> -->
+              <hr>
+              <div v-if="teamInfo.contestRecords[0] != ''" class="list-group" style="height: 230px; overflow-y:scroll">
+                <div v-for="(item,idx) in teamInfo.contestRecords" :key="idx" class="list-group-item d-flex justify-content-between list-group-item-action">
+                  <div class=" text-center">
+                    <p class="mb-0">{{item.contest}}</p>
+                    <!-- <p class="mb-1"><i class="fa-solid fa-hand-fist"></i> {{item.opponent}}</p> -->
+                    <p class="mb-0">vs <span class="badge bg-main">{{item.opponent}}</span></p>
+                    <p class="mb-0 opacity-75">{{item.date}}</p>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <p class="mb-0">{{item.score}}</p> 
+                  </div>
+                  <div class="d-grid gap-2 text-center">
+                    <router-link :to="`/home/${uid}/team/${teamid}/scoring/${item.key}`" class="btn btn-sm btn-primary">計分</router-link>
+                    <router-link :to="`/home/${uid}/team/${teamid}/record/${item.key}`" class="btn btn-sm btn-success">紀錄</router-link>
+                  </div>
+                </div>
               </div>
-              <div class="list-group" style="height: 230px; overflow-y:scroll">
+              <div v-if="teamInfo.contestRecords[0] != ''" class="list-group" style="height: 230px; overflow-y:scroll">
                 <div v-for="(item,idx) in teamInfo.contestRecords" :key="idx" class="list-group-item d-flex justify-content-between list-group-item-action">
                   <div class=" text-center">
                     <p class="mb-0">{{item.contest}}</p>
