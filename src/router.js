@@ -38,7 +38,7 @@ export default new VueRouter({
           component: SingleRecord,
         },
         {
-          path: '/scoring',
+          path: 'team/:teamid/scoring/:contestid',
           component: Scoring,
         }
       ]

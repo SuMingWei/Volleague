@@ -1,16 +1,14 @@
 <template>
   <div class="row py-4 px-4" style="background-color:#EAECEE"> 
+    <div class="d-flex align-items-center justify-content-between text-start mb-3">
+      <button class="btn d-flex align-items-center fs-5" style="color:#2c3e50" @click="$router.push('/home/'+ uid + '/profile')"><i class="fa-solid fa-arrow-left fs-2" style="color:#2c3e50"></i>&nbsp;返回</button>
+      <span class="fs-2 fw-bolder">{{teamInfo.teamName}}</span>
+      <button class="btn align-center" style="color:#EAECEE" :disabled="true"><i class="fa-solid fa-arrow-left fs-2" style="color:#EAECEE"></i>&nbsp;返回</button>
+    </div>
     <div class="col-md-8 col-lg-8 mx-auto "> 
-      <div class="col-md-12 col-lg-12">
-        <div class="d-flex align-items-center">
-          <div class="me-4 my-3">
-            <button class="btn align-center" @click="$router.push('/home/'+ uid + '/profile')"><i class="fa-solid fa-arrow-left fs-2" style="color:#2c3e50"></i></button>
-          </div>
-          <span class="fs-2 fw-bolder">{{teamInfo.teamName}}</span>
-        </div>
-      </div>
-      {{teamid}}
-      {{teamInfo}}
+      
+      <!-- {{teamid}}
+      {{teamInfo}} -->
       <div class="card" >
         <div class="card-body"> 
           <div class="my-3 mx-3 card fw-bold">
@@ -89,7 +87,7 @@
                     <p class="mb-0">{{item.score}}</p> 
                   </div>
                   <div class="d-grid gap-2 text-center">
-                    <router-link to="/scoring" class="btn btn-sm btn-primary">計分</router-link>
+                    <router-link :to="`/home/${uid}/team/${teamid}/scoring/${item.key}`" class="btn btn-sm btn-primary">計分</router-link>
                     <router-link :to="`/home/${uid}/team/${teamid}/record/${item.key}`" class="btn btn-sm btn-success">紀錄</router-link>
                   </div>
                 </div>
