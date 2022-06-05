@@ -6,9 +6,12 @@
           <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
         </button>
         <span class="fs-2 fw-bolder">{{teamInfo.teamName}}</span>
-        <button class="btn d-flex align-items-center fs-5" style="color:#2c3e50" @click="modifyPersonalModal=true">
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-gear fs-2"></i>
-        </button>
+        <div class="d-flex">
+          <p class="me-4">&nbsp;&nbsp;&nbsp;</p>
+          <button class="btn d-flex align-items-center fs-5" style="color:#2c3e50" @click="modifyPersonalModal=true">
+            <i class="fa-solid fa-gear fs-2"></i>
+          </button>
+        </div>
       </div>
       <!-- {{teamid}}
       {{teamInfo}} -->
