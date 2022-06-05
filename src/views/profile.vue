@@ -235,17 +235,17 @@
                     <label>成員</label>
                   </div>
                   <div class="card mb-2">
-                    <div class="container">
-                    <div class="row my-2">
-                      <div class="col-auto mx-0 my-1 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
-                        <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                        <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                        <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
-                        <span v-else-if="mem.position=='O'" class="badge bg-primary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                        <span v-else-if="mem.position=='L'" class="badge bg-secondary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                        <span class="text-nowrap">{{mem.name}}</span>
+                    <div class="container px-1 py-1">
+                      <div class="row my-1">
+                        <div class="col-auto mx-0 mb-1 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
+                          <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                          <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                          <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
+                          <span v-else-if="mem.position=='O'" class="badge bg-primary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                          <span v-else-if="mem.position=='L'" class="badge bg-secondary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                          <span class="text-nowrap">{{mem.name}}</span>
+                        </div>
                       </div>
-                    </div>
                     </div>
                   </div>
                   <div class="form-group">

@@ -22,7 +22,7 @@
               <i class="fa-solid fa-person mx-2"></i> 成員
             </span>
           </div>
-          <div class="card-body text-start">
+          <div class="card-body text-start p-1">
             <div  class="row">
               <div class=" col-auto mx-0 my-1 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
                 <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
