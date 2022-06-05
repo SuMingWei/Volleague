@@ -133,7 +133,7 @@
                   </div>
                   <div class="row" style="width:285px;">
                     <div v-for="idx2 in 3" :key="idx2" class="col" style="height:95px; width:95px;">
-                      <span v-for="(member,idx3) in contestInfo.games[idx-1].placement[idx2+6]" :key="idx3">
+                      <span v-for="(member,idx3) in contestInfo.games[idx-1].placement[idx2+3]" :key="idx3">
                         <small v-if="member.pos=='OH'" class="badge bg-danger score_point">{{member.number}}</small>
                         <small v-else-if="member.pos=='MB'" class="badge bg-warning score_point">{{member.number}}</small>
                         <small v-else-if="member.pos=='S'" class="badge bg-success score_point">{{member.number}}</small>
@@ -193,7 +193,7 @@ export default {
       return data.json();
     }).then(function(data){
       this.contestInfo = data;
-      console.log(this.contestInfo.games[0].ourTeam);
+      console.log(this.contestInfo.games[0].ourTeam, this.contestInfo.games[0].placement);
     })
   },
 }

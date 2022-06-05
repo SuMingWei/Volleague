@@ -380,9 +380,9 @@ export default {
         opponent: '',
         score: '',
         gameScore: '',
-        onCourtMem: [],
-        localRecordsRaw: [],
-        localRecords: []
+        onCourtMem: '',
+        localRecordsRaw: [''],
+        localRecords: ['']
       },
       teamInfo:{
         teamName: '',
@@ -500,6 +500,8 @@ export default {
         this.scoring.opponent.cur_score = parseInt(this.contestInfo.score[2]);
         this.scoring.opponent.winned_game = parseInt(this.contestInfo.gameScore.split(':')[1]);
 
+        this.cur_game = this.scoring.host.winned_game + this.scoring.opponent.winned_game + 1;
+
         if (typeof this.contestInfo.onCourtMem == 'string')
           this.selected_members = [{}, {}, {}, {}, {}, {}, {}];
         else {
@@ -507,28 +509,34 @@ export default {
           this.isCourtMemSet = true;
         }
 
-        if (typeof this.contestInfo.localRecordsRaw == 'string') {
+        // empty localRecordsRaw = ['']
+        if (this.contestInfo.localRecordsRaw[0] == '') {
           this.records_pushed_raw = [{
             'ourTeam': {},
             'placement': [[''], [''], [''], [''], [''], [''], [''], [''], [''], ['']]
           }]
-        } else 
+        } else {
+          if (this.contestInfo.localRecordsRaw[this.cur_game-1].ourTeam[0] == '')
+            this.contestInfo.localRecordsRaw[this.cur_game-1].ourTeam = {};
           this.records_pushed_raw = this.contestInfo.localRecordsRaw;
-        
+        }
 
-        console.log('[beforeMount] ??', this.contestInfo, this.contestInfo.onCourtMem, typeof this.contestInfo.onCourtMem);
+
+        console.log('[beforeMount] localRecordsRaw', this.contestInfo, this.contestInfo.localRecordsRaw, typeof this.contestInfo.localRecordsRaw);
+        console.log('[beforeMount] records_pushed_raw', this.records_pushed_raw, this.records_pushed_raw, typeof this.records_pushed_raw);
       });
   
     // get local_records
     this.$http.get(this.db + 'contest/' + this.contestid + '/localRecords.json').then(function(data) {
       return data.json();
     }).then(function(data) {
-      if (data == null || typeof data == 'string')
+      // empty localRecords = ['']
+      if (data[0] == '')
         this.records_local = [];
       else
         this.records_local = data;
 
-      console.log('[beforeMount] local_records = ', typeof data, typeof this.records_local, this.records_local, this.records_local == null);
+      console.log('[beforeMount] records_local = ', typeof data, typeof this.records_local, this.records_local, this.records_local == null);
     });
   },
   methods: {
@@ -639,12 +647,12 @@ export default {
     },
     setCourtMem() {
       this.selected_members = [ { "name": "蘇名偉", "number": "27", "position": "OH", "uid": "-N3hlfKxXwby0jSSDbxV" },
-                                { "name": "test2", "number": "2", "position": "OH", "uid": "-N3hlhMMtjy-u_QrqVL8" },
                                 { "name": "張祐誠", "number": "3", "position": "MB", "uid": "-N3hloXHeW7EIdJuh5ZD" },
-                                { "name": "test4", "number": "4", "position": "MB", "uid": "-N3hlp05s2nmpA4gx4XC" },
-                                { "name": "Test7", "number": "88", "position": "L", "uid": "-N3hm36BH5b9ngb2N8wQ" },
+                                { "name": "Test6", "number": "66", "position": "S", "uid": "-N3hm182z3keR5kdjpoX" },
                                 { "name": "Test5", "number": "77", "position": "O", "uid": "-N3hlzbf69tjAcJjsAdG" },
-                                { "name": "Test6", "number": "66", "position": "S", "uid": "-N3hm182z3keR5kdjpoX" }];
+                                { "name": "test4", "number": "4", "position": "MB", "uid": "-N3hlp05s2nmpA4gx4XC" },
+                                { "name": "test2", "number": "2", "position": "OH", "uid": "-N3hlhMMtjy-u_QrqVL8" },
+                                { "name": "Test7", "number": "88", "position": "L", "uid": "-N3hm36BH5b9ngb2N8wQ" },];
       console.log(this.selected_members);
 
     },
@@ -661,47 +669,16 @@ export default {
       // add personal entry to "records_pushed_raw"
       for (let entry of Object.entries(this.selected_members)) {
         if (!(entry[1].name in this.records_pushed_raw[this.cur_game-1].ourTeam)) {
-          this.records_pushed_raw[this.cur_game-1].ourTeam[entry[1].name] = { 
-            name: entry[1].name, pos: entry[1].position, number: entry[1].number,
-            attackPoint: 0, blockPoint: 0, servicePoint: 0,
-            attackError: 0, tossError: 0, blockError: 0, receiveError: 0, serviceError: 0
+          this.records_pushed_raw[this.cur_game-1].ourTeam[entry[1].name] = { name: entry[1].name, pos: entry[1].position, number: entry[1].number,
+                                                                              attackPoint: 0, blockPoint: 0, servicePoint: 0,
+                                                                              attackError: 0, tossError: 0, blockError: 0, receiveError: 0, serviceError: 0
           };
         }
       }
       console.log('[checkSetCourtMem]', this.records_pushed_raw[this.cur_game-1]);
     },
     nextGame(isEndGame) {
-      let per_game = {'ourTeam': [], 
-                      'placement': {'1': [''], '2': [''], '3': [''], '4': [''], '5': [''],
-                                    '6': [''], '7': [''], '8': [''], '9': [''], 'touchout': ['']}};
-      
-      // ourTeam & placement
-      for (let [key, item_inner] of Object.entries(this.records_pushed_raw[this.cur_game-1])) { 
-        if (key == 'ourTeam') {
-          for (let [name, trimmed_ourTeam] of Object.entries(item_inner)) {
-            per_game['ourTeam'].push(trimmed_ourTeam);
-            
-            // sum STAT
-            if (this.users[this.getMemID(name)].StatisticsList[0] == '' || this.cur_game-1 == 0) 
-              this.addNewRecord2STAT(name);
-
-            this.sumSTAT(name, trimmed_ourTeam);
-          }
-        } else if (key == 'placement') {
-          for (let index = 1; index <= 9; index++) {
-
-            per_game['placement'][index.toString()] = item_inner[index-1];
-          }
-          
-          per_game['placement']['touchout'] = item_inner[9];
-        }
-      }
-
-      // storing per_game
-      console.log('[nextGame]', this.cur_game, per_game);
-      this.contestInfo.games[this.cur_game-1] = per_game;
-      console.log('[nextGame]', this.cur_game, this.contestInfo.games);
-
+      this.splitGameRecord(true);
 
       // judge who wins
       if (this.scoring['host']['cur_score'] > this.scoring['opponent']['cur_score'])
@@ -723,20 +700,45 @@ export default {
       }
 
       // push to DB
+      // userSTAT & games
       this.$http.patch(this.db + 'user.json', JSON.stringify(this.users));
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {games: this.contestInfo.games});
 
+      // 比分資料
       this.contestInfo.gameScore = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
       this.contestInfo.score = this.scoring.host.cur_score.toString() + ':' + this.scoring.opponent.cur_score.toString();
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {gameScore: this.contestInfo.gameScore});
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {score: this.contestInfo.score});
+
+      // 上場球員
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
+      // if (Object.entries(this.selected_members[0]).length == 0)
+      //   this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
+      // else 
+      //   this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: this.selected_members});
+      
+      // 紀錄資料
+      if (this.records_local.length == 0)
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ['']});
+      else 
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: this.records_local});
+
+      if (Object.entries(this.records_pushed_raw[0].ourTeam).length < 7)
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
+      else {
+        let temp = this.records_pushed_raw;
+        temp[this.cur_game-1].ourTeam = [''];
+
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: temp});
+      }
     },
     endGame() {
       this.nextGame(true);
 
       // 清除遠端的暫存資料
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
-      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ''});
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ['']});
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
     },
     getMemID(name) {
       for (let member of Object.entries(this.teamInfo.members)) {
@@ -746,8 +748,74 @@ export default {
       }
       return '-1';
     },
+    splitGameRecord(isGameChanges) {
+      let per_game = {'ourTeam': [''], 
+                      'placement': {'1': [''], '2': [''], '3': [''], '4': [''], '5': [''],
+                                    '6': [''], '7': [''], '8': [''], '9': [''], 'touchout': ['']}};
+      
+      // ourTeam & placement
+      for (let [key, item_inner] of Object.entries(this.records_pushed_raw[this.cur_game-1])) { 
+        if (key == 'ourTeam') {
+          for (let [name, trimmed_ourTeam] of Object.entries(item_inner)) {
+            if (per_game['ourTeam'][0] == '')
+              per_game['ourTeam'][0] = trimmed_ourTeam;
+            else
+              per_game['ourTeam'].push(trimmed_ourTeam);
+            
+            console.log('[splitGameRecord]', name);
+            // sum UserSTAT [BUG!!!]
+            if (isGameChanges) {
+              if (this.users[this.getMemID(name)].StatisticsList[0] == '' || this.cur_game == 1) 
+                this.addNewRecord2STAT(name);
+
+              this.sumUserSTAT(name, trimmed_ourTeam);
+              
+              // if (this.users[this.getMemID(name)].StatisticsList[0] == '') {
+              //   this.addNewRecord2STAT(name);
+              //   this.sumUserSTAT(name, trimmed_ourTeam);
+              // } else if (this.users[this.getMemID(name)].StatisticsList[0].contest != this.contestInfo.contest) {
+              //   this.addNewRecord2STAT(name);
+              //   this.sumUserSTAT(name, trimmed_ourTeam);
+              // } else if (this.users[this.getMemID(name)].StatisticsList[0].contest != this.contestInfo.contest) {
+              //   let record = {'contest': '', 'date': '', 'teamName': '', 'opponent': '', 'score': '',
+              //                 'name': '', 'pos': '', 'number': '',
+              //                 'attackPoint': 0, 'blockPoint': 0, 'servicePoint': 0,
+              //                 'attackError': 0, 'tossError': 0, 'blockError': 0,
+              //                 'receiveError': 0, 'serviceError': 0};
+              //   this.users[this.getMemID(name)].StatisticsList[0] = record;
+                
+              //   if (this.cur_game != 1) {
+              //     for (let i = 1; i < this.cur_game; ++i) {
+              //       let targetIdx = this.contestInfo.games[i-1]['ourTeam'].findIndex(ele => name in ele);
+              //       if (targetIdx != -1)
+              //         console.log('[splitGameRecord]', this.contestInfo.games[i-1]['ourTeam'][targetIdx]);
+              //         // this.users[this.getMemID(name)].StatisticsList[0] += this.contestInfo.games[i-1]['ourTeam'][targetIdx];
+              //     }
+              //   }
+  
+              //   this.sumUserSTAT(name, trimmed_ourTeam);
+              // }
+            }
+
+
+          }
+        } else if (key == 'placement') {
+          for (let index = 1; index <= 9; index++) {
+
+            per_game['placement'][index.toString()] = item_inner[index-1];
+          }
+          
+          per_game['placement']['touchout'] = item_inner[9];
+        }
+      }
+
+      // storing per_game
+      console.log('[nextGame]', this.cur_game, per_game);
+      this.contestInfo.games[this.cur_game-1] = per_game;
+      console.log('[nextGame]', this.cur_game, this.contestInfo.games);
+    },
     addNewRecord2STAT(name) {
-      let record = {'contest': '', 'date': '', 'teamName': '', 'opponent': '', 'score': '',
+      let record = {'contest': '', 'date': '', 'teamName': '', 'opponent': '', 'gameScore': '', 'score': '',
                     'name': '', 'pos': '', 'number': '',
                     'attackPoint': 0, 'blockPoint': 0, 'servicePoint': 0,
                     'attackError': 0, 'tossError': 0, 'blockError': 0,
@@ -755,7 +823,7 @@ export default {
       
       // insert contest info
       for (let [key, value] of Object.entries(this.contestInfo)) {
-        if (key == 'games') continue;
+        if (['games', 'localRecordsRaw', 'localRecords', 'onCourtMem'].includes(key)) continue;
         else 
           record[key] = value;
       }
@@ -767,7 +835,7 @@ export default {
       else 
         this.users[this.getMemID(name)].StatisticsList.unshift(record);
     },
-    sumSTAT(name, trimmed_ourTeam) {
+    sumUserSTAT(name, trimmed_ourTeam) {
       for (let [key, value] of Object.entries(trimmed_ourTeam)) {
         if (typeof value == 'number') 
           this.users[this.getMemID(name)].StatisticsList[0][key] += value;
@@ -777,22 +845,44 @@ export default {
     }, 
     storeLocalData() {
       console.log('TEST');
+      this.splitGameRecord(false);
 
+      // DB
+      // userStat & game info
+      this.$http.patch(this.db + 'user.json', JSON.stringify(this.users));
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {games: this.contestInfo.games});
+
+      // 比分資料
       this.contestInfo.score = this.scoring.host.cur_score.toString() + ':' + this.scoring.opponent.cur_score.toString();
       this.contestInfo.gameScore = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
-      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: this.records_local});
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {gameScore: this.contestInfo.gameScore});
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {score: this.contestInfo.score});
 
-      if (typeof this.selected_members[0] == 'object')
+      // 上場球員
+      console.log('[storeLocalData]', this.isCourtMemSet, Object.entries(this.selected_members[0]).length == 0, this.selected_members);
+      if (Object.entries(this.selected_members[0]).length == 0 || this.isCourtMemSet == false)
         this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
       else 
         this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: this.selected_members});
+      
+      // 紀錄資料
+      if (this.records_local.length == 0)
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ['']});
+      else
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: this.records_local});
 
       if (Object.entries(this.records_pushed_raw[0].ourTeam).length < 7)
-        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ''});
-      else 
-        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: this.records_pushed_raw});
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
+      else {
+        if (this.records_pushed_raw[this.cur_game-1].ourTeam[0] == '') {
+          let temp = this.records_pushed_raw;
+          temp[this.cur_game-1].ourTeam = [''];
+  
+          this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: temp});
+        } else {
+          this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: this.records_pushed_raw});
+        }
+      }
     }
   }
 }
