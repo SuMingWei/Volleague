@@ -29,7 +29,7 @@
               <h3 class="fw-bold">{{contestInfo.score[2]}}</h3>
             </div>
             <div class="d-flex align-items-center justify-content-end col-4">
-              <h5 class="btn teambtn fw-bolder" style="background-color: #2a9d8f; border:">{{contestInfo.opponent}}</h5>
+              <h5 class="btn teambtn fw-bolder" style="background-color: #219ebc; border:">{{contestInfo.opponent}}</h5>
             </div>
           </div>
         </div>
@@ -137,7 +137,7 @@
                     </div>
                   </div>
                   <div class="row" style="width:270px;">
-                    <div v-for="idx2 in 3" :key="idx2" class="col" style="height:95px; width:05px;">
+                    <div v-for="idx2 in 3" :key="idx2" class="col" style="height:95px; width:90px;">
                       <span v-for="(member,idx3) in contestInfo.games[idx-1].placement[idx2+3]" :key="idx3">
                         <small v-if="member.pos=='OH'" class="badge bg-danger score_point">{{member.number}}</small>
                         <small v-else-if="member.pos=='MB'" class="badge bg-warning score_point">{{member.number}}</small>
@@ -177,7 +177,31 @@ export default {
       contestid: this.$route.params.contestid,
       db: 'https://volleague-default-rtdb.firebaseio.com/',
       teamName: '',
-      contestInfo: {},
+      contestInfo: {
+        opponent: '',
+        contest: '',
+        date:'',
+        score: '0:0',
+        gameScore: '0:0',
+        localRecords: '',
+        games: [
+          {
+            ourTeam: [''],
+            placement:{
+              1: [''],
+              2: [''],
+              3: [''],
+              4: [''],
+              5: [''],
+              6: [''],
+              7: [''],
+              8: [''],
+              9: [''],
+              'touchout': [''],
+            }
+          },
+        ]
+      },
       tabInfo:[
         {id: "game1-tab", target: "#game1-tab-pane", aria_ctrl: "game1-tab-pane", aria_select: true, name: "第一局"},
         {id: "game2-tab", target: "#game2-tab-pane", aria_ctrl: "game2-tab-pane", aria_select: false, name: "第二局"},
@@ -198,7 +222,7 @@ export default {
       return data.json();
     }).then(function(data){
       this.contestInfo = data;
-      // console.log(this.contestInfo.games[0].ourTeam);
+      // console.log(this.contestInfo.score);
     })
   },
 }

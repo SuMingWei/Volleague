@@ -6,7 +6,9 @@
           <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
         </button>
         <span class="fs-2 fw-bolder">{{teamInfo.teamName}}</span>
-        <button class="btn align-center" style="color:white" :disabled="true"><i class="fa-solid fa-arrow-left fs-2" style="color:white"></i>&nbsp;返回</button>
+        <button class="btn d-flex align-items-center fs-5" style="color:#2c3e50" @click="modifyPersonalModal=true">
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-gear fs-2"></i>
+        </button>
       </div>
       <!-- {{teamid}}
       {{teamInfo}} -->
@@ -119,6 +121,44 @@
           </div>
         </div>
       </div>
+      <!-- Modal add contest-->
+      <div v-if="modifyPersonalModal">
+        <div name="modal fade">
+          <div class="modal-mask">
+            <div class="modal-wrapper">
+              <div class="modal-dialog"> 
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title">修改個人資訊</h4>
+                    <button type="button" class="btn-close" @click="modifyPersonalModal=false"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="d-flex gap-3">
+                      <div class="col">
+                        <label>背號</label>
+                        <input type="text" class="form-control" v-model="myInfo.number" />
+                      </div>
+                      <div class="col">
+                        <label>位置</label>
+                        <select class="form-select" v-model="myInfo.position">
+                          <option value="OH" selected>Outside Hitter</option>
+                          <option value="MB">Middle Blocker</option>
+                          <option value="S">Setter</option>
+                          <option value="O">Opposite</option>
+                          <option value="L">Libero</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn teambtn" @click="modifyPersonal">修改</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -141,6 +181,12 @@ export default {
         teamName: '',
         members: [],
         contestRecords: [''],
+      },
+      myInfo:{
+        number: '',
+        position: '',
+        name: '',
+        uid: '',
       },
       allContest: [],
       newContest: {
@@ -183,6 +229,7 @@ export default {
         }
       },
       addContestModal:false,
+      modifyPersonalModal:false,
     }
   },
   beforeMount(){
@@ -191,6 +238,14 @@ export default {
       return data.json();
     }).then(function(data){
       this.teamInfo = data;
+      var userid = this.uid;
+      var userInfo = {};
+      this.teamInfo.members.find(function(value){
+        if(value.uid == userid){
+          userInfo = value;
+        }
+      });
+      this.myInfo = userInfo;
     })
   },
   methods: {
@@ -205,6 +260,10 @@ export default {
         contest: this.newContest.contest,
         date: this.newContest.date,
         score: this.newContest.score,
+        gameScore: '0:0',
+        localRecords: [''],
+        localRecordsRaw: [''],
+        onCourtMem: '',
         games: gameArr,
       }
       var singleContest = {
@@ -237,7 +296,23 @@ export default {
       })
       this.addContestModal = false;
     },
-    
+    modifyPersonal(){
+      var membersArr = this.teamInfo.members;
+      var myID = this.myInfo.uid;
+      var idx = -1;
+      membersArr.find(function(value,index){
+        if(value.uid == myID){
+          idx = index;
+        }
+      })
+      membersArr[idx] = this.myInfo;
+      membersArr.sort(function(a,b){
+        return a.number - b.number;
+      });
+      this.$http.patch(this.db + 'team/' + this.teamid + '.json', {members: membersArr});
+      this.modifyPersonalModal = false;
+    },
+    //test
     addPoint(){
       var newPlayer1 = {
         name: "蘇名偉",
