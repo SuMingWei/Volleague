@@ -54,9 +54,14 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" v-on:click="endGame(true)" data-bs-dismiss="modal">
+                    <router-link :to="`/home/${uid}/team/${teamid}`" class="btn d-flex align-items-center fs-5" style="color:#2c3e50" >
+                      <span class="btn btn-primary" v-on:click="endGame(true)" data-bs-dismiss="modal">
+                        確定
+                      </span>
+                    </router-link>
+                    <!-- <button type="button" v-on:click="endGame(true)" data-bs-dismiss="modal">
                       確定
-                    </button>
+                    </button> -->
                   </div>
                 </div>
               </div>
@@ -604,7 +609,10 @@ export default {
         this.scoring.opponent.cur_score++;  // score adjustment
         this.isOpponentScore = false;
 
-        this.records_pushed_raw[this.cur_game-1].placement[this.selected_button.landing].push(this.selected_button.opponent);
+        if (this.records_pushed_raw[this.cur_game-1].placement[this.selected_button.landing][0] == '')
+          this.records_pushed_raw[this.cur_game-1].placement[this.selected_button.landing][0] = (this.selected_button.opponent);
+        else
+          this.records_pushed_raw[this.cur_game-1].placement[this.selected_button.landing].push(this.selected_button.opponent);
         this.records_local.unshift({'num': this.selected_button.opponent.num,
                                     'name': this.scoring.opponent.name,
                                     'position': this.selected_button.opponent.pos,
@@ -712,10 +720,6 @@ export default {
 
       // 上場球員
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
-      // if (Object.entries(this.selected_members[0]).length == 0)
-      //   this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
-      // else 
-      //   this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: this.selected_members});
       
       // 紀錄資料
       if (this.records_local.length == 0)
@@ -800,10 +804,9 @@ export default {
 
           }
         } else if (key == 'placement') {
-          for (let index = 1; index <= 9; index++) {
-
+          for (let index = 1; index <= 9; index++) 
             per_game['placement'][index.toString()] = item_inner[index-1];
-          }
+
           
           per_game['placement']['touchout'] = item_inner[9];
         }
