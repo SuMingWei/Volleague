@@ -16,26 +16,12 @@
           計分&nbsp;<i class="fa-solid fa-angle-right fs-2 text-primary" ></i>
         </router-link> -->
       </div>
-      <div>
-        <div class="text-center px-3 py-2">
-          <div class="row text-center">
-            <div class="d-flex align-items-center justify-content-start col-4">
-              <h5 class="btn btn-small btn-primary fw-bolder mb-0" style="background-color: #e76f51;border: none;">{{teamName}}</h5>
-            </div>
-            <div class="d-flex align-items-center justify-content-center col-1">
-              <h3 class="fw-bold">{{contestInfo.gameScore[0]}}</h3>
-            </div >
-            <div class="d-flex align-items-center justify-content-center col-2 ">
-              <h3 class="fw-bold">:</h3>
-            </div>
-            <div class="d-flex align-items-center justify-content-center col-1">
-              <h3 class="fw-bold">{{contestInfo.gameScore[2]}}</h3>
-            </div>
-            <div class="d-flex align-items-center justify-content-end col-4">
-              <h5 class="btn btn-small btn-primary fw-bolder mb-0" style="background-color: #2a9d8f;border: none;">{{contestInfo.opponent}}</h5>
-            </div>
-          </div>
-        </div>
+      <div class="d-grid mx-3 my-1" style="grid-template-columns: 4fr 1fr 1fr 1fr 4fr; gap: 10px">
+          <h5 class="d-flex align-items-center justify-content-center btn btn-small btn-primary fw-bolder mb-0" style="background-color: #e76f51;border: none;">{{teamName}}</h5>
+          <h3 class="d-flex align-items-center justify-content-center fw-bold mb-0">{{contestInfo.gameScore[0]}}</h3>
+          <h3 class="d-flex align-items-center justify-content-center fw-bold mb-0">:</h3>
+          <h3 class="d-flex align-items-center justify-content-center fw-bold mb-0">{{contestInfo.gameScore[2]}}</h3>
+          <h5 class="d-flex align-items-center justify-content-center btn btn-small btn-primary fw-bolder mb-0" style="background-color: #2a9d8f;border: none;">{{contestInfo.opponent}}</h5>
       </div>
       <!-- 分頁標籤 -->
       <ul class="nav nav-tabs" id="myTab" role="tablist" style="margin: 1em 1em 0 1em;">
