@@ -10,7 +10,7 @@
           <p class="mb-0 fw-bold">{{contestInfo.date}}</p>
         </div>
         <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn btn-outline-primary">
-          前往計分
+          計分
         </router-link>
         <!-- <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn d-flex align-items-center fs-5 px-0 text-primary">
           計分&nbsp;<i class="fa-solid fa-angle-right fs-2 text-primary" ></i>
@@ -118,47 +118,47 @@
               <div class="card-body text-center">
                 <div class="container border border-2 border-dark" style="width:272px;">
                   <div class="row border-bottom border-2 border-dark" style="width:270px;">
-                    <div v-for="idx2 in 3" :key="idx2" class="col" style="height:95px; width:90px;">
+                    <div v-for="idx2 in 3" :key="idx2" class="col px-1" style="height:95px; width:90px;">
                       <span v-for="(member,idx3) in contestInfo.games[idx-1].placement[idx2]" :key="idx3">
-                        <small v-if="member.pos=='OH'" class="badge bg-danger score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='MB'" class="badge bg-warning score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='S'" class="badge bg-success score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='O'" class="badge bg-primary score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='L'" class="badge bg-secondary score_point">{{member.num}}</small>
+                        <span v-if="member.pos=='OH'" class="badge bg-danger score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='MB'" class="badge bg-warning score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='S'" class="badge bg-success score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='O'" class="badge bg-primary score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='L'" class="badge bg-secondary score_point">{{member.num}}</span>
                       </span>
                     </div>
                   </div>
                   <div class="row border-bottom border-2 border-dark-50" style="width:270px;">
-                    <div v-for="idx2 in 3" :key="idx2" class="col" style="height:95px; width:90px;">
+                    <div v-for="idx2 in 3" :key="idx2" class="col px-1" style="height:95px; width:90px;">
                       <span v-for="(member,idx3) in contestInfo.games[idx-1].placement[idx2+3]" :key="idx3">
-                        <small v-if="member.pos=='OH'" class="badge bg-danger score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='MB'" class="badge bg-warning score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='S'" class="badge bg-success score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='O'" class="badge bg-primary score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='L'" class="badge bg-secondary score_point">{{member.num}}</small>
+                        <span v-if="member.pos=='OH'" class="badge bg-danger score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='MB'" class="badge bg-warning score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='S'" class="badge bg-success score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='O'" class="badge bg-primary score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='L'" class="badge bg-secondary score_point">{{member.num}}</span>
                       </span>
                     </div>
                   </div>
                   <div class="row" style="width:285px;">
-                    <div v-for="idx2 in 3" :key="idx2" class="col" style="height:95px; width:95px;">
+                    <div v-for="idx2 in 3" :key="idx2" class="col px-1" style="height:95px; width:95px;">
                       <span v-for="(member,idx3) in contestInfo.games[idx-1].placement[idx2+6]" :key="idx3">
-                        <small v-if="member.pos=='OH'" class="badge bg-danger score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='MB'" class="badge bg-warning score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='S'" class="badge bg-success score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='O'" class="badge bg-primary score_point">{{member.num}}</small>
-                        <small v-else-if="member.pos=='L'" class="badge bg-secondary score_point">{{member.num}}</small>
+                        <span v-if="member.pos=='OH'" class="badge bg-danger score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='MB'" class="badge bg-warning score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='S'" class="badge bg-success score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='O'" class="badge bg-primary score_point">{{member.num}}</span>
+                        <span v-else-if="member.pos=='L'" class="badge bg-secondary score_point">{{member.num}}</span>
                       </span>
                     </div>
                   </div>
                 </div>
-                <div class="container border-dark border-2" style="border-left:1px dashed;border-right:1px dashed;border-bottom:1px dashed; width:272px;">
+                <div class="container border-dark border-2 px-1" style="border-left:1px dashed;border-right:1px dashed;border-bottom:1px dashed; width:272px;">
                   <p class="mb-0">Touch Out</p>
                   <div v-for="(member,idx2) in contestInfo.games[idx-1].placement.touchout" :key="idx2">
-                    <small v-if="member.pos=='OH'" class="badge bg-danger score_point">{{member.num}}</small>
-                    <small v-else-if="member.pos=='MB'" class="badge bg-warning score_point">{{member.num}}</small>
-                    <small v-else-if="member.pos=='S'" class="badge bg-success score_point">{{member.num}}</small>
-                    <small v-else-if="member.pos=='O'" class="badge bg-primary score_point">{{member.num}}</small>
-                    <small v-else-if="member.pos=='L'" class="badge bg-secondary score_point">{{member.num}}</small>
+                    <span v-if="member.pos=='OH'" class="badge bg-danger score_point">{{member.num}}</span>
+                    <span v-else-if="member.pos=='MB'" class="badge bg-warning score_point">{{member.num}}</span>
+                    <span v-else-if="member.pos=='S'" class="badge bg-success score_point">{{member.num}}</span>
+                    <span v-else-if="member.pos=='O'" class="badge bg-primary score_point">{{member.num}}</span>
+                    <span v-else-if="member.pos=='L'" class="badge bg-secondary score_point">{{member.num}}</span>
                   </div>
                 </div>
               </div>
@@ -233,8 +233,9 @@ export default {
 
 <style scoped>
 .score_point{
-  font-size: 3px; 
+  font-size: 8px; 
   margin: 1px;
+  text-align: center;
 }
 .teambtn {
   background-color:#2c3e50; 
