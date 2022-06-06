@@ -18,12 +18,12 @@
           <p class="mb-0 fw-bold">{{contestInfo.date}}</p>
         </div>
         <router-link :to="`/home/${uid}/team/${teamid}/record/${contestid}`" class="btn btn-outline-success">
-          <span>
+          <span v-on:click="storeLocalData()">
             分析
           </span>
         </router-link>
         <!-- <router-link :to="`/home/${uid}/team/${teamid}/record/${contestid}`" class="btn d-flex align-items-center fs-5 px-0" style="color:#2c3e50">
-          <span class="mb-0 d-flex align-items-center text-success">
+          <span v-on:click="storeLocalData()" class="mb-0 d-flex align-items-center text-success">
             分析&nbsp;<i class="fa-solid fa-angle-right fs-2"></i>
           </span>
         </router-link> -->
@@ -47,10 +47,10 @@
 
             <!-- 下一局 & 結束比賽 -->
             <div class="d-grid round-controls text-center">
-              <button :disabled="!checkNextGame()" class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888" v-on:click="nextGame(false)">
+              <button :disabled="!isNextGame" class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888" v-on:click="nextGame(false)">
                 下一局
               </button>
-              <button :disabled="!checkEndGame()" class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888"
+              <button :disabled="!isGameOver" class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888"
                       data-bs-toggle="modal" data-bs-target="#endGameCheck">結束比賽</button>
             </div>
 
@@ -94,7 +94,8 @@
           </div>
         </div> 
       </div>
-      <div v-else-if="checkNextGame()">
+      <!-- 某一局結束 -->
+      <div v-else-if="isNextGame">
         <div class="card-body py-3 mx-0">
           <div class="p-2 d-flex align-items-center justify-content-center border" style="border-radius: 5px">
             <p class="my-2 text-secondary">這局已經結束了，請按下一局！</p>
@@ -166,8 +167,9 @@
 
                         <div class="modal-body">
                           <!-- quickly set on-court members -->
-                          <button v-on:click="setCourtMem()" class="py-1">設定上場人員</button>
-                          <button v-on:click="checkSetCourtMem()">Test Check</button>
+                          <!-- <button v-on:click="setCourtMem()" class="py-1">設定上場人員</button> -->
+                          <!-- <button v-on:click="checkSetCourtMem()">Test Check</button> -->
+
                           <!-- <button v-on:click="setCourtMem()">Set Court Member</button> -->
                           <div class="d-grid mx-1 my-1 team-members-grid">
                             <div v-for="n in 7" :key="n" v-bind:style="[ n == 7 ? {gridColumnStart: 2} : {} ]">
@@ -468,6 +470,7 @@ export default {
         }],
       },
       isGameOver: false,
+      isNextGame: false,
       isCourtMemSet: false, // bind to court member section
       isOpponentScore: false, // bind to button, '對方得分'
       positions: ['OH', 'O', 'MB', 'S', 'L'],
@@ -560,6 +563,7 @@ export default {
           this.isCourtMemSet = true;
         }
 
+        console.log('[beforeMount] localRecordsRaw 1 = ', this.contestInfo, this.contestInfo.localRecordsRaw, typeof this.contestInfo.localRecordsRaw);
         // empty localRecordsRaw = ['']
         if (this.contestInfo.localRecordsRaw[0] == '') {
           this.records_pushed_raw = [{
@@ -575,10 +579,12 @@ export default {
 
         // check if game over
         console.log('[beforeMount] check = ', this.contestInfo.games.length, this.cur_game, this.contestInfo.games.length < this.cur_game);
-        if (this.contestInfo.games.length < this.cur_game) 
+        if (this.contestInfo.games.length < this.cur_game || this.checkEndGame()) 
           this.isGameOver = true;
+        
+        if (this.checkNextGame()) this.isNextGame = true;
 
-        console.log('[beforeMount] localRecordsRaw', this.contestInfo, this.contestInfo.localRecordsRaw, typeof this.contestInfo.localRecordsRaw);
+        console.log('[beforeMount] localRecordsRaw 2 = ', this.contestInfo, this.contestInfo.localRecordsRaw, typeof this.contestInfo.localRecordsRaw);
         console.log('[beforeMount] records_pushed_raw', this.records_pushed_raw, this.records_pushed_raw, typeof this.records_pushed_raw);
       });
   
@@ -660,6 +666,9 @@ export default {
         
         // store local data
         this.storeLocalData();
+
+        this.isEndGame = this.checkEndGame();
+        this.isNextGame = this.checkNextGame();
       } else if (whichBtn == 'lower' && this.isOpponentScore && this.checkOptionAllSelected('lower')) { 
         // whichBtn == 'lower'
         this.scoring.opponent.cur_score++;  // score adjustment
@@ -678,6 +687,9 @@ export default {
 
         // store local data
         this.storeLocalData();
+
+        this.isEndGame = this.checkEndGame();
+        this.isNextGame = this.checkNextGame();
       }
 
       // 無論如何只要按下送出都要清空選取項目
@@ -747,6 +759,9 @@ export default {
       console.log('[checkSetCourtMem]', this.records_pushed_raw[this.cur_game-1]);
     },
     checkNextGame() {
+        console.log('[checkNextGame]', this.scoring.host.cur_score, this.scoring.opponent.cur_score);
+        console.log('[checkNextGame]', this.scoring.host.cur_score >= 24 && this.scoring.opponent.cur_score >= 24, this.scoring.host.cur_score == 25 || this.scoring.opponent.cur_score == 25);
+        console.log('[checkNextGame]', this.isGameOver, this.isNextGame);
         if (this.contestInfo.games.length == this.cur_game) {
             return false;
         } else {
@@ -764,33 +779,35 @@ export default {
         }
     },
     checkEndGame() {
+      console.log('[checkEndGame]', this.contestInfo.games.length == this.cur_game, this.contestInfo.games.length != 1); 
+      console.log('[checkEndGame]', this.scoring.host.cur_score == 15 || this.scoring.opponent.cur_score == 15, this.scoring.host.cur_score == 15, this.scoring.opponent.cur_score == 15); 
       if (this.contestInfo.games.length == this.cur_game && this.contestInfo.games.length != 1) {
         if (this.scoring.host.cur_score >= 14 && this.scoring.opponent.cur_score >= 14) {
-            // 雙方大於 24 分
-            // deuce
-            if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2)
-              return true;
-            else
-              return false;
-          } else if (this.scoring.host.cur_score == 15 || this.scoring.opponent.cur_score == 15)// not deucing
+          // 雙方大於 24 分
+          // deuce
+          if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2)
             return true;
-          else 
+          else
             return false;
-        } else if (this.contestInfo.games.length == 1) {
-          if (this.scoring.host.cur_score >= 24 && this.scoring.opponent.cur_score >= 24) {
-            // 雙方大於 24 分
-            // deuce
-            if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2)
-              return true;
-            else
-              return false;
-          } else if (this.scoring.host.cur_score == 25 || this.scoring.opponent.cur_score == 25)// not deucing
-            return true;
-          else 
-            return false;
-        } else {
+        } else if (this.scoring.host.cur_score == 15 || this.scoring.opponent.cur_score == 15)// not deucing
+          return true;
+        else 
           return false;
-        }
+      } else if (this.contestInfo.games.length == 1) {
+        if (this.scoring.host.cur_score >= 24 && this.scoring.opponent.cur_score >= 24) {
+          // 雙方大於 24 分
+          // deuce
+          if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2)
+            return true;
+          else
+            return false;
+        } else if (this.scoring.host.cur_score == 25 || this.scoring.opponent.cur_score == 25)// not deucing
+          return true;
+        else 
+          return false;
+      } else {
+        return false;
+      }
     },
     nextGame(isEndGame) {
       this.splitGameRecord(true);
@@ -842,22 +859,27 @@ export default {
       else 
         this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: this.records_local});
 
-      if (Object.entries(this.records_pushed_raw[0].ourTeam).length < 7)
-        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
-      else {
+      if (Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam).length == 0) {
         let temp = this.records_pushed_raw;
         temp[this.cur_game-1].ourTeam = [''];
 
         this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: temp});
-      }
+      } else 
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: this.records_pushed_raw});
+      
+
+      this.isEndGame = this.checkEndGame();
+      this.isNextGame = this.checkNextGame();
     },
     endGame() {
-      this.nextGame(true);
-
-      // 清除遠端的暫存資料
-      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
-      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ['']});
-      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
+      if (!(this.contestInfo.games.length < this.cur_game)) {
+        this.nextGame(true);
+  
+        // 清除遠端的暫存資料
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ['']});
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
+      }
     },
     getMemID(name) {
       for (let member of Object.entries(this.teamInfo.members)) {
@@ -876,47 +898,52 @@ export default {
       for (let [key, item_inner] of Object.entries(this.records_pushed_raw[this.cur_game-1])) { 
         if (key == 'ourTeam') {
           for (let [name, trimmed_ourTeam] of Object.entries(item_inner)) {
-            if (per_game['ourTeam'][0] == '')
-              per_game['ourTeam'][0] = trimmed_ourTeam;
-            else
-              per_game['ourTeam'].push(trimmed_ourTeam);
-            
-            console.log('[splitGameRecord]', name);
-            // sum UserSTAT 
-            if (isGameChanges) {
-              if (this.users[this.getMemID(name)].StatisticsList[0] == '' || this.cur_game == 1) 
-                this.addNewRecord2STAT(name);
-
-              this.sumUserSTAT(name, trimmed_ourTeam);
-              
-              // if (this.users[this.getMemID(name)].StatisticsList[0] == '') {
-              //   this.addNewRecord2STAT(name);
-              //   this.sumUserSTAT(name, trimmed_ourTeam);
-              // } else if (this.users[this.getMemID(name)].StatisticsList[0].contest != this.contestInfo.contest) {
-              //   this.addNewRecord2STAT(name);
-              //   this.sumUserSTAT(name, trimmed_ourTeam);
-              // } else if (this.users[this.getMemID(name)].StatisticsList[0].contest != this.contestInfo.contest) {
-              //   let record = {'contest': '', 'date': '', 'teamName': '', 'opponent': '', 'score': '',
-              //                 'name': '', 'pos': '', 'number': '',
-              //                 'attackPoint': 0, 'blockPoint': 0, 'servicePoint': 0,
-              //                 'attackError': 0, 'tossError': 0, 'blockError': 0,
-              //                 'receiveError': 0, 'serviceError': 0};
-              //   this.users[this.getMemID(name)].StatisticsList[0] = record;
-                
-              //   if (this.cur_game != 1) {
-              //     for (let i = 1; i < this.cur_game; ++i) {
-              //       let targetIdx = this.contestInfo.games[i-1]['ourTeam'].findIndex(ele => name in ele);
-              //       if (targetIdx != -1)
-              //         console.log('[splitGameRecord]', this.contestInfo.games[i-1]['ourTeam'][targetIdx]);
-              //         // this.users[this.getMemID(name)].StatisticsList[0] += this.contestInfo.games[i-1]['ourTeam'][targetIdx];
-              //     }
-              //   }
-  
-              //   this.sumUserSTAT(name, trimmed_ourTeam);
-              // }
+            // [BUG] sometimes '0' is added to "this.records_pushed_raw" :(((
+            if (name == '0' || name == 0) {
+              console.log('[splitGameRecord] buggy "0" appears!!');
+              continue;
             }
-
-
+            else {
+              if (per_game['ourTeam'][0] == '')
+                per_game['ourTeam'][0] = trimmed_ourTeam;
+              else
+                per_game['ourTeam'].push(trimmed_ourTeam);
+              
+              console.log('[splitGameRecord]', name);
+              // sum UserSTAT 
+              if (isGameChanges ) {
+                if (this.users[this.getMemID(name)].StatisticsList[0] == '' || this.cur_game == 1) 
+                  this.addNewRecord2STAT(name);
+  
+                this.sumUserSTAT(name, trimmed_ourTeam);
+                
+                // if (this.users[this.getMemID(name)].StatisticsList[0] == '') {
+                //   this.addNewRecord2STAT(name);
+                //   this.sumUserSTAT(name, trimmed_ourTeam);
+                // } else if (this.users[this.getMemID(name)].StatisticsList[0].contest != this.contestInfo.contest) {
+                //   this.addNewRecord2STAT(name);
+                //   this.sumUserSTAT(name, trimmed_ourTeam);
+                // } else if (this.users[this.getMemID(name)].StatisticsList[0].contest != this.contestInfo.contest) {
+                //   let record = {'contest': '', 'date': '', 'teamName': '', 'opponent': '', 'score': '',
+                //                 'name': '', 'pos': '', 'number': '',
+                //                 'attackPoint': 0, 'blockPoint': 0, 'servicePoint': 0,
+                //                 'attackError': 0, 'tossError': 0, 'blockError': 0,
+                //                 'receiveError': 0, 'serviceError': 0};
+                //   this.users[this.getMemID(name)].StatisticsList[0] = record;
+                  
+                //   if (this.cur_game != 1) {
+                //     for (let i = 1; i < this.cur_game; ++i) {
+                //       let targetIdx = this.contestInfo.games[i-1]['ourTeam'].findIndex(ele => name in ele);
+                //       if (targetIdx != -1)
+                //         console.log('[splitGameRecord]', this.contestInfo.games[i-1]['ourTeam'][targetIdx]);
+                //         // this.users[this.getMemID(name)].StatisticsList[0] += this.contestInfo.games[i-1]['ourTeam'][targetIdx];
+                //     }
+                //   }
+    
+                //   this.sumUserSTAT(name, trimmed_ourTeam);
+                // }
+              }
+            }
           }
         } else if (key == 'placement') {
           for (let index = 1; index <= 9; index++) 
@@ -997,17 +1024,15 @@ export default {
       else
         this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: this.records_local});
 
-      if (Object.entries(this.records_pushed_raw[0].ourTeam).length < 7)
-        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
-      else {
-        if (this.records_pushed_raw[this.cur_game-1].ourTeam[0] == '') {
-          let temp = this.records_pushed_raw;
-          temp[this.cur_game-1].ourTeam = [''];
-  
-          this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: temp});
-        } else {
-          this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: this.records_pushed_raw});
-        }
+      console.log('[storeLocalData] records_pushed_raw = ', typeof this.records_pushed_raw[this.cur_game-1].ourTeam, Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam).length);
+      console.log('[storeLocalData] records_pushed_raw = ', this.records_pushed_raw[this.cur_game-1].ourTeam);
+      if (Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam).length == 0) {
+        let temp = this.records_pushed_raw;
+        temp[this.cur_game-1].ourTeam = [''];
+
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: temp});
+      } else {
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: this.records_pushed_raw});
       }
     }
   }

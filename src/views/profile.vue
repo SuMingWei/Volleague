@@ -83,7 +83,7 @@
                         <p class="mb-0">{{statistic.contest}}</p>
                         <p class="mb-1">{{statistic.teamName}}&nbsp;<span class="badge bg-main">vs</span>&nbsp;{{statistic.opponent}}</p>
                         <p class="mb-0 opacity-75">{{statistic.date}}</p>
-                        <p class="mb-0 opacity-75">{{statistic.score}}</p> 
+                        <p class="mb-0 opacity-75">{{statistic.gameScore}}</p> 
                       </div>
                     </td>
                     <td class="border-start">{{statistic.attackPoint}}</td>
