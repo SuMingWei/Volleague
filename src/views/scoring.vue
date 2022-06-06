@@ -198,43 +198,45 @@
                     <div class="d-grid" style="grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 5px 5px">
                       <!-- 得分 -->
                       <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 97%"
+                              style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 85%"
                               v-on:click="selected_button['record_type'] = 'attackPoint'">
                               攻擊得分
                       </button>
                       <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 97%"
+                              style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 85%"
                               v-on:click="selected_button['record_type'] = 'blockPoint'">
                               攔網得分
                       </button>
                       <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 97%"
+                              style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 85%"
                               v-on:click="selected_button['record_type'] = 'servicePoint'">
                               發球得分
                       </button>
                       <!-- 失誤 & 失分 -->
                       <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 97%"
+                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 85%"
                               v-on:click="selected_button['record_type'] = 'attackError'">
                               攻擊失誤
                       </button>
                       <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 97%"
+                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 85%"
                               v-on:click="selected_button['record_type'] = 'tossError'">
                               舉球失誤
                       </button>
                       <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 97%"
+                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 85%"
                               v-on:click="selected_button['record_type'] = 'blockError'">
                               觸網失誤
                       </button>
                     </div>
                     <div class="d-grid" style="grid-template-columns: 1fr 1fr;; grid-template-rows: 1fr; gap: 5px">
-                      <button type="button" class="btn btn-outline-secondary" style="background-color: #f08080; border-color: #f08080; color: #FFF"
+                      <button type="button" class="btn btn-outline-secondary"
+                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 85%"
                               v-on:click="selected_button['record_type'] = 'receiveError'">
                               接發失誤
                       </button>
-                      <button type="button" class="btn btn-outline-secondary" style="background-color: #f08080; border-color: #f08080; color: #FFF"
+                      <button type="button" class="btn btn-outline-secondary"
+                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 85%"
                               v-on:click="selected_button['record_type'] = 'serviceError'">
                               發球失誤
                       </button>
@@ -243,12 +245,14 @@
                     
                   <!-- 送出按鈕 -->
                   <div class="d-grid" style="grid-template-columns: 1fr 1fr; gap: 5px 5px">
-                    <button type="button" class="btn btn-outline-secondary" style="background-color: #219ebc; border-color: #219ebc; color: #FFF"
+                    <button type="button" class="btn btn-outline-secondary"
+                            style="background-color: #219ebc; border-color: #219ebc; color: #FFF; font-size: 85%"
                             v-on:click="record('upper')">
                             <span>送出紀錄</span>
                     </button>
                     <!-- 對方得分：用於記錄落點 -->
-                    <button type="button" class="btn btn-outline-secondary" style="background-color: #219ebc; border-color: #219ebc; color: #FFF"
+                    <button type="button" class="btn btn-outline-secondary"
+                            style="background-color: #219ebc; border-color: #219ebc; color: #FFF; font-size: 85%"
                             v-on:click="clearSelected(); selected_button['record_type'] = 'oppoScore'; isOpponentScore = true">
                             對方得分
                     </button>
