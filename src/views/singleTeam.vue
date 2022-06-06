@@ -98,9 +98,7 @@
                         <label>局數</label>
                         <select class="form-select" v-model="newContest.gamesNum">
                           <option>1</option>
-                          <option>2</option>
                           <option selected>3</option>
-                          <option>4</option>
                           <option>5</option>
                         </select>
                       </div>
