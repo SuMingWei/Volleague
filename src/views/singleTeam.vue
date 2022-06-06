@@ -22,8 +22,8 @@
               <i class="fa-solid fa-person mx-2"></i> 成員
             </span>
           </div>
-          <div class="card-body text-start p-1">
-            <div  class="row">
+          <div class="card-body text-start py-2">
+            <div class="row d-flex justify-content-between">
               <div class=" col-auto mx-0 my-1 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
                 <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
                 <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
@@ -47,9 +47,9 @@
                 <i class="fa-solid fa-plus"></i> 新增比賽
               </button>
             </div>
-            <!-- <div class="d-flex gap-3 justify-content-center mb-2">
-              <button @click="addPoint" class="btn btn-warning">紀錄得分</button>
-            </div> -->
+            <div class="d-flex gap-3 justify-content-center mb-2">
+              <button @click="addPoint" class="btn btn-warning">測試</button>
+            </div>
             <div v-if="teamInfo.contestRecords[0] != ''" class="list-group" style="height: 350px; overflow-y:scroll">
               <div v-for="(item,idx) in teamInfo.contestRecords" :key="idx" class="list-group-item d-flex justify-content-between list-group-item-action">
                 <div class=" text-center">
@@ -59,7 +59,7 @@
                   <p class="mb-0 opacity-75">{{item.date}}</p>
                 </div>
                 <div class="d-flex align-items-center">
-                  <p class="mb-0 fs-4">{{item.score}}</p> 
+                  <p class="mb-0 fs-4">{{item.gameScore}}</p> 
                 </div>
                 <div class="d-grid gap-2 text-center">
                   <router-link :to="`/home/${uid}/team/${teamid}/scoring/${item.key}`" class="btn btn-primary">計分</router-link>
@@ -196,7 +196,7 @@ export default {
         opponent: '',
         contest: '',
         date:'',
-        score: '0:0',
+        gameScore: '0:0',
         gamesNum: 3,
       },
       personalRecord:{
@@ -262,8 +262,8 @@ export default {
         opponent: this.newContest.opponent,
         contest: this.newContest.contest,
         date: this.newContest.date,
-        score: this.newContest.score,
-        gameScore: '0:0',
+        gameScore: this.newContest.gameScore,
+        score: '0:0',
         localRecords: [''],
         localRecordsRaw: [''],
         onCourtMem: '',
@@ -274,7 +274,7 @@ export default {
         opponent: this.newContest.opponent,
         contest: this.newContest.contest,
         date: this.newContest.date,
-        score: this.newContest.score,
+        gameScore: this.newContest.gameScore,
       }
       this.$http.post(this.db + 'contest.json',emptyContest).then(function(data){
         singleContest.key = data.body.name;
@@ -293,7 +293,7 @@ export default {
           opponent: '',
           contest: '',
           date:'',
-          score: '0:0',
+          gameScore: '0:0',
           gamesNum: 3,
         }
       })
@@ -317,83 +317,32 @@ export default {
     },
     //test
     addPoint(){
-      var newPlayer1 = {
-        name: "蘇名偉",
-        pos: 'OH',
-        number: '27',
-        attackPoint: 4,
-        blockPoint: 1,
-        servicePoint: 2,
-        attackError: 1,
-        tossError: 0,
-        blockError: 0,
-        receiveError: 1,
-        serviceError: 1,
+      var gameArr = [];
+      for(let i=0; i<this.newContest.gamesNum;i++){
+        gameArr.push(this.emptyGame);
       }
-      var newPlayer2 = {
-        name: "蘇名",
-        pos: 'O',
-        number: '20',
-        attackPoint: 3,
-        blockPoint: 1,
-        servicePoint: 3,
-        attackError: 1,
-        tossError: 1,
-        blockError: 2,
-        receiveError: 0,
-        serviceError: 1,
+      var emptyContest = {
+        opponent: this.teamInfo.contestRecords[0].opponent,
+        contest: this.teamInfo.contestRecords[0].contest,
+        date: this.teamInfo.contestRecords[0].date,
+        gameScore: this.teamInfo.contestRecords[0].gameScore,
+        score: '0:0',
+        localRecords: [''],
+        localRecordsRaw: [''],
+        onCourtMem: '',
+        games: gameArr,
       }
-      var ourteam1 = [newPlayer1,newPlayer2];
-      var placement1 = {
-        1: [{pos: 'OH',number: '12'},{pos: 'MB',number: '1'}],
-        2: [{pos: 'MB',number: '1'}],
-        3: [''],
-        4: [''],
-        5: [''],
-        6: [{pos: 'MB',number: '1'},{pos: 'OH',number: '12'}],
-        7: [''],
-        8: [''],
-        9: [''],
-        'touchout': [''],
-      }
-      var placement2 = {
-        1: [{pos: 'OH',number: '12'},{pos: 'MB',number: '1'},{pos: 'MB',number: '1'},{pos: 'MB',number: '1'},{pos: 'MB',number: '1'},{pos: 'MB',number: '1'}],
-        2: [{pos: 'MB',number: '1'}],
-        3: [''],
-        4: [''],
-        5: [''],
-        6: [{pos: 'MB',number: '1'},{pos: 'OH',number: '12'}],
-        7: [''],
-        8: [''],
-        9: [''],
-        'touchout': [''],
-      }
-      var game = {
-        0: {
-          ourTeam: ourteam1,
-          placement: placement1,
-        },
-        1:{
-          ourTeam: ourteam1,
-          placement: placement2,
-        },
-        2:{
-          ourTeam: [''],
-          placement:{
-            1: [''],
-            2: [''],
-            3: [''],
-            4: [''],
-            5: [''],
-            6: [''],
-            7: [''],
-            8: [''],
-            9: [''],
-            'touchout': [''],
-          }
+      this.$http.patch(this.db + 'contest/-N3hrnRBzCzhGgmCwhil.json', JSON.stringify(emptyContest)).then(function(){
+        // clear
+        this.newContest = {
+          opponent: '',
+          contest: '',
+          date:'',
+          gameScore: '0:0',
+          gamesNum: 3,
         }
-      }
-      this.$http.patch(this.db + 'contest/' + this.teamInfo.contestRecords[0].key + '.json', {games: game})
+      })
+
     },
   }
 
