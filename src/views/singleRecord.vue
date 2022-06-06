@@ -9,7 +9,7 @@
           <p class="mb-0 fs-5 fw-bolder">{{contestInfo.contest}}</p>
           <p class="mb-0 fw-bold">{{contestInfo.date}}</p>
         </div>
-        <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn btn-primary">
+        <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn btn-outline-primary">
           前往計分
         </router-link>
         <!-- <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn d-flex align-items-center fs-5 px-0 text-primary">
@@ -32,7 +32,7 @@
               <h3 class="fw-bold">{{contestInfo.gameScore[2]}}</h3>
             </div>
             <div class="d-flex align-items-center justify-content-end col-4">
-              <h5 class="btn btn-small btn-primary fw-bolder mb-0" style="background-color: #219ebc;border: none;">{{contestInfo.opponent}}</h5>
+              <h5 class="btn btn-small btn-primary fw-bolder mb-0" style="background-color: #2a9d8f;border: none;">{{contestInfo.opponent}}</h5>
             </div>
           </div>
         </div>

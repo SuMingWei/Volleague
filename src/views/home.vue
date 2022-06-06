@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- <div class="navbar navbar-dark" style="background-color:#85929E"> -->
     <div class="navbar navbar-dark" style="background-color:#85929E">
       <a class="navbar-brand ms-4 fs-2 fw-bold" href="#">Volleague</a>
       <ul class="nav fs-6 fw-bold">

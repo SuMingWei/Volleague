@@ -23,14 +23,16 @@
             </span>
           </div>
           <div class="card-body text-start px-1 py-2">
-            <div class="row d-flex justify-content-between">
-              <div class=" col-auto mx-0 my-1 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
-                <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
-                <span v-else-if="mem.position=='O'" class="badge bg-primary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                <span v-else-if="mem.position=='L'" class="badge bg-secondary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
-                <span class="text-nowrap">{{mem.name}}</span>
+            <div class="container">
+              <div class="row d-flex justify-content-between">
+                <div class=" col-auto mx-0 my-1 px-0 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
+                  <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                  <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                  <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
+                  <span v-else-if="mem.position=='O'" class="badge bg-primary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                  <span v-else-if="mem.position=='L'" class="badge bg-secondary text-wrap mx-1" style="width:35px">{{mem.number}}</span>
+                  <span class="text-nowrap">{{mem.name}}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -47,9 +49,9 @@
                 <i class="fa-solid fa-plus"></i> 新增比賽
               </button>
             </div>
-            <div class="d-flex gap-3 justify-content-center mb-2">
+            <!-- <div class="d-flex gap-3 justify-content-center mb-2">
               <button @click="addPoint" class="btn btn-warning">測試</button>
-            </div>
+            </div> -->
             <div v-if="teamInfo.contestRecords[0] != ''" class="list-group" style="height: 350px; overflow-y:scroll">
               <div v-for="(item,idx) in teamInfo.contestRecords" :key="idx" class="list-group-item d-flex justify-content-between list-group-item-action">
                 <div class=" text-center">

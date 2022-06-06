@@ -234,10 +234,10 @@
                   <div class="form-group">
                     <label>成員</label>
                   </div>
-                  <div class="card mb-2">
-                    <div class="container px-1 py-2">
+                  <div class="card-body mb-2 px-1 py-2 border">
+                    <div class="container">
                       <div class="row d-flex justify-content-between">
-                        <div class="col-auto mx-0 mb-1 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
+                        <div class="col-auto mx-0 mb-1 px-0 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
                           <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
                           <span v-else-if="mem.position=='MB'" class="badge bg-warning text-wrap mx-1" style="width:35px">{{mem.number}}</span>
                           <span v-else-if="mem.position=='S'" class="badge bg-success text-w rap mx-1" style="width:35px">{{mem.number}}</span>
