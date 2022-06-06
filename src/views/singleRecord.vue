@@ -10,7 +10,7 @@
           <p class="mb-0 fw-bold">{{contestInfo.date}}</p>
         </div>
         <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn btn-outline-primary">
-          前往計分
+          計分
         </router-link>
         <!-- <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn d-flex align-items-center fs-5 px-0 text-primary">
           計分&nbsp;<i class="fa-solid fa-angle-right fs-2 text-primary" ></i>
