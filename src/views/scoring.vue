@@ -2,38 +2,48 @@
   <div>
     <div class="card text-center border-0">
       <!-- 返回按鈕 -->
-      <div class="d-flex align-items-center text-start mx-3 mt-3 justify-content-between">
-        <router-link :to="`/home/${uid}/team/${teamid}`" class="btn d-flex align-items-center fs-5" style="color:#2c3e50">
-          <span v-on:click="storeLocalData()">
-            <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
-          </span>
+      <div class="d-flex align-items-center text-start mx-3 my-3 justify-content-between">
+        <!-- <router-link :to="`/home/${uid}/team/${teamid}`"  class="btn btn-outline-dark">
+          <p v-on:click="storeLocalData()" class="mb-0 d-flex align-items-center">
+            返回頁面
+          </p>
+        </router-link> -->
+        <router-link :to="`/home/${uid}/team/${teamid}`" class="btn d-flex align-items-center fs-5 px-0" style="color:#2c3e50">
+          <p v-on:click="storeLocalData()" class="mb-0 d-flex align-items-center">
+            <i class="fa-solid fa-angle-left fs-2" style="color:#495057;"></i>&nbsp;返回
+          </p>
         </router-link>
         <div class="text-center">
           <p class="mb-0 fs-5 fw-bolder">{{contestInfo.contest}}</p>
           <p class="mb-0 fw-bold">{{contestInfo.date}}</p>
         </div>
-        <router-link :to="`/home/${uid}/team/${teamid}/record/${contestid}`" class="btn btn-outline-dark">
-          <!-- <span v-on:click="storeLocalData()"> -->
+        <router-link :to="`/home/${uid}/team/${teamid}/record/${contestid}`" class="btn btn-success">
           <span>
             查看分析
           </span>
         </router-link>
+        <!-- <router-link :to="`/home/${uid}/team/${teamid}/record/${contestid}`" class="btn d-flex align-items-center fs-5 px-0" style="color:#2c3e50">
+          <span class="mb-0 d-flex align-items-center text-success">
+            分析&nbsp;<i class="fa-solid fa-angle-right fs-2"></i>
+          </span>
+        </router-link> -->
       </div>
 
       <!-- 計分表 -->
-      <div class="card-body py-2 mx-1">
+      <div class="card-body py-2 mx-0">
         <div class="card" style="border: none">
           <!-- 隊伍 & 局數 & 分數 -->
           <div class="d-grid score-board text-center">
             <div class="d-grid scores text-center">
               <!-- 我方 -->
-              <button class="btn btn-sm btn-primary" style="background-color: #e76f51; border: none;"> {{ scoring['host']['name'] }} </button>
-              <span class="justify-content-center mx-1 my-1" style="color: #e76f51; font-weight: bolder"> {{ scoring['host']['winned_game'] }} </span>
-              <span class="justify-content-center mx-1 my-1" style="color: #e76f51; font-weight: bolder"> {{ scoring['host']['cur_score'] }} </span>
+              <button class="btn btn-sm btn-primary fw-bolder" style="background-color: #e76f51; border: none;"> {{ scoring['host']['name'] }} </button>
+              <span class="justify-content-center d-flex align-items-center mx-1 my-1" style="color: #e76f51; font-weight: bolder"> {{ scoring['host']['winned_game'] }} </span>
+              <span class="justify-content-center d-flex align-items-center mx-1 my-1" style="color: #e76f51; font-weight: bolder"> {{ scoring['host']['cur_score'] }} </span>
               <!-- 敵方: 兩個顏色可以選 #219eb(水藍) 和 #2a9d8f(藍綠) -->
-              <button class="btn btn-sm btn-primary" style="background-color: #219ebc; border: none;"> {{ scoring['opponent']['name'] }} </button>
-              <span class="justify-content-center mx-1 my-1" style="color: #219ebc; font-weight: bolder"> {{ scoring['opponent']['winned_game'] }} </span>
-              <span class="justify-content-center mx-1 my-1" style="color: #219ebc; font-weight: bolder"> {{ scoring['opponent']['cur_score'] }} </span>
+              <button class="btn btn-sm btn-primary fw-bolder" style="background-color: #219ebc; border: none;"> {{ scoring['opponent']['name'] }} </button>
+              <!-- <button class="btn btn-sm btn-primary fw-bolder" style="background-color: #219ebc; border: none;"> 國立陽明交通大學學學學嗎嗎嗎嗎嗎嗎嗎</button> -->
+              <span class="justify-content-center d-flex align-items-center mx-1 my-1" style="color: #219ebc; font-weight: bolder"> {{ scoring['opponent']['winned_game'] }} </span>
+              <span class="justify-content-center d-flex align-items-center mx-1 my-1" style="color: #219ebc; font-weight: bolder"> {{ scoring['opponent']['cur_score'] }} </span>
             </div>
 
             <!-- 下一局 & 結束比賽 -->
@@ -109,7 +119,8 @@
                   <button v-for="(member, index) in selected_members" :key="index" type="button" class="btn btn-outline-secondary team-member" 
                           v-bind:style="[ index == 6 ? {gridColumnStart: 2} : {} ]"
                           v-on:click="selected_button['name'] = member['name']; selected_button['number'] = member['number']; selected_button['position'] = member['position']">
-                    <span :class="setPositionTag(member)" style="width:30px">{{ member['number'] }}</span>{{ member['name'] }}
+                    <span :class="setPositionTag(member)" style="width:30px; font-size:70%">{{ member['number'] }}</span>
+                    <br><span style="font-size:100%">{{ member['name'] }}</span>
                   </button>
 
                   <!-- 開啟 modal -->
@@ -186,28 +197,34 @@
                   <div class="d-grid" style="grid-template-rows: 2fr 1fr; gap: 5px">
                     <div class="d-grid" style="grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 5px 5px">
                       <!-- 得分 -->
-                      <button type="button" class="btn btn-outline-secondary" style="background-color: #90be6d; border-color: #90be6d; color: #FFF"
+                      <button type="button" class="btn btn-outline-secondary"
+                              style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 97%"
                               v-on:click="selected_button['record_type'] = 'attackPoint'">
                               攻擊得分
                       </button>
-                      <button type="button" class="btn btn-outline-secondary" style="background-color: #90be6d; border-color: #90be6d; color: #FFF"
+                      <button type="button" class="btn btn-outline-secondary"
+                              style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 97%"
                               v-on:click="selected_button['record_type'] = 'blockPoint'">
                               攔網得分
                       </button>
-                      <button type="button" class="btn btn-outline-secondary" style="background-color: #90be6d; border-color: #90be6d; color: #FFF"
+                      <button type="button" class="btn btn-outline-secondary"
+                              style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 97%"
                               v-on:click="selected_button['record_type'] = 'servicePoint'">
                               發球得分
                       </button>
                       <!-- 失誤 & 失分 -->
-                      <button type="button" class="btn btn-outline-secondary" style="background-color: #f08080; border-color: #f08080; color: #FFF"
+                      <button type="button" class="btn btn-outline-secondary"
+                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 97%"
                               v-on:click="selected_button['record_type'] = 'attackError'">
                               攻擊失誤
                       </button>
-                      <button type="button" class="btn btn-outline-secondary" style="background-color: #f08080; border-color: #f08080; color: #FFF"
+                      <button type="button" class="btn btn-outline-secondary"
+                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 97%"
                               v-on:click="selected_button['record_type'] = 'tossError'">
                               舉球失誤
                       </button>
-                      <button type="button" class="btn btn-outline-secondary" style="background-color: #f08080; border-color: #f08080; color: #FFF"
+                      <button type="button" class="btn btn-outline-secondary"
+                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 97%"
                               v-on:click="selected_button['record_type'] = 'blockError'">
                               觸網失誤
                       </button>
@@ -533,7 +550,7 @@ export default {
   },
   methods: {
     setPositionTag(record) {
-      var tag = 'badge text-wrapm mx-1 ';
+      var tag = 'badge text-wrap me-1 ';
       
       if (record['position'] == 'MB')
         return tag + 'bg-warning';
@@ -935,8 +952,8 @@ export default {
 
 <style scoped>
 .score-board {
-  grid-template-columns: 7fr 2fr;
-  column-gap: 15px;
+  grid-template-columns: 7fr 3fr;
+  column-gap: 5px;
 }
 .scores{
   grid-template-columns: 13fr 3fr 3fr;
