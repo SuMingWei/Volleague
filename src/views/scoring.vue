@@ -667,7 +667,7 @@ export default {
         // store local data
         this.storeLocalData();
 
-        this.isEndGame = this.checkEndGame();
+        this.isGameOver = this.checkEndGame();
         this.isNextGame = this.checkNextGame();
       } else if (whichBtn == 'lower' && this.isOpponentScore && this.checkOptionAllSelected('lower')) { 
         // whichBtn == 'lower'
@@ -688,7 +688,7 @@ export default {
         // store local data
         this.storeLocalData();
 
-        this.isEndGame = this.checkEndGame();
+        this.isGameOver = this.checkEndGame();
         this.isNextGame = this.checkNextGame();
       }
 
@@ -782,6 +782,7 @@ export default {
       console.log('[checkEndGame]', this.contestInfo.games.length == this.cur_game, this.contestInfo.games.length != 1); 
       console.log('[checkEndGame]', this.scoring.host.cur_score == 15 || this.scoring.opponent.cur_score == 15, this.scoring.host.cur_score == 15, this.scoring.opponent.cur_score == 15); 
       if (this.contestInfo.games.length == this.cur_game && this.contestInfo.games.length != 1) {
+        console.log('[checkEndGame] 1');
         if (this.scoring.host.cur_score >= 14 && this.scoring.opponent.cur_score >= 14) {
           // 雙方大於 24 分
           // deuce
@@ -794,6 +795,7 @@ export default {
         else 
           return false;
       } else if (this.contestInfo.games.length == 1) {
+        console.log('[checkEndGame] 2');
         if (this.scoring.host.cur_score >= 24 && this.scoring.opponent.cur_score >= 24) {
           // 雙方大於 24 分
           // deuce
@@ -801,11 +803,16 @@ export default {
             return true;
           else
             return false;
-        } else if (this.scoring.host.cur_score == 25 || this.scoring.opponent.cur_score == 25)// not deucing
+        } else if (this.scoring.host.cur_score == 25 || this.scoring.opponent.cur_score == 25) {
+          // not deucing 
+          console.log('[checkEndGame] 2-1');
           return true;
-        else 
+        } else {
+          console.log('[checkEndGame] 2-2');
           return false;
+        }
       } else {
+        console.log('[checkEndGame] 3');
         return false;
       }
     },
@@ -868,11 +875,12 @@ export default {
         this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: this.records_pushed_raw});
       
 
-      this.isEndGame = this.checkEndGame();
+      this.isGameOver = this.checkEndGame();
       this.isNextGame = this.checkNextGame();
     },
     endGame() {
-      if (!(this.contestInfo.games.length < this.cur_game)) {
+      if (!(this.contestInfo.games.length < this.cur_game)) { 
+        // 避免在查看已經結束的比賽時，按下 endgame 還是會繼續送資料
         this.nextGame(true);
   
         // 清除遠端的暫存資料
