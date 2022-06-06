@@ -19,7 +19,7 @@
         </div>
         <router-link :to="`/home/${uid}/team/${teamid}/record/${contestid}`" class="btn btn-outline-success">
           <span>
-            查看分析
+            分析
           </span>
         </router-link>
         <!-- <router-link :to="`/home/${uid}/team/${teamid}/record/${contestid}`" class="btn d-flex align-items-center fs-5 px-0" style="color:#2c3e50">
@@ -85,313 +85,329 @@
           </div>
         </div>
       </div>
-      
-      <!-- 分頁標籤 -->
-      <ul class="nav nav-tabs" id="myTab" role="tablist" style="margin: 1em 1em 0 1em;">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active fw-bold" id="record-tab" data-bs-toggle="tab" data-bs-target="#record-tab-pane" type="button" role="tab" aria-controls="record-tab-pane" aria-selected="true">記錄選項</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link fw-bold" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-tab-pane" type="button" role="tab" aria-controls="history-tab-pane" aria-selected="false">歷史記錄</button>
-        </li>
-      </ul>
-      <!-- 分頁標籤內容 -->
-      <div class="tab-content border border-1 border-top-0" id="myTabContent" style="margin: 0em 1em 1em 1em;">
-        <!-- 紀錄選項 -->
-        <div class="tab-pane fade show active" id="record-tab-pane" role="tabpanel" aria-labelledby="record-tab" tabindex="0">
-          <div class="card-body"> 
-            <!-- 上場球員 -->
-            <div v-show="!isOpponentScore" class="card mb-3 fw-bold">
-              <!-- card 標題 -->
-              <div class="card-head py-2" style="background-color:#E5E8E8">
-                <span class="fw-bolder fs-5">
-                  <i class="fa-solid fa-people-group"></i> 上場球員
-                </span>
-              </div>
-              <!-- card 內容 -->
-              <div class="card-body text-center" style="padding: 0.5em 0.5em !important">
-                <!-- 已經設定過上場人員 -->
-                <div v-if="this.isCourtMemSet" class="d-grid team-members-grid">
-                  <!-- 上場人員九宮格 -->
-                  <button v-for="(member, index) in selected_members" :key="index" type="button" class="btn btn-outline-secondary team-member" 
-                          v-bind:style="[ index == 6 ? {gridColumnStart: 2} : {} ]"
-                          v-on:click="selected_button['name'] = member['name']; selected_button['number'] = member['number']; selected_button['position'] = member['position']">
-                    <span :class="setPositionTag(member)" style="width:35px; font-size:70%">{{ member['number'] }}</span>
-                    <br><span style="font-size:100%">{{ member['name'] }}</span>
-                  </button>
 
-                  <!-- 開啟 modal -->
-                  <div class="d-block d-flex align-items-middle justify-content-end" style="grid-column-start: 3; grid-row-start: 3">
-                    <button class="btn text-black-50 mx-1 my-1" data-bs-toggle="modal" data-bs-target="#setCourtMemModal">
-                      <i class="fa-solid fa-pencil fs-5"></i>
-                    </button>
-                  </div>
+      <!-- 如果比賽已經結束 -->
+      <div v-if="isGameOver">
+        <div class="card-body py-3 mx-0">
+          <div class="p-2 d-flex align-items-center justify-content-center border" style="border-radius: 5px">
+            <p class="my-2 text-secondary">比賽已經結束了喔！</p>
+          </div>
+        </div> 
+      </div>
+      <!-- 比賽還沒結束 -->
+      <div v-else>
+        <!-- 分頁標籤 -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist" style="margin: 1em 1em 0 1em;">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="record-tab" data-bs-toggle="tab" data-bs-target="#record-tab-pane" type="button" role="tab" aria-controls="record-tab-pane" aria-selected="true">記錄選項</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-tab-pane" type="button" role="tab" aria-controls="history-tab-pane" aria-selected="false">歷史記錄</button>
+          </li>
+        </ul>
+        <!-- 分頁標籤內容 -->
+        <div class="tab-content border border-1 border-top-0" id="myTabContent" style="margin: 0em 1em 1em 1em;">
+          <!-- 紀錄選項 -->
+          <div class="tab-pane fade show active" id="record-tab-pane" role="tabpanel" aria-labelledby="record-tab" tabindex="0">
+            <div class="card-body"> 
+              <!-- 上場球員 -->
+              <div v-show="!isOpponentScore" class="card mb-3 fw-bold">
+                <!-- card 標題 -->
+                <div class="card-head py-2" style="background-color:#E5E8E8">
+                  <span class="fw-bolder fs-5">
+                    <i class="fa-solid fa-people-group"></i> 上場球員
+                  </span>
                 </div>
-
-                <!-- 沒有設定過上場人員（初始化） -->
-                <div v-else>
-                  <div class="d-block text-center">
-                    <button class="btn btn-outline-secondary text-black-50 mx-1 my-1" data-bs-toggle="modal" data-bs-target="#setCourtMemModal">
-                      按我來選擇上場的人員
+                <!-- card 內容 -->
+                <div class="card-body text-center" style="padding: 0.5em 0.5em !important">
+                  <!-- 已經設定過上場人員 -->
+                  <div v-if="this.isCourtMemSet" class="d-grid team-members-grid">
+                    <!-- 上場人員九宮格 -->
+                    <button v-for="(member, index) in selected_members" :key="index" type="button" class="btn btn-outline-secondary team-member" 
+                            v-bind:style="[ index == 6 ? {gridColumnStart: 2} : {} ]"
+                            v-on:click="selected_button['name'] = member['name']; selected_button['number'] = member['number']; selected_button['position'] = member['position']">
+                      <span :class="setPositionTag(member)" style="width:35px; font-size:70%">{{ member['number'] }}</span>
+                      <br><span style="font-size:100%">{{ member['name'] }}</span>
                     </button>
+
+                    <!-- 開啟 modal -->
+                    <div class="d-block d-flex align-items-middle justify-content-end" style="grid-column-start: 3; grid-row-start: 3">
+                      <button class="btn text-black-50 mx-1 my-1" data-bs-toggle="modal" data-bs-target="#setCourtMemModal">
+                        <i class="fa-solid fa-pencil fs-5"></i>
+                      </button>
+                    </div>
                   </div>
 
-                </div>
-                
-                <!-- 編輯上場人員的 modal -->
-                <div class="modal fade" id="setCourtMemModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setCourtMemModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="setCourtMemModalLabel">選擇上場人員</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
+                  <!-- 沒有設定過上場人員（初始化） -->
+                  <div v-else>
+                    <div class="d-block text-center">
+                      <button class="btn btn-outline-secondary text-black-50 mx-1 my-1" data-bs-toggle="modal" data-bs-target="#setCourtMemModal">
+                        按我來選擇上場的人員
+                      </button>
+                    </div>
 
-                      <div class="modal-body">
-                        <!-- quickly set on-court members -->
-                        <button v-on:click="setCourtMem()" class="py-1">設定上場人員</button>
-                        <button v-on:click="checkSetCourtMem()">Test Check</button>
-                        <!-- <button v-on:click="setCourtMem()">Set Court Member</button> -->
-                        <div class="d-grid mx-1 my-1 team-members-grid">
-                          <div v-for="n in 7" :key="n" v-bind:style="[ n == 7 ? {gridColumnStart: 2} : {} ]">
-                            <select class="form-select text-center"  v-model="selected_members[n-1]">
-                              <option selected>
-                                <p v-if="n != 7">人員 {{ n }}</p>
-                                <p v-else>自由</p>
-                              </option>
-                              <option v-for="(item, index) in teamInfo.members" :key="index" :value="item"> 
-                                <p>{{ item['number'] }} | {{ item['name'] }} | {{ item['position'] }}</p>
-                              </option>
-                            </select>
+                  </div>
+                  
+                  <!-- 編輯上場人員的 modal -->
+                  <div class="modal fade" id="setCourtMemModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setCourtMemModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="setCourtMemModalLabel">選擇上場人員</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body">
+                          <!-- quickly set on-court members -->
+                          <button v-on:click="setCourtMem()" class="py-1">設定上場人員</button>
+                          <button v-on:click="checkSetCourtMem()">Test Check</button>
+                          <!-- <button v-on:click="setCourtMem()">Set Court Member</button> -->
+                          <div class="d-grid mx-1 my-1 team-members-grid">
+                            <div v-for="n in 7" :key="n" v-bind:style="[ n == 7 ? {gridColumnStart: 2} : {} ]">
+                              <select class="form-select text-center"  v-model="selected_members[n-1]">
+                                <option selected>
+                                  <p v-if="n != 7">人員 {{ n }}</p>
+                                  <p v-else>自由</p>
+                                </option>
+                                <option v-for="(item, index) in teamInfo.members" :key="index" :value="item"> 
+                                  <p>{{ item['number'] }} | {{ item['name'] }} | {{ item['position'] }}</p>
+                                </option>
+                              </select>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary" v-on:click="checkSetCourtMem()" data-bs-dismiss="modal">確認</button>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                          <button type="button" class="btn btn-primary" v-on:click="checkSetCourtMem()" data-bs-dismiss="modal">確認</button>
+                        </div>
                       </div>
                     </div>
                   </div>
+
+                </div>
+              </div>
+              
+              <!-- 各球記錄 -->
+              <div class="card mb-3 fw-bold">
+                <!-- 標題 -->
+                <div class="card-head py-2" style="background-color:#E5E8E8">
+                  <span class="fw-bolder fs-5">
+                    <i class="far fa-clipboard"></i> 各球記錄
+                  </span>
                 </div>
 
-              </div>
-            </div>
-            
-            <!-- 各球記錄 -->
-            <div class="card mb-3 fw-bold">
-              <!-- 標題 -->
-              <div class="card-head py-2" style="background-color:#E5E8E8">
-                <span class="fw-bolder fs-5">
-                  <i class="far fa-clipboard"></i> 各球記錄
-                </span>
-              </div>
+                <!-- 十個按鈕 -->
+                <div class="card-body text-center">
+                  <div class="d-grid" style="grid-template-rows: 3fr 1fr; row-gap: 15px">
+                    <!-- 九個得失分按鈕 -->
+                    <!-- <div class="d-grid" style="grid-template-rows: 2fr 1fr; gap: 5px"> -->
+                      <div class="d-grid" style="grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 5px 5px">
+                        <!-- <span class="d-flex align-items-center justify-content-center" style="grid-column-start:2">
+                          得分
+                        </span> -->
+                        <!-- 得分 -->
+                        <button type="button" class="btn btn-outline-secondary"
+                                style="background-color: #95a5a6; border-color: #95a5a6; color: #FFF; font-size: 85%"
+                                v-on:click="selected_button['record_type'] = 'attackPoint'">
+                                攻擊得分
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary"
+                                style="background-color: #95a5a6; border-color: #95a5a6; color: #FFF; font-size: 85%"
+                                v-on:click="selected_button['record_type'] = 'blockPoint'">
+                                攔網得分
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary"
+                                style="background-color: #95a5a6; border-color: #95a5a6; color: #FFF; font-size: 85%"
+                                v-on:click="selected_button['record_type'] = 'servicePoint'">
+                                發球得分
+                        </button>
 
-              <!-- 十個按鈕 -->
-              <div class="card-body text-center">
-                <div class="d-grid" style="grid-template-rows: 3fr 1fr; row-gap: 15px">
-                  <!-- 九個得失分按鈕 -->
-                  <!-- <div class="d-grid" style="grid-template-rows: 2fr 1fr; gap: 5px"> -->
-                    <div class="d-grid" style="grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 5px 5px">
-                      <!-- <span class="d-flex align-items-center justify-content-center" style="grid-column-start:2">
-                        得分
-                      </span> -->
-                      <!-- 得分 -->
-                      <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #95a5a6; border-color: #95a5a6; color: #FFF; font-size: 85%"
-                              v-on:click="selected_button['record_type'] = 'attackPoint'">
-                              攻擊得分
+                        <!-- <span class="d-flex align-items-center justify-content-center" style="grid-column-start:2">
+                          失誤
+                        </span> -->
+                        <!-- 失誤 & 失分 -->
+                        <button type="button" class="btn btn-outline-secondary"
+                                style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
+                                v-on:click="selected_button['record_type'] = 'attackError'">
+                                攻擊失誤
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary"
+                                style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
+                                v-on:click="selected_button['record_type'] = 'tossError'">
+                                舉球失誤
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary"
+                                style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
+                                v-on:click="selected_button['record_type'] = 'blockError'">
+                                觸網失誤
+                        </button>
+                      <!-- </div> -->
+                      <!-- <div class="d-grid" style="grid-template-columns: 1fr 1fr;; grid-template-rows: 1fr; gap: 5px"> -->
+                        <button type="button" class="btn btn-outline-secondary"
+                                style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
+                                v-on:click="selected_button['record_type'] = 'receiveError'">
+                                接發失誤
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary"
+                                style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
+                                v-on:click="selected_button['record_type'] = 'serviceError'">
+                                發球失誤
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary"
+                                style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
+                                v-on:click="clearSelected(); selected_button['record_type'] = 'oppoScore'; isOpponentScore = true">
+                                對方得分
                       </button>
-                      <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #95a5a6; border-color: #95a5a6; color: #FFF; font-size: 85%"
-                              v-on:click="selected_button['record_type'] = 'blockPoint'">
-                              攔網得分
-                      </button>
-                      <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #95a5a6; border-color: #95a5a6; color: #FFF; font-size: 85%"
-                              v-on:click="selected_button['record_type'] = 'servicePoint'">
-                              發球得分
-                      </button>
-
-                      <!-- <span class="d-flex align-items-center justify-content-center" style="grid-column-start:2">
-                        失誤
-                      </span> -->
-                      <!-- 失誤 & 失分 -->
-                      <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
-                              v-on:click="selected_button['record_type'] = 'attackError'">
-                              攻擊失誤
-                      </button>
-                      <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
-                              v-on:click="selected_button['record_type'] = 'tossError'">
-                              舉球失誤
-                      </button>
-                      <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
-                              v-on:click="selected_button['record_type'] = 'blockError'">
-                              觸網失誤
-                      </button>
+                      </div>
                     <!-- </div> -->
-                    <!-- <div class="d-grid" style="grid-template-columns: 1fr 1fr;; grid-template-rows: 1fr; gap: 5px"> -->
+                      
+                    <!-- 送出按鈕 -->
+                    <div class="d-grid" style="grid-template-columns: 1fr; gap: 5px">
+                      <!-- <button type="button" class="btn btn-outline-secondary"
+                              style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 85%; grid-column-start:2"
+                              v-on:click="clearSelected();">
+                              取消
+                      </button> -->
                       <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
-                              v-on:click="selected_button['record_type'] = 'receiveError'">
-                              接發失誤
+                              style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 85%; grid-column-start:1"
+                              v-on:click="record('upper')">
+                              <!-- <span>送出紀錄</span> -->
+                              <span v-if="selected_button.name == '' && selected_button.record_type == ''">送出紀錄</span>
+                              <span v-else>送出：</span>
+                              
+                              <span v-if="selected_button.name != ''">{{ this.selected_button.name }} </span>
+                              <span v-if="selected_button.record_type != ''"> {{ this.translateType2Man[this.selected_button.record_type] }}</span>
                       </button>
-                      <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
-                              v-on:click="selected_button['record_type'] = 'serviceError'">
-                              發球失誤
-                      </button>
-                      <button type="button" class="btn btn-outline-secondary"
-                              style="background-color: #515a5a; border-color: #515a5a; color: #FFF; font-size: 85%;"
-                              v-on:click="clearSelected(); selected_button['record_type'] = 'oppoScore'; isOpponentScore = true">
-                              對方得分
-                    </button>
+                      <!-- 對方得分：用於記錄落點 -->
                     </div>
-                  <!-- </div> -->
-                    
-                  <!-- 送出按鈕 -->
-                  <div class="d-grid" style="grid-template-columns: 1fr; gap: 5px">
-                    <!-- <button type="button" class="btn btn-outline-secondary"
-                            style="background-color: #f08080; border-color: #f08080; color: #FFF; font-size: 85%; grid-column-start:2"
-                            v-on:click="clearSelected();">
-                            取消
-                    </button> -->
-                    <button type="button" class="btn btn-outline-secondary"
-                            style="background-color: #90be6d; border-color: #90be6d; color: #FFF; font-size: 85%; grid-column-start:1"
-                            v-on:click="record('upper')">
-                            <span>送出紀錄</span>
-                    </button>
-                    <!-- 對方得分：用於記錄落點 -->
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- 落點記錄 -->
-            <div v-if="isOpponentScore" class="card mb-3 fw-bolds">
-              <!-- 標題 -->
-              <div class="card-head py-2" style="background-color:#E5E8E8">
-                <span class="fw-bolder fs-5">
-                  <i class="fas fa-volleyball-ball"></i> 落點記錄
-                </span>
-              </div>
-
-              <!-- 場地九宮格 & 下方控制項 -->
-              <div class="card-body">
-                <!-- 場地九宮格 -->
-                <div class="container border border-2 border-dark" style="width: 272px; height: 272px">
-                  <div class="row border-bottom border-2 border-dark" style="width: 270px">
-                    <div  v-for="n in 3" :key="n" class="d-flex col landing-spots" style="height: 90px" 
-                          v-on:click="selected_button['landing'] = n-1">
-                      <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> {{ n }} </button>
-                    </div>
-                  </div>
-                  <div class="row border-bottom border-2 border-dark-80" style="width: 270px">
-                    <div  v-for="n in 3" :key="n" class="d-flex col landing-spots" style="height: 90px"
-                          v-on:click="selected_button['landing'] = (n-1+3)">
-                      <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> {{ n+3 }} </button>
-                    </div>
-                  </div>
-                  <div class="row" style="width: 270px">
-                    <div  v-for="n in 3" :key="n" class="d-flex col landing-spots" style="height: 90px"
-                          v-on:click="selected_button['landing'] = (n-1+6)">
-                      <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> {{ n+6 }} </button>
-                    </div>
-                  </div>
+              <!-- 落點記錄 -->
+              <div v-if="isOpponentScore" class="card mb-3 fw-bolds">
+                <!-- 標題 -->
+                <div class="card-head py-2" style="background-color:#E5E8E8">
+                  <span class="fw-bolder fs-5">
+                    <i class="fas fa-volleyball-ball"></i> 落點記錄
+                  </span>
                 </div>
 
-                <!-- 右邊控制項 & 界外按鈕 -->
-                <div class="d-grid" style="grid-template-columns: 1fr 2fr; column-gap: 5px; width: 272px; margin: auto auto">
-                  <!-- 界外按鈕 -->
-                  <div class="landing-spots">
-                    <button type="button" class="btn btn-outline-secondary" style="padding: auto auto; height: 80px; width: 80px"
-                            v-on:click="selected_button['landing'] = 9"> 
-                      Touch Out
-                    </button>
-                  </div>
-                  <!-- 右邊控制項 -->
-                  <div class="d-grid text-center" style="grid-template-rows: 1.75fr 1fr">
-                    <div class="d-grid" style="grid-template-rows: 0.75fr 1fr; grid-template-columns: 1fr 1fr">
-                      <p class="" style="margin: auto auto">敵方背號</p>
-                      <p class="" style="margin: auto auto">敵方位置</p>
-                      <input type="text" v-model="selected_button['opponent']['num']" size="1" class="mx-1 my-1">
-                      <select class="form-select text-center mx-1 my-1" style="min-width: auto"  v-model="selected_button['opponent']['pos']">
-                        <option selected> 選擇位置</option>
-                        <option v-for="(item, index) in positions" :key="index" :value="item"> 
-                          <p> {{ item }} </p>
-                        </option>
-                      </select>
+                <!-- 場地九宮格 & 下方控制項 -->
+                <div class="card-body">
+                  <!-- 場地九宮格 -->
+                  <div class="container border border-2 border-dark" style="width: 272px; height: 272px">
+                    <div class="row border-bottom border-2 border-dark" style="width: 270px">
+                      <div  v-for="n in 3" :key="n" class="d-flex col landing-spots" style="height: 90px" 
+                            v-on:click="selected_button['landing'] = n-1">
+                        <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> {{ n }} </button>
+                      </div>
                     </div>
-                    <div class="d-grid" style="grid-template-columns: 1fr 1fr">
-                      <button type="button" class="btn btn-outline-secondary mx-1 my-1"
-                              style="background-color: #f08080; border-color: #f08080 !important; color: #FFF"
-                              v-on:click="isOpponentScore = false; clearSelected()"> 
-                            取消
+                    <div class="row border-bottom border-2 border-dark-80" style="width: 270px">
+                      <div  v-for="n in 3" :key="n" class="d-flex col landing-spots" style="height: 90px"
+                            v-on:click="selected_button['landing'] = (n-1+3)">
+                        <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> {{ n+3 }} </button>
+                      </div>
+                    </div>
+                    <div class="row" style="width: 270px">
+                      <div  v-for="n in 3" :key="n" class="d-flex col landing-spots" style="height: 90px"
+                            v-on:click="selected_button['landing'] = (n-1+6)">
+                        <button type="button" class="btn btn-outline-secondary" style="height: 50px; width: 50px"> {{ n+6 }} </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 右邊控制項 & 界外按鈕 -->
+                  <div class="d-grid" style="grid-template-columns: 1fr 2fr; column-gap: 5px; width: 272px; margin: auto auto">
+                    <!-- 界外按鈕 -->
+                    <div class="landing-spots">
+                      <button type="button" class="btn btn-outline-secondary" style="padding: auto auto; height: 80px; width: 80px"
+                              v-on:click="selected_button['landing'] = 9"> 
+                        Touch Out
                       </button>
-                      <button type="button" class="btn btn-outline-secondary mx-1 my-1"
-                              style="background-color: #90be6d; border-color: #90be6d !important; color: #FFF"
-                              v-on:click="record('lower')"> 
-                            送出
-                      </button>
+                    </div>
+                    <!-- 右邊控制項 -->
+                    <div class="d-grid text-center" style="grid-template-rows: 1.75fr 1fr">
+                      <div class="d-grid" style="grid-template-rows: 0.75fr 1fr; grid-template-columns: 1fr 1fr">
+                        <p class="" style="margin: auto auto">敵方背號</p>
+                        <p class="" style="margin: auto auto">敵方位置</p>
+                        <input type="text" v-model="selected_button['opponent']['num']" size="1" class="mx-1 my-1">
+                        <select class="form-select text-center mx-1 my-1" style="min-width: auto"  v-model="selected_button['opponent']['pos']">
+                          <option selected> 選擇位置</option>
+                          <option v-for="(item, index) in positions" :key="index" :value="item"> 
+                            <p> {{ item }} </p>
+                          </option>
+                        </select>
+                      </div>
+                      <div class="d-grid" style="grid-template-columns: 1fr 1fr">
+                        <button type="button" class="btn btn-outline-secondary mx-1 my-1"
+                                style="background-color: #f08080; border-color: #f08080 !important; color: #FFF"
+                                v-on:click="isOpponentScore = false; clearSelected()"> 
+                              取消
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary mx-1 my-1"
+                                style="background-color: #90be6d; border-color: #90be6d !important; color: #FFF"
+                                v-on:click="record('lower')"> 
+                              送出
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- 本局歷史記錄 -->
-        <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" aria-labelledby="history-tab" tabindex="0">
-          <!-- 位置與標記的對應 -->
-          <div class="mt-3">
-            <span class="fw-bold">位置：</span>
-            <span class="badge bg-primary text-wrapm mx-1" style="width:35px">OP</span>
-            <span class="badge bg-secondary text-wrapm mx-1" style="width:35px">L</span>
-            <span class="badge bg-danger text-wrapm mx-1" style="width:35px">OH</span>
-            <span class="badge bg-warning text-wrapm mx-1" style="width:35px">MB</span>
-            <span class="badge bg-success text-wrapm mx-1" style="width:35px">S</span>
-          </div>
+          <!-- 本局歷史記錄 -->
+          <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" aria-labelledby="history-tab" tabindex="0">
+            <!-- 位置與標記的對應 -->
+            <div class="mt-3">
+              <span class="fw-bold">位置：</span>
+              <span class="badge bg-primary text-wrapm mx-1" style="width:35px">OP</span>
+              <span class="badge bg-secondary text-wrapm mx-1" style="width:35px">L</span>
+              <span class="badge bg-danger text-wrapm mx-1" style="width:35px">OH</span>
+              <span class="badge bg-warning text-wrapm mx-1" style="width:35px">MB</span>
+              <span class="badge bg-success text-wrapm mx-1" style="width:35px">S</span>
+            </div>
 
-          <!-- 表格 -->
-          <div class="table-responsive-md mx-2 my-3 fw-bold text-center" style="max-height:400px">
-            <table class="table table-striped align-middle text-nowrap">
-              <thead class="sticky-top">
-                <tr style="background-color:#2c3e50; color:white">
-                  <th scope="col" style="">球員</th>
-                  <th scope="col" style="" >內容</th>
-                  <th scope="col">落點</th>
-                  <th scope="col">局數</th>
-                  <th scope="col">功能</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(record, index) in records_local" :key="index">
-                  <td class="" style="">
-                    <div class="col-auto d-flex align-items-center">
-                      <span :class="setPositionTag(record)" style="width:35px"> {{ record['num'] }} </span>
-                      <span class="text-nowrap"> {{ record['name'] }} </span>
-                    </div>
-                  </td>
-                  <td class="border-start" style=""> {{ record['record_type'] }} </td>
-                  <td class="border-start"> 
-                    <span v-if="record['landing'] == 10">Touch Out</span>
-                    <span v-else-if="record['landing'] != -1">{{ record['landing'] }}</span>
-                    <span v-else>X</span>
-                  </td>
-                  <td class="border-start"> {{ record['game'] }} </td>
-                  <td class="border-start"> 
-                    <button style="border-color: red; border-style: solid; border-radius: 20%"
-                            v-on:click="deleteLocalRecord(record)">
-                      <i class="fas fa-trash-alt" style="color: red"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <!-- 表格 -->
+            <div class="table-responsive-md mx-2 my-3 fw-bold text-center" style="max-height:400px">
+              <table class="table table-striped align-middle text-nowrap">
+                <thead class="sticky-top">
+                  <tr style="background-color:#2c3e50; color:white">
+                    <th scope="col" style="">球員</th>
+                    <th scope="col" style="" >內容</th>
+                    <th scope="col">落點</th>
+                    <th scope="col">局數</th>
+                    <th scope="col">功能</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(record, index) in records_local" :key="index">
+                    <td class="" style="">
+                      <div class="col-auto d-flex align-items-center">
+                        <span :class="setPositionTag(record)" style="width:35px"> {{ record['num'] }} </span>
+                        <span class="text-nowrap"> {{ record['name'] }} </span>
+                      </div>
+                    </td>
+                    <td class="border-start" style=""> {{ record['record_type'] }} </td>
+                    <td class="border-start"> 
+                      <span v-if="record['landing'] == 10">Touch Out</span>
+                      <span v-else-if="record['landing'] != -1">{{ record['landing'] }}</span>
+                      <span v-else>X</span>
+                    </td>
+                    <td class="border-start"> {{ record['game'] }} </td>
+                    <td class="border-start"> 
+                      <button style="border-color: red; border-style: solid; border-radius: 20%"
+                              v-on:click="deleteLocalRecord(record)">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -436,8 +452,15 @@ export default {
         bulletin: '',
         awards: [''],
         members: [],  // name, number, position, uid
-        contestRecords: [''],
+        contestRecords: [{
+          contest: '',
+          date: '',
+          gameScore: '',
+          key: '',
+          opponent: ''
+        }],
       },
+      isGameOver: false,
       isCourtMemSet: false, // bind to court member section
       isOpponentScore: false, // bind to button, '對方得分'
       positions: ['OH', 'O', 'MB', 'S', 'L'],
@@ -543,6 +566,10 @@ export default {
           this.records_pushed_raw = this.contestInfo.localRecordsRaw;
         }
 
+        // check if game over
+        console.log('[beforeMount] check = ', this.contestInfo.games.length, this.cur_game, this.contestInfo.games.length < this.cur_game);
+        if (this.contestInfo.games.length < this.cur_game) 
+          this.isGameOver = true;
 
         console.log('[beforeMount] localRecordsRaw', this.contestInfo, this.contestInfo.localRecordsRaw, typeof this.contestInfo.localRecordsRaw);
         console.log('[beforeMount] records_pushed_raw', this.records_pushed_raw, this.records_pushed_raw, typeof this.records_pushed_raw);
@@ -560,6 +587,8 @@ export default {
 
       console.log('[beforeMount] records_local = ', typeof data, typeof this.records_local, this.records_local, this.records_local == null);
     });
+  
+    
   },
   methods: {
     setPositionTag(record) {
@@ -789,6 +818,14 @@ export default {
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {gameScore: this.contestInfo.gameScore});
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {score: this.contestInfo.score});
 
+      // contestRecords
+      for(let i = 0; i < this.teamInfo.contestRecords.length; ++i) {
+        if (this.teamInfo.contestRecords[i].contest == this.contestInfo.contest) {
+          this.teamInfo.contestRecords[i].gameScore = this.contestInfo.gameScore;
+          this.$http.patch(this.db + 'team/' + this.teamid + '.json', JSON.stringify(this.teamInfo));
+        }
+      }
+
       // 上場球員
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
       
@@ -931,6 +968,14 @@ export default {
       this.contestInfo.gameScore = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {gameScore: this.contestInfo.gameScore});
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {score: this.contestInfo.score});
+
+      // contestRecords
+      for(let i = 0; i < this.teamInfo.contestRecords.length; ++i) {
+        if (this.teamInfo.contestRecords[i].contest == this.contestInfo.contest) {
+          this.teamInfo.contestRecords[i].gameScore = this.contestInfo.gameScore;
+          this.$http.patch(this.db + 'team/' + this.teamid + '.json', JSON.stringify(this.teamInfo));
+        }
+      }
 
       // 上場球員
       console.log('[storeLocalData]', this.isCourtMemSet, Object.entries(this.selected_members[0]).length == 0, this.selected_members);
