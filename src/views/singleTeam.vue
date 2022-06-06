@@ -47,9 +47,9 @@
                 <i class="fa-solid fa-plus"></i> 新增比賽
               </button>
             </div>
-            <div class="d-flex gap-3 justify-content-center mb-2">
+            <!-- <div class="d-flex gap-3 justify-content-center mb-2">
               <button @click="addPoint" class="btn btn-warning">測試</button>
-            </div>
+            </div> -->
             <div v-if="teamInfo.contestRecords[0] != ''" class="list-group" style="height: 350px; overflow-y:scroll">
               <div v-for="(item,idx) in teamInfo.contestRecords" :key="idx" class="list-group-item d-flex justify-content-between list-group-item-action">
                 <div class=" text-center">
