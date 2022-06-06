@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div class="card text-center">
-      <div>
-        <!-- {{ uid }} | {{ teamid }} | {{ teamInfo }} -->
-      </div>
+    <div class="card text-center border-0">
       <!-- 返回按鈕 -->
       <div class="d-flex align-items-center text-start mx-3 mt-3 justify-content-between">
         <router-link :to="`/home/${uid}/team/${teamid}`" class="btn d-flex align-items-center fs-5" style="color:#2c3e50">
@@ -14,7 +11,9 @@
           <p class="mb-0 fw-bold">{{teamInfo.contestRecords[0].date}}</p>
         </div>
         <router-link :to="`/home/${uid}/team/${teamid}/record/${contestid}`" class="btn btn-outline-dark">
-          查看分析
+          <span v-on:click="storeLocalData()">
+            查看分析
+          </span>
         </router-link>
       </div>
 
@@ -55,7 +54,14 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" v-on:click="endGame(true)" data-bs-dismiss="modal">確定</button>
+                    <router-link :to="`/home/${uid}/team/${teamid}`" class="btn d-flex align-items-center fs-5" style="color:#2c3e50" >
+                      <span class="btn btn-primary" v-on:click="endGame(true)" data-bs-dismiss="modal">
+                        確定
+                      </span>
+                    </router-link>
+                    <!-- <button type="button" v-on:click="endGame(true)" data-bs-dismiss="modal">
+                      確定
+                    </button> -->
                   </div>
                 </div>
               </div>
@@ -140,7 +146,7 @@
                                 <p v-if="n != 7">人員 {{ n }}</p>
                                 <p v-else>自由</p>
                               </option>
-                              <option v-for="(item, index) in teamInfo.member" :key="index" :value="item"> 
+                              <option v-for="(item, index) in teamInfo.members" :key="index" :value="item"> 
                                 <p>{{ item['number'] }} | {{ item['name'] }} | {{ item['position'] }}</p>
                               </option>
                             </select>
@@ -362,42 +368,96 @@ export default {
       teamid: this.$route.params.teamid,
       contestid: this.$route.params.contestid,
       db: 'https://volleague-default-rtdb.firebaseio.com/',
+      users: {
+        // 'uid': {
+        //   StatisticsList: [''],
+        //   authid: '',
+        //   birthday: {},
+        //   name: {},
+        //   position: [],
+        //   teamList: []
+        // }
+      },
+      contestInfo: {
+        contest: '',
+        date: '',
+        games: [],
+        opponent: '',
+        score: '',
+        gameScore: '',
+        onCourtMem: '',
+        localRecordsRaw: [''],
+        localRecords: ['']
+      },
       teamInfo:{
         teamName: '',
         bulletin: '',
         awards: [''],
-        members: [],
+        members: [],  // name, number, position, uid
         contestRecords: [''],
       },
       isCourtMemSet: false, // bind to court member section
       isOpponentScore: false, // bind to button, '對方得分'
-      positions: ['OH', 'OP', 'MB', 'S', 'L'],
+      positions: ['OH', 'O', 'MB', 'S', 'L'],
       translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
                       'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '攔網失誤',
                       'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
       translateType2Eng: {'攻擊得分': 'attackPoint', '攔網得分': 'blockPoint','發球得分': 'servicePoint',
                       '攻擊失誤': 'attackError', '舉球失誤': 'tossError', '攔網失誤': 'blockError',
                       '接發失誤': 'receiveError', '發球失誤': 'serviceError', '對方得分': 'oppoScore'},
-      records_pushed: [{
-        'ourteam': {
-          '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
-                    attackPoint: 1, blockPoint: 0, servicePoint: 0,
-                    attackError: 0, tossError: 0, blockError: 0,
-                    receiveError: 0, serviceError: 0 },
-          '張祐誠': {name: '張祐誠', pos: 'MB', number: '22',
-                    attackPoint: 0, blockPoint: 0, servicePoint: 0,
-                    attackError: 0, tossError: 0, blockError: 1,
-                    receiveError: 0, serviceError: 0 },
-        }, 
-        'placement': [[], [], [{'num': 2, 'pos': 'S'}], [], [], [], [], [], [], []] // 0~8: 1~9 九號位置 ; 9: touch out
+      records_pushed_raw: [{
+        'ourTeam': {},
+        'placement': [[''], [''], [''], [''], [''], [''], [''], [''], [''], ['']]
       }],
+      // records_pushed_raw: [
+      //   {
+      //     'ourTeam': {
+      //       '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
+      //                 attackPoint: 1, blockPoint: 0, servicePoint: 0,
+      //                 attackError: 0, tossError: 0, blockError: 0,
+      //                 receiveError: 0, serviceError: 0 },
+      //       'Test7': {name: 'Test7', pos: 'L', number: '88',
+      //                 attackPoint: 0, blockPoint: 0, servicePoint: 0,
+      //                 attackError: 0, tossError: 0, blockError: 1,
+      //                 receiveError: 0, serviceError: 0 },
+      //     }, 
+      //     'placement': [[''], [''], [{'num': 2, 'pos': 'S'}], [''], [''], [''], [''], [''], [''], ['']] // 0~8: 1~9 九號位置 ; 9: touch out
+      //   }
+      //   ,{
+      //     'ourTeam': {
+      //       '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
+      //                 attackPoint: 0, blockPoint: 1, servicePoint: 0,
+      //                 attackError: 0, tossError: 0, blockError: 0,
+      //                 receiveError: 0, serviceError: 0 },
+      //       'Test7': {name: 'Test7', pos: 'L', number: '88',
+      //                 attackPoint: 0, blockPoint: 0, servicePoint: 0,
+      //                 attackError: 0, tossError: 0, blockError: 1,
+      //                 receiveError: 0, serviceError: 1 },
+      //     }, 
+      //     'placement': [[''], [''], [{'num': 22, 'pos': 'S'}], [''], [''], [''], [''], [''], [{'num': 22, 'pos': 'L'}], ['']] // 0~8: 1~9 九號位置 ; 9: touch out
+      //   },
+      //   {
+      //     'ourTeam': {
+      //       '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
+      //                 attackPoint: 0, blockPoint: 0, servicePoint: 0,
+      //                 attackError: 0, tossError: 1, blockError: 0,
+      //                 receiveError: 0, serviceError: 0 },
+      //       'Test7': {name: 'Test7', pos: 'L', number: '88',
+      //                 attackPoint: 0, blockPoint: 0, servicePoint: 0,
+      //                 attackError: 1, tossError: 0, blockError: 1,
+      //                 receiveError: 0, serviceError: 0 },
+      //     }, 
+      //     'placement': [[''], [''], [''], [''], [''], [{'num': 33, 'pos': 'MB'}], [''], [''], [''], ['']] // 0~8: 1~9 九號位置 ; 9: touch out
+      //   }
+      // ],
       // landing: 呈現在表格 --> 1~9 + touch-out
-      records_local: [{'num': 22, 'name': '張祐誠', 'position': 'MB', 'record_type': '攻擊得分', 'landing': -1, 'game': 1},
-                      {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record_type': '攔網失誤', 'landing': -1, 'game': 1},
-                      {'num': 2, 'name': '土木系', 'position': 'S', 'record_type': '對方得分', 'landing': 3, 'game': 1}],
+      records_local: [],
+      // records_local: [{'num': 88, 'name': 'Test7', 'position': 'L', 'record_type': '攻擊得分', 'landing': -1, 'game': 1},
+      //                 {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record_type': '攔網失誤', 'landing': -1, 'game': 1},
+      //                 {'num': 2, 'name': 'NCKU EE', 'position': 'S', 'record_type': '對方得分', 'landing': 3, 'game': 1}],
       scoring: {
-        host: {'name': '資訊系', 'winned_game': 0, 'cur_score': 1},
-        opponent: {'name': '土木系', 'winned_game': 0, 'cur_score': 2}
+        host: {'name': '', 'winned_game': 0, 'cur_score': 0},
+        opponent: {'name': '', 'winned_game': 0, 'cur_score': 0}
       },
       selected_button: {
         'name': '',
@@ -409,24 +469,80 @@ export default {
         'game': this.cur_game
       },
       selected_members: [{}, {}, {}, {}, {}, {}, {}],     // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
-
-      // team_members:[{'name': '張祐1', 'number': 22, 'position': 'MB'},
-      //               {'name': '張祐2', 'number': 23, 'position': 'S'},
-      //               {'name': '張祐3', 'number': 24, 'position': 'OP'},
-      //               {'name': '張祐4', 'number': 25, 'position': 'L'},
-      //               {'name': '張祐5', 'number': 26, 'position': 'OH'},
-      //               {'name': '張祐6', 'number': 27, 'position': 'OH'},
-      //               {'name': '張祐7', 'number': 28, 'position': 'MB'},
-      //               {'name': '張祐L', 'number': 29, 'position': 'S'}], // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
     }
   },
   beforeMount(){
     // console.log(this.teamid);
+    // get teamInfo & memberStatisticList
     this.$http.get(this.db + 'team/' + this.teamid + '.json').then(function(data){
       return data.json();
     }).then(function(data){
       this.teamInfo = data;
+      console.log('[beforeMount] this.teamInfo = ', this.teamInfo);
+      this.scoring.host.name = this.teamInfo.teamName;
+
+      this.$http.get(this.db + 'user.json').then(function(NumData) {
+        return NumData.json();
+      }).then(function(NumDataJsoned) {
+        this.users = NumDataJsoned;
+        console.log('[beforeMount] this.users = ', this.users);
+        for (let user of Object.entries(this.users)) {
+          user[1].StatisticsList.sort(function(a,b){
+            return new Date(a.date) - new Date(b.date);
+          }).reverse();
+        }
+      });
     })
+    
+    // get contestInfo
+    this.$http.get(this.db + 'contest/' + this.contestid + '.json').then(function(data) {
+        return data.json();
+      }).then(function(data) {
+        this.contestInfo = data;
+        this.scoring.opponent.name = this.contestInfo.opponent;
+        this.scoring.host.cur_score = parseInt(this.contestInfo.score[0]);
+        this.scoring.host.winned_game = parseInt(this.contestInfo.gameScore.split(':')[0]);
+        this.scoring.opponent.cur_score = parseInt(this.contestInfo.score[2]);
+        this.scoring.opponent.winned_game = parseInt(this.contestInfo.gameScore.split(':')[1]);
+
+        this.cur_game = this.scoring.host.winned_game + this.scoring.opponent.winned_game + 1;
+
+        if (typeof this.contestInfo.onCourtMem == 'string')
+          this.selected_members = [{}, {}, {}, {}, {}, {}, {}];
+        else {
+          this.selected_members = this.contestInfo.onCourtMem;
+          this.isCourtMemSet = true;
+        }
+
+        // empty localRecordsRaw = ['']
+        if (this.contestInfo.localRecordsRaw[0] == '') {
+          this.records_pushed_raw = [{
+            'ourTeam': {},
+            'placement': [[''], [''], [''], [''], [''], [''], [''], [''], [''], ['']]
+          }]
+        } else {
+          if (this.contestInfo.localRecordsRaw[this.cur_game-1].ourTeam[0] == '')
+            this.contestInfo.localRecordsRaw[this.cur_game-1].ourTeam = {};
+          this.records_pushed_raw = this.contestInfo.localRecordsRaw;
+        }
+
+
+        console.log('[beforeMount] localRecordsRaw', this.contestInfo, this.contestInfo.localRecordsRaw, typeof this.contestInfo.localRecordsRaw);
+        console.log('[beforeMount] records_pushed_raw', this.records_pushed_raw, this.records_pushed_raw, typeof this.records_pushed_raw);
+      });
+  
+    // get local_records
+    this.$http.get(this.db + 'contest/' + this.contestid + '/localRecords.json').then(function(data) {
+      return data.json();
+    }).then(function(data) {
+      // empty localRecords = ['']
+      if (data[0] == '')
+        this.records_local = [];
+      else
+        this.records_local = data;
+
+      console.log('[beforeMount] records_local = ', typeof data, typeof this.records_local, this.records_local, this.records_local == null);
+    });
   },
   methods: {
     setPositionTag(record) {
@@ -440,7 +556,7 @@ export default {
         return tag + 'bg-success';
       else if (record['position'] == 'L')
         return tag + 'bg-secondary';
-      else if (record['position'] == 'OP')
+      else if (record['position'] == 'O')
         return tag + 'bg-primary';
       else 
         return tag + 'bg-warning';
@@ -470,8 +586,10 @@ export default {
           return true;
         }
       }
-    },    record(whichBtn) {
+    },    
+    record(whichBtn) {
       if (whichBtn == 'upper' && this.checkOptionAllSelected('upper')) {
+        console.log('[record]', this.selected_button, this.records_local);
         // score adjustment
         if (this.selected_button.record_type.indexOf('Point') != -1)
           this.scoring.host.cur_score++;
@@ -479,7 +597,7 @@ export default {
           this.scoring.opponent.cur_score++;
 
         // record ajustment
-        this.records_pushed[this.cur_game-1].ourteam[this.selected_button['name']][this.selected_button['record_type']]++;
+        this.records_pushed_raw[this.cur_game-1].ourTeam[this.selected_button['name']][this.selected_button['record_type']]++;
         this.records_local.unshift({'num': this.selected_button.number,
                                     'name': this.selected_button.name,
                                     'position': this.selected_button.position,
@@ -491,7 +609,10 @@ export default {
         this.scoring.opponent.cur_score++;  // score adjustment
         this.isOpponentScore = false;
 
-        this.records_pushed[this.cur_game-1].placement[this.selected_button.landing].push(this.selected_button.opponent);
+        if (this.records_pushed_raw[this.cur_game-1].placement[this.selected_button.landing][0] == '')
+          this.records_pushed_raw[this.cur_game-1].placement[this.selected_button.landing][0] = (this.selected_button.opponent);
+        else
+          this.records_pushed_raw[this.cur_game-1].placement[this.selected_button.landing].push(this.selected_button.opponent);
         this.records_local.unshift({'num': this.selected_button.opponent.num,
                                     'name': this.scoring.opponent.name,
                                     'position': this.selected_button.opponent.pos,
@@ -516,10 +637,10 @@ export default {
         if (record2delete.landing == 'Touch Out')
           record2delete.landing = 10;
 
-        let opponent = this.records_pushed[record2delete.game-1].placement[record2delete.landing-1].find(x => x.num == record2delete.num && x.pos == record2delete.position),
-            indexOfOpponent = this.records_pushed[record2delete.game-1].placement[record2delete.landing-1].indexOf(opponent);
+        let opponent = this.records_pushed_raw[record2delete.game-1].placement[record2delete.landing-1].find(x => x.num == record2delete.num && x.pos == record2delete.position),
+            indexOfOpponent = this.records_pushed_raw[record2delete.game-1].placement[record2delete.landing-1].indexOf(opponent);
         
-        this.records_pushed[record2delete.game-1].placement[record2delete.landing-1].splice(indexOfOpponent, 1);
+        this.records_pushed_raw[record2delete.game-1].placement[record2delete.landing-1].splice(indexOfOpponent, 1);
       } else {
         // score adjustment
         if (record2delete.record_type.indexOf('失誤') != -1  && record2delete.game == this.cur_game)
@@ -529,54 +650,17 @@ export default {
 
         // record deletion
         let engType = this.translateType2Eng[record2delete.record_type];
-        this.records_pushed[record2delete.game-1].ourteam[record2delete.name][engType]--;
-      }
-    },
-    sendRecord(whichBtn) {
-      if (whichBtn == 'lower' && this.isOpponentScore) {
-        // this.selected_button['opponent'] = this.opponent == '' ? 'none' : this.opponent;
-        this.isOpponentScore = false;
-          
-        console.log(this.cur_game);
-        for (const [key, value] of Object.entries(this.selected_button))
-          console.log(key, value);
-
-        this.selected_button = {
-          'name': '',
-          'number': -1,
-          'position': '',
-          'record_type': '',
-          'landing': -1,  // 依照 placement 的 index (0~9)
-          'opponent': {'num': -1, 'pos': ''},
-          'game': this.cur_game
-        }
-      } else { // whichBtn == upper
-        this.isOpponentScore = false;
-
-        console.log(this.cur_game);
-        for (const [key, value] of Object.entries(this.selected_button))
-          console.log(key, value);
-
-        this.selected_button = {
-          'name': '',
-          'number': -1,
-          'position': '',
-          'record_type': '',
-          'landing': -1,  // 依照 placement 的 index (0~9)
-          'opponent': {'num': -1, 'pos': ''},
-          'game': this.cur_game
-        }
-        return;
+        this.records_pushed_raw[record2delete.game-1].ourTeam[record2delete.name][engType]--;
       }
     },
     setCourtMem() {
-      this.selected_members = [{'name': '張祐1', 'number': 27, 'position': 'OH'},
-                              {'name': '張祐2', 'number': 22, 'position': 'MB'},
-                              {'name': '張祐3', 'number': 23, 'position': 'S'},
-                              {'name': '張祐4', 'number': 24, 'position': 'OP'},
-                              {'name': '張祐5', 'number': 28, 'position': 'MB'},
-                              {'name': '張祐6', 'number': 26, 'position': 'OH'},
-                              {'name': '張祐L', 'number': 25, 'position': 'L'}];
+      this.selected_members = [ { "name": "蘇名偉", "number": "27", "position": "OH", "uid": "-N3hlfKxXwby0jSSDbxV" },
+                                { "name": "張祐誠", "number": "3", "position": "MB", "uid": "-N3hloXHeW7EIdJuh5ZD" },
+                                { "name": "Test6", "number": "66", "position": "S", "uid": "-N3hm182z3keR5kdjpoX" },
+                                { "name": "Test5", "number": "77", "position": "O", "uid": "-N3hlzbf69tjAcJjsAdG" },
+                                { "name": "test4", "number": "4", "position": "MB", "uid": "-N3hlp05s2nmpA4gx4XC" },
+                                { "name": "test2", "number": "2", "position": "OH", "uid": "-N3hlhMMtjy-u_QrqVL8" },
+                                { "name": "Test7", "number": "88", "position": "L", "uid": "-N3hm36BH5b9ngb2N8wQ" },];
       console.log(this.selected_members);
 
     },
@@ -590,23 +674,20 @@ export default {
       }
       this.isCourtMemSet = true;
 
-      // add personal entry to "records_pushed"
+      // add personal entry to "records_pushed_raw"
       for (let entry of Object.entries(this.selected_members)) {
-        if (!(entry[1].name in this.records_pushed[this.cur_game-1].ourteam)) {
-          this.records_pushed[this.cur_game-1].ourteam[entry[1].name] = { 
-            name: entry[1].name, pos: entry[1].position, number: entry[1].number,
-            attackPoint: 0, blockPoint: 0, servicePoint: 0,
-            attackError: 0, tossError: 0, blockError: 0, receiveError: 0, serviceError: 0
+        if (!(entry[1].name in this.records_pushed_raw[this.cur_game-1].ourTeam)) {
+          this.records_pushed_raw[this.cur_game-1].ourTeam[entry[1].name] = { name: entry[1].name, pos: entry[1].position, number: entry[1].number,
+                                                                              attackPoint: 0, blockPoint: 0, servicePoint: 0,
+                                                                              attackError: 0, tossError: 0, blockError: 0, receiveError: 0, serviceError: 0
           };
         }
       }
-      console.log(this.records_pushed[this.cur_game-1]);
+      console.log('[checkSetCourtMem]', this.records_pushed_raw[this.cur_game-1]);
     },
     nextGame(isEndGame) {
-      console.log('[nextGame]', this.cur_game);
-      this.cur_game += 1;
-      console.log('[nextGame]', this.cur_game);
-      
+      this.splitGameRecord(true);
+
       // judge who wins
       if (this.scoring['host']['cur_score'] > this.scoring['opponent']['cur_score'])
         this.scoring['host']['winned_game'] += 1;
@@ -619,18 +700,192 @@ export default {
       this.clearSelected();
       this.scoring.host.cur_score = this.scoring.opponent.cur_score = 0;
       if (!isEndGame) { // 如果是最後一場就不用再新增了
-        this.records_pushed.push({ 
-          'ourteam': {},
-          'placement': [[], [], [], [], [], [], [], [], [], []] // 0~8: 1~9 九號位置 ; 9: touch out
+        this.cur_game += 1;
+        this.records_pushed_raw.push({ 
+          'ourTeam': {},
+          'placement': [[''], [''], [''], [''], [''], [''], [''], [''], [''], ['']] // 0~8: 1~9 九號位置 ; 9: touch out
         });
+      }
+
+      // push to DB
+      // userSTAT & games
+      this.$http.patch(this.db + 'user.json', JSON.stringify(this.users));
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {games: this.contestInfo.games});
+
+      // 比分資料
+      this.contestInfo.gameScore = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
+      this.contestInfo.score = this.scoring.host.cur_score.toString() + ':' + this.scoring.opponent.cur_score.toString();
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {gameScore: this.contestInfo.gameScore});
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {score: this.contestInfo.score});
+
+      // 上場球員
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
+      
+      // 紀錄資料
+      if (this.records_local.length == 0)
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ['']});
+      else 
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: this.records_local});
+
+      if (Object.entries(this.records_pushed_raw[0].ourTeam).length < 7)
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
+      else {
+        let temp = this.records_pushed_raw;
+        temp[this.cur_game-1].ourTeam = [''];
+
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: temp});
       }
     },
     endGame() {
       this.nextGame(true);
 
-      // push to two place:
-      // 1. contest games
-      // 2. member: statistic list
+      // 清除遠端的暫存資料
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ['']});
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
+    },
+    getMemID(name) {
+      for (let member of Object.entries(this.teamInfo.members)) {
+        // console.log('[getMemID]', member[1], name);
+        if (member[1].name == name) 
+          return member[1].uid;
+      }
+      return '-1';
+    },
+    splitGameRecord(isGameChanges) {
+      let per_game = {'ourTeam': [''], 
+                      'placement': {'1': [''], '2': [''], '3': [''], '4': [''], '5': [''],
+                                    '6': [''], '7': [''], '8': [''], '9': [''], 'touchout': ['']}};
+      
+      // ourTeam & placement
+      for (let [key, item_inner] of Object.entries(this.records_pushed_raw[this.cur_game-1])) { 
+        if (key == 'ourTeam') {
+          for (let [name, trimmed_ourTeam] of Object.entries(item_inner)) {
+            if (per_game['ourTeam'][0] == '')
+              per_game['ourTeam'][0] = trimmed_ourTeam;
+            else
+              per_game['ourTeam'].push(trimmed_ourTeam);
+            
+            console.log('[splitGameRecord]', name);
+            // sum UserSTAT [BUG!!!]
+            if (isGameChanges) {
+              if (this.users[this.getMemID(name)].StatisticsList[0] == '' || this.cur_game == 1) 
+                this.addNewRecord2STAT(name);
+
+              this.sumUserSTAT(name, trimmed_ourTeam);
+              
+              // if (this.users[this.getMemID(name)].StatisticsList[0] == '') {
+              //   this.addNewRecord2STAT(name);
+              //   this.sumUserSTAT(name, trimmed_ourTeam);
+              // } else if (this.users[this.getMemID(name)].StatisticsList[0].contest != this.contestInfo.contest) {
+              //   this.addNewRecord2STAT(name);
+              //   this.sumUserSTAT(name, trimmed_ourTeam);
+              // } else if (this.users[this.getMemID(name)].StatisticsList[0].contest != this.contestInfo.contest) {
+              //   let record = {'contest': '', 'date': '', 'teamName': '', 'opponent': '', 'score': '',
+              //                 'name': '', 'pos': '', 'number': '',
+              //                 'attackPoint': 0, 'blockPoint': 0, 'servicePoint': 0,
+              //                 'attackError': 0, 'tossError': 0, 'blockError': 0,
+              //                 'receiveError': 0, 'serviceError': 0};
+              //   this.users[this.getMemID(name)].StatisticsList[0] = record;
+                
+              //   if (this.cur_game != 1) {
+              //     for (let i = 1; i < this.cur_game; ++i) {
+              //       let targetIdx = this.contestInfo.games[i-1]['ourTeam'].findIndex(ele => name in ele);
+              //       if (targetIdx != -1)
+              //         console.log('[splitGameRecord]', this.contestInfo.games[i-1]['ourTeam'][targetIdx]);
+              //         // this.users[this.getMemID(name)].StatisticsList[0] += this.contestInfo.games[i-1]['ourTeam'][targetIdx];
+              //     }
+              //   }
+  
+              //   this.sumUserSTAT(name, trimmed_ourTeam);
+              // }
+            }
+
+
+          }
+        } else if (key == 'placement') {
+          for (let index = 1; index <= 9; index++) 
+            per_game['placement'][index.toString()] = item_inner[index-1];
+
+          
+          per_game['placement']['touchout'] = item_inner[9];
+        }
+      }
+
+      // storing per_game
+      console.log('[nextGame]', this.cur_game, per_game);
+      this.contestInfo.games[this.cur_game-1] = per_game;
+      console.log('[nextGame]', this.cur_game, this.contestInfo.games);
+    },
+    addNewRecord2STAT(name) {
+      let record = {'contest': '', 'date': '', 'teamName': '', 'opponent': '', 'gameScore': '', 'score': '',
+                    'name': '', 'pos': '', 'number': '',
+                    'attackPoint': 0, 'blockPoint': 0, 'servicePoint': 0,
+                    'attackError': 0, 'tossError': 0, 'blockError': 0,
+                    'receiveError': 0, 'serviceError': 0};
+      
+      // insert contest info
+      for (let [key, value] of Object.entries(this.contestInfo)) {
+        if (['games', 'localRecordsRaw', 'localRecords', 'onCourtMem'].includes(key)) continue;
+        else 
+          record[key] = value;
+      }
+      record['teamName'] = this.teamInfo.teamName;
+
+      // PUSH
+      if (this.users[this.getMemID(name)].StatisticsList[0] == '')
+        this.users[this.getMemID(name)].StatisticsList[0] = record;
+      else 
+        this.users[this.getMemID(name)].StatisticsList.unshift(record);
+    },
+    sumUserSTAT(name, trimmed_ourTeam) {
+      for (let [key, value] of Object.entries(trimmed_ourTeam)) {
+        if (typeof value == 'number') 
+          this.users[this.getMemID(name)].StatisticsList[0][key] += value;
+        else if (typeof value == 'string')
+          this.users[this.getMemID(name)].StatisticsList[0][key] = value;
+      }
+    }, 
+    storeLocalData() {
+      console.log('TEST');
+      this.splitGameRecord(false);
+
+      // DB
+      // userStat & game info
+      this.$http.patch(this.db + 'user.json', JSON.stringify(this.users));
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {games: this.contestInfo.games});
+
+      // 比分資料
+      this.contestInfo.score = this.scoring.host.cur_score.toString() + ':' + this.scoring.opponent.cur_score.toString();
+      this.contestInfo.gameScore = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {gameScore: this.contestInfo.gameScore});
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {score: this.contestInfo.score});
+
+      // 上場球員
+      console.log('[storeLocalData]', this.isCourtMemSet, Object.entries(this.selected_members[0]).length == 0, this.selected_members);
+      if (Object.entries(this.selected_members[0]).length == 0 || this.isCourtMemSet == false)
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
+      else 
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: this.selected_members});
+      
+      // 紀錄資料
+      if (this.records_local.length == 0)
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ['']});
+      else
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: this.records_local});
+
+      if (Object.entries(this.records_pushed_raw[0].ourTeam).length < 7)
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
+      else {
+        if (this.records_pushed_raw[this.cur_game-1].ourTeam[0] == '') {
+          let temp = this.records_pushed_raw;
+          temp[this.cur_game-1].ourTeam = [''];
+  
+          this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: temp});
+        } else {
+          this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: this.records_pushed_raw});
+        }
+      }
     }
   }
 }
