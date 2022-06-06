@@ -2,22 +2,25 @@
   <div>
     <div class="card text-center">
       <div class="d-flex align-items-center text-start mx-3 my-3 justify-content-between">
-        <router-link :to="`/home/${uid}/team/${teamid}`" class="btn d-flex align-items-center fs-5" style="color:#2c3e50">
-          <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
+        <router-link :to="`/home/${uid}/team/${teamid}`" class="btn d-flex align-items-center fs-5 px-0" style="color:#2c3e50">
+          <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回
         </router-link>
         <div class="text-center">
           <p class="mb-0 fs-5 fw-bolder">{{contestInfo.contest}}</p>
           <p class="mb-0 fw-bold">{{contestInfo.date}}</p>
         </div>
-        <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn btn-outline-dark">
+        <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn btn-primary">
           前往計分
         </router-link>
+        <!-- <router-link :to="`/home/${uid}/team/${teamid}/scoring/${contestid}`" class="btn d-flex align-items-center fs-5 px-0 text-primary">
+          計分&nbsp;<i class="fa-solid fa-angle-right fs-2 text-primary" ></i>
+        </router-link> -->
       </div>
       <div>
-        <div class="text-center px-3">
+        <div class="text-center px-3 py-2">
           <div class="row text-center">
             <div class="d-flex align-items-center justify-content-start col-4">
-              <h5 class="btn teambtn fw-bolder" style="background-color: #e76f51;">{{teamName}}</h5>
+              <h5 class="btn btn-small btn-primary fw-bolder mb-0" style="background-color: #e76f51;border: none;">{{teamName}}</h5>
             </div>
             <div class="d-flex align-items-center justify-content-center col-1">
               <h3 class="fw-bold">{{contestInfo.gameScore[0]}}</h3>
@@ -29,7 +32,7 @@
               <h3 class="fw-bold">{{contestInfo.gameScore[2]}}</h3>
             </div>
             <div class="d-flex align-items-center justify-content-end col-4">
-              <h5 class="btn teambtn fw-bolder" style="background-color: #219ebc; border:">{{contestInfo.opponent}}</h5>
+              <h5 class="btn btn-small btn-primary fw-bolder mb-0" style="background-color: #219ebc;border: none;">{{contestInfo.opponent}}</h5>
             </div>
           </div>
         </div>

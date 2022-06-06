@@ -2,13 +2,13 @@
   <div>
     <div class="card text-center border-0"> 
       <div class="d-flex align-items-center text-start mx-3 mt-3 justify-content-between">
-        <button class="btn d-flex align-items-center fs-5" style="color:#2c3e50" @click="$router.push('/home/'+ uid + '/profile')">
+        <button class="btn d-flex align-items-center fs-5 ps-0" style="color:#2c3e50" @click="$router.push('/home/'+ uid + '/profile')">
           <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
         </button>
-        <span class="fs-2 fw-bolder">{{teamInfo.teamName}}</span>
+        <span class="fs-2 fw-bolder d-flex align-items-center" style="height:54px">{{teamInfo.teamName}}</span>
         <div class="d-flex">
           <p class="me-4">&nbsp;&nbsp;&nbsp;</p>
-          <button class="btn d-flex align-items-center fs-5" style="color:#2c3e50" @click="modifyPersonalModal=true">
+          <button class="btn d-flex align-items-center fs-5 pe-0" style="color:#2c3e50" @click="modifyPersonalModal=true">
             <i class="fa-solid fa-gear fs-2"></i>
           </button>
         </div>
@@ -22,7 +22,7 @@
               <i class="fa-solid fa-person mx-2"></i> 成員
             </span>
           </div>
-          <div class="card-body text-start py-2">
+          <div class="card-body text-start px-1 py-2">
             <div class="row d-flex justify-content-between">
               <div class=" col-auto mx-0 my-1 d-flex align-items-center" v-for="(mem,idx) in teamInfo.members" :key=idx>
                 <span v-if="mem.position=='OH'" class="badge bg-danger text-wrap mx-1" style="width:35px">{{mem.number}}</span>
