@@ -94,6 +94,13 @@
           </div>
         </div> 
       </div>
+      <div v-else-if="checkNextGame()">
+        <div class="card-body py-3 mx-0">
+          <div class="p-2 d-flex align-items-center justify-content-center border" style="border-radius: 5px">
+            <p class="my-2 text-secondary">這局已經結束了，請按下一局！</p>
+          </div>
+        </div> 
+      </div>
       <!-- 比賽還沒結束 -->
       <div v-else>
         <!-- 分頁標籤 -->
