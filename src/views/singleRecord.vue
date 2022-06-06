@@ -225,7 +225,13 @@ export default {
       return data.json();
     }).then(function(data){
       this.contestInfo = data;
-      // console.log(this.contestInfo.score);
+    }).then(function(){
+      for(var i=0;i<this.contestInfo.games.length;i++){
+        this.contestInfo.games[i].ourTeam.sort(function(a,b){
+          return a.number - b.number;
+        })
+      }
+      // console.log(this.contestInfo.games[i].ourTeam);
     })
   },
 }
