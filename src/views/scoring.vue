@@ -4,14 +4,17 @@
       <!-- 返回按鈕 -->
       <div class="d-flex align-items-center text-start mx-3 mt-3 justify-content-between">
         <router-link :to="`/home/${uid}/team/${teamid}`" class="btn d-flex align-items-center fs-5" style="color:#2c3e50">
-          <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
+          <span v-on:click="storeLocalData()">
+            <i class="fa-solid fa-angle-left fs-2" style="color:#495057"></i>&nbsp;返回&nbsp;
+          </span>
         </router-link>
         <div class="text-center">
-          <p class="mb-0 fs-5 fw-bolder">{{teamInfo.contestRecords[0].contest}}</p>
-          <p class="mb-0 fw-bold">{{teamInfo.contestRecords[0].date}}</p>
+          <p class="mb-0 fs-5 fw-bolder">{{contestInfo.contest}}</p>
+          <p class="mb-0 fw-bold">{{contestInfo.date}}</p>
         </div>
         <router-link :to="`/home/${uid}/team/${teamid}/record/${contestid}`" class="btn btn-outline-dark">
-          <span v-on:click="storeLocalData()">
+          <!-- <span v-on:click="storeLocalData()"> -->
+          <span>
             查看分析
           </span>
         </router-link>
@@ -35,8 +38,10 @@
 
             <!-- 下一局 & 結束比賽 -->
             <div class="d-grid round-controls text-center">
-              <button class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888" v-on:click="nextGame(false)">下一局</button>
-              <button class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888"
+              <button :disabled="!checkNextGame()" class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888" v-on:click="nextGame(false)">
+                下一局
+              </button>
+              <button :disabled="!checkEndGame()" class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888"
                       data-bs-toggle="modal" data-bs-target="#endGameCheck">結束比賽</button>
             </div>
 
@@ -89,7 +94,7 @@
         <div class="tab-pane fade show active" id="record-tab-pane" role="tabpanel" aria-labelledby="record-tab" tabindex="0">
           <div class="card-body"> 
             <!-- 上場球員 -->
-            <div class="card mb-3 fw-bold">
+            <div v-show="!isOpponentScore" class="card mb-3 fw-bold">
               <!-- card 標題 -->
               <div class="card-head py-2" style="background-color:#E5E8E8">
                 <span class="fw-bolder fs-5">
@@ -227,7 +232,7 @@
                     </button>
                     <!-- 對方得分：用於記錄落點 -->
                     <button type="button" class="btn btn-outline-secondary" style="background-color: #219ebc; border-color: #219ebc; color: #FFF"
-                            v-on:click="selected_button['record_type'] = 'oppoScore'; isOpponentScore = true">
+                            v-on:click="clearSelected(); selected_button['record_type'] = 'oppoScore'; isOpponentScore = true">
                             對方得分
                     </button>
                   </div>
@@ -283,18 +288,25 @@
                       <p class="" style="margin: auto auto">敵方背號</p>
                       <p class="" style="margin: auto auto">敵方位置</p>
                       <input type="text" v-model="selected_button['opponent']['num']" size="1" class="mx-1 my-1">
-                      <select class="form-select text-center mx-1 my-1"  v-model="selected_button['opponent']['pos']">
+                      <select class="form-select text-center mx-1 my-1" style="min-width: auto"  v-model="selected_button['opponent']['pos']">
                         <option selected> 選擇位置</option>
                         <option v-for="(item, index) in positions" :key="index" :value="item"> 
                           <p> {{ item }} </p>
                         </option>
                       </select>
                     </div>
-                    <button type="button" class="btn btn-outline-secondary mx-1 my-1"
-                            style="background-color: #90be6d; border-color: #90be6d !important; color: #FFF"
-                            v-on:click="record('lower')"> 
-                          送出
-                    </button>
+                    <div class="d-grid" style="grid-template-columns: 1fr 1fr">
+                      <button type="button" class="btn btn-outline-secondary mx-1 my-1"
+                              style="background-color: #f08080; border-color: #f08080 !important; color: #FFF"
+                              v-on:click="isOpponentScore = false; clearSelected()"> 
+                            取消
+                      </button>
+                      <button type="button" class="btn btn-outline-secondary mx-1 my-1"
+                              style="background-color: #90be6d; border-color: #90be6d !important; color: #FFF"
+                              v-on:click="record('lower')"> 
+                            送出
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -423,32 +435,6 @@ export default {
       //     }, 
       //     'placement': [[''], [''], [{'num': 2, 'pos': 'S'}], [''], [''], [''], [''], [''], [''], ['']] // 0~8: 1~9 九號位置 ; 9: touch out
       //   }
-      //   ,{
-      //     'ourTeam': {
-      //       '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
-      //                 attackPoint: 0, blockPoint: 1, servicePoint: 0,
-      //                 attackError: 0, tossError: 0, blockError: 0,
-      //                 receiveError: 0, serviceError: 0 },
-      //       'Test7': {name: 'Test7', pos: 'L', number: '88',
-      //                 attackPoint: 0, blockPoint: 0, servicePoint: 0,
-      //                 attackError: 0, tossError: 0, blockError: 1,
-      //                 receiveError: 0, serviceError: 1 },
-      //     }, 
-      //     'placement': [[''], [''], [{'num': 22, 'pos': 'S'}], [''], [''], [''], [''], [''], [{'num': 22, 'pos': 'L'}], ['']] // 0~8: 1~9 九號位置 ; 9: touch out
-      //   },
-      //   {
-      //     'ourTeam': {
-      //       '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
-      //                 attackPoint: 0, blockPoint: 0, servicePoint: 0,
-      //                 attackError: 0, tossError: 1, blockError: 0,
-      //                 receiveError: 0, serviceError: 0 },
-      //       'Test7': {name: 'Test7', pos: 'L', number: '88',
-      //                 attackPoint: 0, blockPoint: 0, servicePoint: 0,
-      //                 attackError: 1, tossError: 0, blockError: 1,
-      //                 receiveError: 0, serviceError: 0 },
-      //     }, 
-      //     'placement': [[''], [''], [''], [''], [''], [{'num': 33, 'pos': 'MB'}], [''], [''], [''], ['']] // 0~8: 1~9 九號位置 ; 9: touch out
-      //   }
       // ],
       // landing: 呈現在表格 --> 1~9 + touch-out
       records_local: [],
@@ -523,6 +509,7 @@ export default {
         } else {
           if (this.contestInfo.localRecordsRaw[this.cur_game-1].ourTeam[0] == '')
             this.contestInfo.localRecordsRaw[this.cur_game-1].ourTeam = {};
+
           this.records_pushed_raw = this.contestInfo.localRecordsRaw;
         }
 
@@ -604,6 +591,9 @@ export default {
                                     'record_type': this.translateType2Man[this.selected_button.record_type],
                                     'landing': -1,
                                     'game': this.cur_game});
+        
+        // store local data
+        this.storeLocalData();
       } else if (whichBtn == 'lower' && this.isOpponentScore && this.checkOptionAllSelected('lower')) { 
         // whichBtn == 'lower'
         this.scoring.opponent.cur_score++;  // score adjustment
@@ -619,6 +609,9 @@ export default {
                                     'record_type': this.translateType2Man[this.selected_button.record_type],
                                     'landing': this.selected_button.landing+1 == 10 ? 'Touch Out' : this.selected_button.landing+1,
                                     'game': this.cur_game});
+
+        // store local data
+        this.storeLocalData();
       }
 
       // 無論如何只要按下送出都要清空選取項目
@@ -652,6 +645,8 @@ export default {
         let engType = this.translateType2Eng[record2delete.record_type];
         this.records_pushed_raw[record2delete.game-1].ourTeam[record2delete.name][engType]--;
       }
+
+      this.storeLocalData();
     },
     setCourtMem() {
       this.selected_members = [ { "name": "蘇名偉", "number": "27", "position": "OH", "uid": "-N3hlfKxXwby0jSSDbxV" },
@@ -684,6 +679,52 @@ export default {
         }
       }
       console.log('[checkSetCourtMem]', this.records_pushed_raw[this.cur_game-1]);
+    },
+    checkNextGame() {
+        if (this.contestInfo.games.length == this.cur_game) {
+            return false;
+        } else {
+          if (this.scoring.host.cur_score >= 24 && this.scoring.opponent.cur_score >= 24) {
+            // 雙方大於 24 分
+            // deuce
+            if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2)
+              return true;
+            else
+              return false;
+          } else if (this.scoring.host.cur_score == 25 || this.scoring.opponent.cur_score == 25)// not deucing
+            return true;
+          else 
+            return false;
+        }
+    },
+    checkEndGame() {
+      if (this.contestInfo.games.length == this.cur_game && this.contestInfo.games.length != 1) {
+        if (this.scoring.host.cur_score >= 14 && this.scoring.opponent.cur_score >= 14) {
+            // 雙方大於 24 分
+            // deuce
+            if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2)
+              return true;
+            else
+              return false;
+          } else if (this.scoring.host.cur_score == 15 || this.scoring.opponent.cur_score == 15)// not deucing
+            return true;
+          else 
+            return false;
+        } else if (this.contestInfo.games.length == 1) {
+          if (this.scoring.host.cur_score >= 24 && this.scoring.opponent.cur_score >= 24) {
+            // 雙方大於 24 分
+            // deuce
+            if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2)
+              return true;
+            else
+              return false;
+          } else if (this.scoring.host.cur_score == 25 || this.scoring.opponent.cur_score == 25)// not deucing
+            return true;
+          else 
+            return false;
+        } else {
+          return false;
+        }
     },
     nextGame(isEndGame) {
       this.splitGameRecord(true);
@@ -767,7 +808,7 @@ export default {
               per_game['ourTeam'].push(trimmed_ourTeam);
             
             console.log('[splitGameRecord]', name);
-            // sum UserSTAT [BUG!!!]
+            // sum UserSTAT 
             if (isGameChanges) {
               if (this.users[this.getMemID(name)].StatisticsList[0] == '' || this.cur_game == 1) 
                 this.addNewRecord2STAT(name);

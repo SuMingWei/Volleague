@@ -20,13 +20,13 @@
               <h5 class="btn teambtn fw-bolder" style="background-color: #e76f51;">{{teamName}}</h5>
             </div>
             <div class="d-flex align-items-center justify-content-center col-1">
-              <h3 class="fw-bold">{{contestInfo.score[0]}}</h3>
+              <h3 class="fw-bold">{{contestInfo.gameScore[0]}}</h3>
             </div >
             <div class="d-flex align-items-center justify-content-center col-2 ">
               <h3 class="fw-bold">:</h3>
             </div>
             <div class="d-flex align-items-center justify-content-center col-1">
-              <h3 class="fw-bold">{{contestInfo.score[2]}}</h3>
+              <h3 class="fw-bold">{{contestInfo.gameScore[2]}}</h3>
             </div>
             <div class="d-flex align-items-center justify-content-end col-4">
               <h5 class="btn teambtn fw-bolder" style="background-color: #219ebc; border:">{{contestInfo.opponent}}</h5>
