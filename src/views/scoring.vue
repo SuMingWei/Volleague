@@ -408,9 +408,9 @@
                     </td>
                     <td class="border-start"> {{ record['game'] }} </td>
                     <td class="border-start"> 
-                      <button style="border-color: red; border-style: solid; border-radius: 20%"
+                      <button class="border-0" style="background-color: transparent;"
                               v-on:click="deleteLocalRecord(record)">
-                        <i class="fas fa-trash-alt" style="color: red"></i>
+                        <i class="fas fa-trash-alt" style="color: #f08080"></i>
                       </button>
                     </td>
                   </tr>
@@ -846,7 +846,23 @@ export default {
           this.scoring['host']['winned_game'] += 1;
         else 
           this.scoring['opponent']['winned_game'] += 1;
+
+        // update to users contest gameScore
+        // 檢查是否有七個值 (場上七個人)
+        if (Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam).length == 7) {
+          for (let ele of Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam)) {
+            let memIdx = this.getMemID(ele[0]);
+            console.log('[nextGame] ele = ', ele, memIdx);
+            
+            if (memIdx != '-1') {
+              console.log('[nextGame]', this.users[memIdx], memIdx);
+              let temp = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
+              this.users[memIdx].StatisticsList[0].gameScore = temp;
+            }
+          }
+        }
       }
+
       
       // reset variables
       this.isCourtMemSet = false;
@@ -874,9 +890,11 @@ export default {
 
       // contestRecords
       for(let i = 0; i < this.teamInfo.contestRecords.length; ++i) {
-        if (this.teamInfo.contestRecords[i].contest == this.contestInfo.contest) {
+        if (this.teamInfo.contestRecords[i].contest == this.contestInfo.contest && this.teamInfo.contestRecords[i].opponent == this.contestInfo.opponent) {
           this.teamInfo.contestRecords[i].gameScore = this.contestInfo.gameScore;
+          console.log('[nextGame] contestRecords = ', this.teamInfo.contestRecords[i].gameScore);
           this.$http.patch(this.db + 'team/' + this.teamid + '.json', JSON.stringify(this.teamInfo));
+          break; // modify only the first match, and ignore others
         }
       }
 
@@ -1001,8 +1019,10 @@ export default {
       // insert contest info
       for (let [key, value] of Object.entries(this.contestInfo)) {
         if (['games', 'localRecordsRaw', 'localRecords', 'onCourtMem'].includes(key)) continue;
-        else 
+        else {
+          console.log('[addNewRecord2STAT]', key, value);
           record[key] = value;
+        }
       }
       record['teamName'] = this.teamInfo.teamName;
 
@@ -1014,6 +1034,7 @@ export default {
     },
     sumUserSTAT(name, trimmed_ourTeam) {
       for (let [key, value] of Object.entries(trimmed_ourTeam)) {
+        console.log('[sumUserSTAT]', key, value);
         if (typeof value == 'number') 
           this.users[this.getMemID(name)].StatisticsList[0][key] += value;
         else if (typeof value == 'string')
@@ -1039,6 +1060,7 @@ export default {
       for(let i = 0; i < this.teamInfo.contestRecords.length; ++i) {
         if (this.teamInfo.contestRecords[i].contest == this.contestInfo.contest && this.teamInfo.contestRecords[i].opponent == this.contestInfo.opponent) {
           this.teamInfo.contestRecords[i].gameScore = this.contestInfo.gameScore;
+          console.log('[storeLocalData] contestRecords = ', this.teamInfo.contestRecords[i].gameScore);
           this.$http.patch(this.db + 'team/' + this.teamid + '.json', JSON.stringify(this.teamInfo));
           break; // modify only the first match, and ignore others
         }
