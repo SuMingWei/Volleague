@@ -55,7 +55,10 @@
             <div v-if="teamInfo.contestRecords[0] != ''" class="list-group" style="height: 350px; overflow-y:scroll">
               <div v-for="(item,idx) in teamInfo.contestRecords" :key="idx" class="list-group-item d-flex justify-content-between list-group-item-action">
                 <div class=" text-center">
-                  <p class="mb-0 fs-5">{{item.contest}}</p>
+                  <span class="d-flex gap-1 justify-content-center align-items-center">
+                    <p v-if="checkEnd(item)" class="badge mb-0" style="background-color: #90be6d">Fin</p>
+                    <p class="mb-0 fs-5">{{item.contest}}</p>
+                  </span> 
                   <!-- <p class="mb-1"><i class="fa-solid fa-hand-fist"></i> {{item.opponent}}</p> -->
                   <p class="mb-1">vs <span class="badge bg-main">{{item.opponent}}</span></p>
                   <p class="mb-0 opacity-75">{{item.date}}</p>
@@ -275,6 +278,7 @@ export default {
         contest: this.newContest.contest,
         date: this.newContest.date,
         gameScore: this.newContest.gameScore,
+        gamesNum: this.newContest.gamesNum,
       }
       this.$http.post(this.db + 'contest.json',emptyContest).then(function(data){
         singleContest.key = data.body.name;
@@ -314,6 +318,14 @@ export default {
       });
       this.$http.patch(this.db + 'team/' + this.teamid + '.json', {members: membersArr});
       this.modifyPersonalModal = false;
+    },
+    checkEnd(item){
+      var curGames = parseInt(item.gameScore[0],10) + parseInt(item.gameScore[2],10);
+      if(curGames == item.gamesNum){
+        return true;
+      }else{
+        return false;
+      }
     },
     //test
     addPoint(){
