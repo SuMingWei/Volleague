@@ -890,7 +890,7 @@ export default {
         for (let i = 0; i < user[1].StatisticsList.length; ++i) {
           let Game = user[1].StatisticsList[i];
 
-          if (Game.contest == this.contestInfo.contest && Game.opponent == this.contestInfo.opponent) {
+          if (Game.contestID == this.contestid) {
             this.users[user[0]].StatisticsList[i].gameScore = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
             console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[i].gameScore);
             console.log('[update user contest GameScore]', this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString());
@@ -912,7 +912,7 @@ export default {
 
       // contestRecords
       for(let i = 0; i < this.teamInfo.contestRecords.length; ++i) {
-        if (this.teamInfo.contestRecords[i].contest == this.contestInfo.contest && this.teamInfo.contestRecords[i].opponent == this.contestInfo.opponent) {
+        if (this.teamInfo.contestRecords[i].key == this.contestid) {
           this.teamInfo.contestRecords[i].gameScore = this.contestInfo.gameScore;
           console.log('[nextGame] contestRecords = ', this.teamInfo.contestRecords[i].gameScore);
           this.$http.patch(this.db + 'team/' + this.teamid + '.json', JSON.stringify(this.teamInfo));
@@ -1050,6 +1050,7 @@ export default {
         }
       }
       record['teamName'] = this.teamInfo.teamName;
+      record['contestID'] = this.contestid;
 
       // PUSH
       if (this.users[this.getMemID(name)].StatisticsList[0] == '')
@@ -1084,7 +1085,7 @@ export default {
 
       // contestRecords
       for(let i = 0; i < this.teamInfo.contestRecords.length; ++i) {
-        if (this.teamInfo.contestRecords[i].contest == this.contestInfo.contest && this.teamInfo.contestRecords[i].opponent == this.contestInfo.opponent) {
+        if (this.teamInfo.contestRecords[i].key == this.contestid) {
           this.teamInfo.contestRecords[i].gameScore = this.contestInfo.gameScore;
           console.log('[storeLocalData] contestRecords = ', this.teamInfo.contestRecords[i].gameScore);
           this.$http.patch(this.db + 'team/' + this.teamid + '.json', JSON.stringify(this.teamInfo));
