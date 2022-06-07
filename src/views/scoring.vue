@@ -535,8 +535,9 @@ export default {
       }).then(function(NumDataJsoned) {
         this.users = NumDataJsoned;
         console.log('[beforeMount] this.users = ', this.users);
+        
         for (let user of Object.entries(this.users)) {
-          user[1].StatisticsList.sort(function(a,b){
+          this.users[user[0]].StatisticsList.sort(function(a,b){
             return new Date(a.date) - new Date(b.date);
           }).reverse();
         }
@@ -846,21 +847,6 @@ export default {
           this.scoring['host']['winned_game'] += 1;
         else 
           this.scoring['opponent']['winned_game'] += 1;
-
-        // update to users contest gameScore
-        // 檢查是否有七個值 (場上七個人)
-        if (Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam).length == 7) {
-          for (let ele of Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam)) {
-            let memIdx = this.getMemID(ele[0]);
-            console.log('[nextGame] ele = ', ele, memIdx);
-            
-            if (memIdx != '-1') {
-              console.log('[nextGame]', this.users[memIdx], memIdx);
-              let temp = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
-              this.users[memIdx].StatisticsList[0].gameScore = temp;
-            }
-          }
-        }
       }
 
       
@@ -878,7 +864,39 @@ export default {
       }
 
       // push to DB
+      // update to users contest gameScore
+      // 檢查是否有七個值 (場上七個人)
+      // if (Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam).length == 7) {
+      //   for (let ele of Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam)) {
+      //     let memIdx = this.getMemID(ele[0]);
+      //     console.log('[nextGame] ele = ', ele, memIdx);
+          
+      //     if (memIdx != '-1') {
+      //       console.log('[nextGame]', this.users[memIdx], memIdx);
+      //       let temp = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
+      //       this.users[memIdx].StatisticsList[0].gameScore = temp;
+      //     }
+      //   }
+      // }
+      for (let user of Object.entries(this.users)) {
+        this.users[user[0]].StatisticsList.sort(function(a,b){
+          return new Date(a.date) - new Date(b.date);
+        }).reverse();
+        console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[0].gameScore, this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString());
+        console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[0].opponent, this.users[user[0]].StatisticsList[0].contest);
+      }
+
+      for (let user of Object.entries(this.users)) {
+        let latestGame = user[1].StatisticsList[0];
+        if (latestGame.contest == this.contestInfo.contest && latestGame.opponent == this.contestInfo.opponent) {
+          this.users[user[0]].StatisticsList[0].gameScore = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
+          console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[0].gameScore, this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString());
+        }
+      }
+
       // userSTAT & games
+      console.log('[nextGame] users = ', this.users);
+      // console.log('[nextGame] users json.stringify= ', JSON.stringify(this.users));
       this.$http.patch(this.db + 'user.json', JSON.stringify(this.users));
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {games: this.contestInfo.games});
 
@@ -962,8 +980,11 @@ export default {
               console.log('[splitGameRecord]', name);
               // sum UserSTAT 
               if (isGameChanges) {
-                if (this.users[this.getMemID(name)].StatisticsList[0] == '' || this.cur_game == 1) 
+                console.log('[splitGameRecord] sumUsersSTAT');
+                if (this.users[this.getMemID(name)].StatisticsList[0] == '' || this.cur_game == 1) {
+                  console.log('[splitGameRecord] addNewRecord2STAT');
                   this.addNewRecord2STAT(name);
+                }
   
                 this.sumUserSTAT(name, trimmed_ourTeam);
                 
@@ -1031,6 +1052,7 @@ export default {
         this.users[this.getMemID(name)].StatisticsList[0] = record;
       else 
         this.users[this.getMemID(name)].StatisticsList.unshift(record);
+      
     },
     sumUserSTAT(name, trimmed_ourTeam) {
       for (let [key, value] of Object.entries(trimmed_ourTeam)) {
