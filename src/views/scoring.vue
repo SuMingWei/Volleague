@@ -878,19 +878,23 @@ export default {
       //     }
       //   }
       // }
-      for (let user of Object.entries(this.users)) {
-        this.users[user[0]].StatisticsList.sort(function(a,b){
-          return new Date(a.date) - new Date(b.date);
-        }).reverse();
-        console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[0].gameScore, this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString());
-        console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[0].opponent, this.users[user[0]].StatisticsList[0].contest);
-      }
+      // for (let user of Object.entries(this.users)) {
+      //   this.users[user[0]].StatisticsList.sort(function(a,b){
+      //     return new Date(a.date) - new Date(b.date);
+      //   }).reverse();
+      //   console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[0].gameScore, this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString());
+      //   console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[0].opponent, this.users[user[0]].StatisticsList[0].contest);
+      // }
 
       for (let user of Object.entries(this.users)) {
-        let latestGame = user[1].StatisticsList[0];
-        if (latestGame.contest == this.contestInfo.contest && latestGame.opponent == this.contestInfo.opponent) {
-          this.users[user[0]].StatisticsList[0].gameScore = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
-          console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[0].gameScore, this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString());
+        for (let i = 0; i < user[1].StatisticsList.length; ++i) {
+          let Game = user[1].StatisticsList[i];
+
+          if (Game.contest == this.contestInfo.contest && Game.opponent == this.contestInfo.opponent) {
+            this.users[user[0]].StatisticsList[i].gameScore = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
+            console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[i].gameScore);
+            console.log('[update user contest GameScore]', this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString());
+          }
         }
       }
 
