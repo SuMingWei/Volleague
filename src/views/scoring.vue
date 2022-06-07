@@ -46,13 +46,13 @@
             </div>
 
             <!-- 下一局 & 結束比賽 -->
-            <div class="d-grid round-controls text-center">
+            <!-- <div class="d-grid round-controls text-center">
               <button :disabled="!isNextGame" class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888" v-on:click="nextGame(false)">
                 下一局
               </button>
               <button :disabled="!isGameOver" class="btn btn-sm btn-outline-dark" style="color: #888; border-color: #888"
                       data-bs-toggle="modal" data-bs-target="#endGameCheck">結束比賽</button>
-            </div>
+            </div> -->
 
             <!-- 結束比賽的的 modal -->
             <div class="modal fade" id="endGameCheck" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="endGameCheckLabel" aria-hidden="true">
@@ -95,13 +95,13 @@
         </div> 
       </div>
       <!-- 某一局結束 -->
-      <div v-else-if="isNextGame">
+      <!-- <div v-else-if="isNextGame">
         <div class="card-body py-3 mx-0">
           <div class="p-2 d-flex align-items-center justify-content-center border" style="border-radius: 5px">
             <p class="my-2 text-secondary">這局已經結束了，請按下一局！</p>
           </div>
         </div> 
-      </div>
+      </div> -->
       <!-- 比賽還沒結束 -->
       <div v-else>
         <!-- 分頁標籤 -->
@@ -408,9 +408,9 @@
                     </td>
                     <td class="border-start"> {{ record['game'] }} </td>
                     <td class="border-start"> 
-                      <button style="border-color: red; border-style: solid; border-radius: 20%"
+                      <button class="border-0" style="background-color: transparent;"
                               v-on:click="deleteLocalRecord(record)">
-                        <i class="fas fa-trash-alt" style="color: red"></i>
+                        <i class="fas fa-trash-alt" style="color: #f08080"></i>
                       </button>
                     </td>
                   </tr>
@@ -475,10 +475,10 @@ export default {
       isOpponentScore: false, // bind to button, '對方得分'
       positions: ['OH', 'O', 'MB', 'S', 'L'],
       translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
-                      'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '攔網失誤',
+                      'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
                       'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
       translateType2Eng: {'攻擊得分': 'attackPoint', '攔網得分': 'blockPoint','發球得分': 'servicePoint',
-                      '攻擊失誤': 'attackError', '舉球失誤': 'tossError', '攔網失誤': 'blockError',
+                      '攻擊失誤': 'attackError', '舉球失誤': 'tossError', '觸網失誤': 'blockError',
                       '接發失誤': 'receiveError', '發球失誤': 'serviceError', '對方得分': 'oppoScore'},
       records_pushed_raw: [{
         'ourTeam': {},
@@ -535,8 +535,9 @@ export default {
       }).then(function(NumDataJsoned) {
         this.users = NumDataJsoned;
         console.log('[beforeMount] this.users = ', this.users);
+        
         for (let user of Object.entries(this.users)) {
-          user[1].StatisticsList.sort(function(a,b){
+          this.users[user[0]].StatisticsList.sort(function(a,b){
             return new Date(a.date) - new Date(b.date);
           }).reverse();
         }
@@ -579,10 +580,10 @@ export default {
 
         // check if game over
         console.log('[beforeMount] check = ', this.contestInfo.games.length, this.cur_game, this.contestInfo.games.length < this.cur_game);
-        if (this.contestInfo.games.length < this.cur_game || this.checkEndGame()) 
-          this.isGameOver = true;
+        if (this.checkEndGame()) this.isGameOver = true;
+        console.log('[beforeMount] isGameOver = ', this.isGameOver, this.checkEndGame());
         
-        if (this.checkNextGame()) this.isNextGame = true;
+        // if (this.checkNextGame()) this.isNextGame = true;
 
         console.log('[beforeMount] localRecordsRaw 2 = ', this.contestInfo, this.contestInfo.localRecordsRaw, typeof this.contestInfo.localRecordsRaw);
         console.log('[beforeMount] records_pushed_raw', this.records_pushed_raw, this.records_pushed_raw, typeof this.records_pushed_raw);
@@ -669,6 +670,11 @@ export default {
 
         this.isGameOver = this.checkEndGame();
         this.isNextGame = this.checkNextGame();
+
+        // auto nextGame or endGame
+        if (this.isGameOver) this.endGame();
+        if (this.isNextGame) this.nextGame();
+
       } else if (whichBtn == 'lower' && this.isOpponentScore && this.checkOptionAllSelected('lower')) { 
         // whichBtn == 'lower'
         this.scoring.opponent.cur_score++;  // score adjustment
@@ -690,6 +696,10 @@ export default {
 
         this.isGameOver = this.checkEndGame();
         this.isNextGame = this.checkNextGame();
+
+        // auto nextGame or endGame
+        if (this.isGameOver) this.endGame();
+        if (this.isNextGame) this.nextGame();
       }
 
       // 無論如何只要按下送出都要清空選取項目
@@ -757,12 +767,26 @@ export default {
         }
       }
       console.log('[checkSetCourtMem]', this.records_pushed_raw[this.cur_game-1]);
+      
+      // 設定好人就備份到雲端，不然一局結束之後沒有按其他存取鍵會有問題 (selected_member沒清空)
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: this.selected_members});
+      if (Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam).length == 0) {
+        console.log('[checkSetCourtMem] EMPTY!', this.records_pushed_raw);
+        let temp = this.records_pushed_raw;
+        temp[this.cur_game-1].ourTeam = [''];
+
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: temp});
+      } else {
+        console.log('[checkSetCourtMem] FULL!', this.records_pushed_raw, this.cur_game)
+        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: this.records_pushed_raw});
+      }
+      
     },
     checkNextGame() {
         console.log('[checkNextGame]', this.scoring.host.cur_score, this.scoring.opponent.cur_score);
         console.log('[checkNextGame]', this.scoring.host.cur_score >= 24 && this.scoring.opponent.cur_score >= 24, this.scoring.host.cur_score == 25 || this.scoring.opponent.cur_score == 25);
         console.log('[checkNextGame]', this.isGameOver, this.isNextGame);
-        if (this.contestInfo.games.length == this.cur_game) {
+        if (this.contestInfo.games.length == this.cur_game) { // 決勝局 or 只有一局的狀況
             return false;
         } else {
           if (this.scoring.host.cur_score >= 24 && this.scoring.opponent.cur_score >= 24) {
@@ -781,49 +805,50 @@ export default {
     checkEndGame() {
       console.log('[checkEndGame]', this.contestInfo.games.length == this.cur_game, this.contestInfo.games.length != 1); 
       console.log('[checkEndGame]', this.scoring.host.cur_score == 15 || this.scoring.opponent.cur_score == 15, this.scoring.host.cur_score == 15, this.scoring.opponent.cur_score == 15); 
-      if (this.contestInfo.games.length == this.cur_game && this.contestInfo.games.length != 1) {
-        console.log('[checkEndGame] 1');
-        if (this.scoring.host.cur_score >= 14 && this.scoring.opponent.cur_score >= 14) {
-          // 雙方大於 24 分
-          // deuce
-          if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2)
+      console.log('[checkEndGame]', [this.scoring.host.winned_game, this.scoring.opponent.winned_game].includes(Math.ceil(this.contestInfo.games.length / 2)));
+      console.log('[checkEndGame]', this.scoring.host.winned_game, this.scoring.opponent.winned_game, Math.ceil(this.contestInfo.games.length / 2));
+
+      let isWinHalfGame = [this.scoring.host.winned_game, this.scoring.opponent.winned_game].includes(Math.ceil(this.contestInfo.games.length / 2));
+      if (this.contestInfo.games.length == this.cur_game && !isWinHalfGame) {
+        // 決勝局
+        if (this.contestInfo.games.length != 1) { // 三(1:1)或五局(2:2)
+          if (this.scoring.host.cur_score >= 14 && this.scoring.opponent.cur_score >= 14) {
+            // deuce
+            if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2) return true;
+            else return false;
+          } else if (this.scoring.host.cur_score == 15 || this.scoring.opponent.cur_score == 15) // not deucing
             return true;
-          else
+          else 
             return false;
-        } else if (this.scoring.host.cur_score == 15 || this.scoring.opponent.cur_score == 15)// not deucing
-          return true;
-        else 
-          return false;
-      } else if (this.contestInfo.games.length == 1) {
-        console.log('[checkEndGame] 2');
-        if (this.scoring.host.cur_score >= 24 && this.scoring.opponent.cur_score >= 24) {
-          // 雙方大於 24 分
-          // deuce
-          if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2)
+        } else { // 只有一局
+          if (this.scoring.host.cur_score >= 24 && this.scoring.opponent.cur_score >= 24) {
+            // deuce
+            if (Math.abs(this.scoring.host.cur_score - this.scoring.opponent.cur_score) == 2) return true;
+            else return false;
+          } else if (this.scoring.host.cur_score == 25 || this.scoring.opponent.cur_score == 25) {
+            // not deucing 
             return true;
-          else
+          } else 
             return false;
-        } else if (this.scoring.host.cur_score == 25 || this.scoring.opponent.cur_score == 25) {
-          // not deucing 
-          console.log('[checkEndGame] 2-1');
-          return true;
-        } else {
-          console.log('[checkEndGame] 2-2');
-          return false;
         }
-      } else {
-        console.log('[checkEndGame] 3');
+      } else if (isWinHalfGame) {
+        // 如果有一方贏超過預計比賽局數的一半就結束比賽
+        return true;
+      } else 
         return false;
-      }
     },
     nextGame(isEndGame) {
+      console.log('[nextGame] isEndGame = ', isEndGame);
       this.splitGameRecord(true);
 
-      // judge who wins
-      if (this.scoring['host']['cur_score'] > this.scoring['opponent']['cur_score'])
-        this.scoring['host']['winned_game'] += 1;
-      else 
-        this.scoring['opponent']['winned_game'] += 1;
+      if (this.scoring['host']['cur_score'] != 0 || this.scoring['opponent']['cur_score'] != 0) {
+        // judge who wins
+        if (this.scoring['host']['cur_score'] > this.scoring['opponent']['cur_score'])
+          this.scoring['host']['winned_game'] += 1;
+        else 
+          this.scoring['opponent']['winned_game'] += 1;
+      }
+
       
       // reset variables
       this.isCourtMemSet = false;
@@ -839,7 +864,43 @@ export default {
       }
 
       // push to DB
+      // update to users contest gameScore
+      // 檢查是否有七個值 (場上七個人)
+      // if (Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam).length == 7) {
+      //   for (let ele of Object.entries(this.records_pushed_raw[this.cur_game-1].ourTeam)) {
+      //     let memIdx = this.getMemID(ele[0]);
+      //     console.log('[nextGame] ele = ', ele, memIdx);
+          
+      //     if (memIdx != '-1') {
+      //       console.log('[nextGame]', this.users[memIdx], memIdx);
+      //       let temp = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
+      //       this.users[memIdx].StatisticsList[0].gameScore = temp;
+      //     }
+      //   }
+      // }
+      // for (let user of Object.entries(this.users)) {
+      //   this.users[user[0]].StatisticsList.sort(function(a,b){
+      //     return new Date(a.date) - new Date(b.date);
+      //   }).reverse();
+      //   console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[0].gameScore, this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString());
+      //   console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[0].opponent, this.users[user[0]].StatisticsList[0].contest);
+      // }
+
+      for (let user of Object.entries(this.users)) {
+        for (let i = 0; i < user[1].StatisticsList.length; ++i) {
+          let Game = user[1].StatisticsList[i];
+
+          if (Game.contestID == this.contestid) {
+            this.users[user[0]].StatisticsList[i].gameScore = this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString();
+            console.log('[update user contest GameScore]', this.users[user[0]].StatisticsList[i].gameScore);
+            console.log('[update user contest GameScore]', this.scoring.host.winned_game.toString() + ':' + this.scoring.opponent.winned_game.toString());
+          }
+        }
+      }
+
       // userSTAT & games
+      console.log('[nextGame] users = ', this.users);
+      // console.log('[nextGame] users json.stringify= ', JSON.stringify(this.users));
       this.$http.patch(this.db + 'user.json', JSON.stringify(this.users));
       this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {games: this.contestInfo.games});
 
@@ -851,9 +912,11 @@ export default {
 
       // contestRecords
       for(let i = 0; i < this.teamInfo.contestRecords.length; ++i) {
-        if (this.teamInfo.contestRecords[i].contest == this.contestInfo.contest) {
+        if (this.teamInfo.contestRecords[i].key == this.contestid) {
           this.teamInfo.contestRecords[i].gameScore = this.contestInfo.gameScore;
+          console.log('[nextGame] contestRecords = ', this.teamInfo.contestRecords[i].gameScore);
           this.$http.patch(this.db + 'team/' + this.teamid + '.json', JSON.stringify(this.teamInfo));
+          break; // modify only the first match, and ignore others
         }
       }
 
@@ -874,20 +937,21 @@ export default {
       } else 
         this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: this.records_pushed_raw});
       
+      // re-check nextGame & endGame 
+      this.isNextGame = false; // set isnextGame = false
+      if (!isEndGame) {
+        this.isGameOver = this.checkEndGame();  // 看看是否已經要結束比賽 (有贏 (2 out of 3) / (3 out of 5)場 ; 決勝局是在 record 那邊判斷)
+        if (this.isGameOver) this.endGame();    // 如果是結束比賽的話就 call endGame()
+      }
 
-      this.isGameOver = this.checkEndGame();
-      this.isNextGame = this.checkNextGame();
     },
     endGame() {
-      if (!(this.contestInfo.games.length < this.cur_game)) { 
-        // 避免在查看已經結束的比賽時，按下 endgame 還是會繼續送資料
-        this.nextGame(true);
-  
-        // 清除遠端的暫存資料
-        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
-        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ['']});
-        this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
-      }
+      this.nextGame(true);
+
+      // 清除遠端的暫存資料
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {onCourtMem: ''});
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecords: ['']});
+      this.$http.patch(this.db + 'contest/' + this.contestid + '.json', {localRecordsRaw: ['']});
     },
     getMemID(name) {
       for (let member of Object.entries(this.teamInfo.members)) {
@@ -919,9 +983,12 @@ export default {
               
               console.log('[splitGameRecord]', name);
               // sum UserSTAT 
-              if (isGameChanges ) {
-                if (this.users[this.getMemID(name)].StatisticsList[0] == '' || this.cur_game == 1) 
+              if (isGameChanges) {
+                console.log('[splitGameRecord] sumUsersSTAT');
+                if (this.users[this.getMemID(name)].StatisticsList[0] == '' || this.cur_game == 1) {
+                  console.log('[splitGameRecord] addNewRecord2STAT');
                   this.addNewRecord2STAT(name);
+                }
   
                 this.sumUserSTAT(name, trimmed_ourTeam);
                 
@@ -977,19 +1044,24 @@ export default {
       // insert contest info
       for (let [key, value] of Object.entries(this.contestInfo)) {
         if (['games', 'localRecordsRaw', 'localRecords', 'onCourtMem'].includes(key)) continue;
-        else 
+        else {
+          console.log('[addNewRecord2STAT]', key, value);
           record[key] = value;
+        }
       }
       record['teamName'] = this.teamInfo.teamName;
+      record['contestID'] = this.contestid;
 
       // PUSH
       if (this.users[this.getMemID(name)].StatisticsList[0] == '')
         this.users[this.getMemID(name)].StatisticsList[0] = record;
       else 
         this.users[this.getMemID(name)].StatisticsList.unshift(record);
+      
     },
     sumUserSTAT(name, trimmed_ourTeam) {
       for (let [key, value] of Object.entries(trimmed_ourTeam)) {
+        console.log('[sumUserSTAT]', key, value);
         if (typeof value == 'number') 
           this.users[this.getMemID(name)].StatisticsList[0][key] += value;
         else if (typeof value == 'string')
@@ -1013,9 +1085,11 @@ export default {
 
       // contestRecords
       for(let i = 0; i < this.teamInfo.contestRecords.length; ++i) {
-        if (this.teamInfo.contestRecords[i].contest == this.contestInfo.contest) {
+        if (this.teamInfo.contestRecords[i].key == this.contestid) {
           this.teamInfo.contestRecords[i].gameScore = this.contestInfo.gameScore;
+          console.log('[storeLocalData] contestRecords = ', this.teamInfo.contestRecords[i].gameScore);
           this.$http.patch(this.db + 'team/' + this.teamid + '.json', JSON.stringify(this.teamInfo));
+          break; // modify only the first match, and ignore others
         }
       }
 
@@ -1050,7 +1124,8 @@ export default {
 
 <style scoped>
 .score-board {
-  grid-template-columns: 7fr 3fr;
+  /*grid-template-columns: 7fr 3fr;*/
+  grid-template-columns: 1fr;
   column-gap: 5px;
 }
 .scores{
