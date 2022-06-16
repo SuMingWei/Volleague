@@ -41,7 +41,7 @@
                   <i class="fa-regular fa-face-laugh"></i>&nbsp;我方得失紀錄
                 </span>
               </div>
-              <div class="card-body text-center" style="height: 250px; overflow-y:scroll">
+              <div class="card-body text-center" style="height: 500px; overflow-y:scroll">
                 <div class="table-responsive">
                   <table class="table table-striped align-middle text-nowrap">
                     <thead>
