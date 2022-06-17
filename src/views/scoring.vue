@@ -571,11 +571,17 @@ export default {
             'ourTeam': {},
             'placement': [[''], [''], [''], [''], [''], [''], [''], [''], [''], ['']]
           }]
-        } else {
+        } else if (this.cur_game <= this.contestInfo.games.length) {
+          console.log('[beforeMount] this.contestInfo.localRecordsRaw ', this.contestInfo.localRecordsRaw[this.cur_game-1], this.cur_game);
           if (this.contestInfo.localRecordsRaw[this.cur_game-1].ourTeam[0] == '')
             this.contestInfo.localRecordsRaw[this.cur_game-1].ourTeam = {};
 
           this.records_pushed_raw = this.contestInfo.localRecordsRaw;
+        } else {
+          if (this.checkEndGame()) {
+            this.isGameOver = true;
+            this.endGame();
+          }
         }
 
         // check if game over
