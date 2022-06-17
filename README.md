@@ -24,7 +24,7 @@
 4. Heroku: (Deployment)
 
 ## Note 
-If you want to update Vue2 to Vue3, you will have to tackle incompatible modules (27 modules in total). GOOD LUCK :)
+If you want to update Vue2 to Vue3, you will have to tackle incompatible modules (27 modules in total). GOOD LUCK 😄
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
