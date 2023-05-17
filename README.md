@@ -5,19 +5,19 @@
 1-1. Project setup
     - Install dependent modules
 
-        ```bash
-        npm install
-        ```
+```bash
+    $ npm install
+```
 
 1-2. Use the command below to use Openssl.
 
-    ```bash
-        # MAC user
-        export NODE_OPTIONS=--openssl-legacy-provider
+```bash
+    # MAC user
+    $ export NODE_OPTIONS=--openssl-legacy-provider
 
-        # PowerShell
-        $env:NODE_OPTIONS="--openssl-legacy-provider"
-    ```
+    # PowerShell
+    $ $env:NODE_OPTIONS="--openssl-legacy-provider"
+```
 
 2. Compiles and hot-reloads for **development**
     - Type the command below for development.
@@ -26,6 +26,26 @@
             # It will reload every time you save it.
             $ npm run serve 
         ```
+
+## Testing
+- You can use the following command to add the Vue Test Utils
+    ```bash
+        $ vue add unit-jest
+    ```
+    - Then the CLI will add the testing command in `packet.json`
+        ```json
+            "scripts": {
+	            "test:unit": "vue-cli-service test:unit"
+            }
+        ```
+- Run all the test files in `tests/unit/`
+    ```bash
+        $ npm run test:unit
+    ```
+- Run specified test file in `tests/unit/`
+    ```bash
+        $ npm run test:unit --file /tests/unit/<filename>
+    ```
 
 ## Deployment
 
