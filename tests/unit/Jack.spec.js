@@ -20,3 +20,5 @@ describe('App', () => {
     expect(wrapper.find('#app').exists()).toBe(true)
   })
 })
+
+// This is jack!
