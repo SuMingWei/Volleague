@@ -21,4 +21,4 @@ describe('App', () => {
   })
 })
 
-// This is jack!
+// This is pin!
