@@ -648,6 +648,102 @@ describe('singleTeam', () => {
     expect(divElements.at(0).find('div.text-center p.badge.mb-0').text()).toBe('Fin');
   });
 
+  it('test on checkEnd() - should return true', async () => { // has error
+    jest.spyOn(singleTeam, 'beforeMount').mockImplementation(() => {
+      console.log('test on checkEnd() - should return true - jest.spyOn()')
+    })
+
+    const checkEndSpy = jest.spyOn(singleTeam.methods, 'checkEnd').mockImplementation((item) => {
+      var curGames = parseInt(item.gameScore[0],10) + parseInt(item.gameScore[2],10);
+      if(curGames == item.gamesNum){
+        return true;
+      }else{
+        return false;
+      }
+    });
+
+    const wrapper = mount(singleTeam, {
+      props: {
+        uid: mockUid
+      },
+      stubs: ['router-link', 'router-view'], 
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          teamInfo:{
+            teamName: 'NYCU CS',
+            contestRecords: [
+              {
+                opponent: '交大電機',
+                contest: '系際盃',
+                date:'2023-04-20',
+                gameScore: '2:0',
+                gamesNum: 3,
+                key: 'NTdKbOPAh9F89udkTNB'
+              },
+            ],
+          }
+        }
+      }
+    });
+
+    const result = checkEndSpy(wrapper.vm.teamInfo.contestRecords[0]);
+    // Assert that the result should be true
+    expect(result).toBe(true);
+
+  });
+
+  it('test on checkEnd() - should return false', async () => {
+    jest.spyOn(singleTeam, 'beforeMount').mockImplementation(() => {
+      console.log('test on checkEnd() - should return false - jest.spyOn()')
+    })
+
+    const checkEndSpy = jest.spyOn(singleTeam.methods, 'checkEnd').mockImplementation((item) => {
+      var curGames = parseInt(item.gameScore[0],10) + parseInt(item.gameScore[2],10);
+      if(curGames == item.gamesNum){
+        return true;
+      }else{
+        return false;
+      }
+    });
+
+    const wrapper = mount(singleTeam, {
+      props: {
+        uid: mockUid
+      },
+      stubs: ['router-link', 'router-view'], 
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          teamInfo:{
+            teamName: 'NYCU CS',
+            contestRecords: [
+              {
+                opponent: '交大電機',
+                contest: '系際盃',
+                date:'2023-04-20',
+                gameScore: '1:0',
+                gamesNum: 3,
+                key: 'NTdKbOPAh9F89udkTNB'
+              },
+            ],
+          }
+        }
+      }
+    });
+
+    const result = checkEndSpy(wrapper.vm.teamInfo.contestRecords[0]);
+    // Assert that the result should be true
+    expect(result).toBe(false);
+
+  });
+
   // add contest button
   it('test on open contest modal', async () => {
     jest.spyOn(singleTeam, 'beforeMount').mockImplementation(() => {
