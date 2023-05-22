@@ -18,26 +18,6 @@ describe('login.vue', () => {
         }
         }
 
-        const wrapper = mount(login, {
-        stubs: ['router-link', 'router-view'], 
-        mocks: {
-            $router: mockRouter,
-            $route: mockRoute
-        },
-        data() {
-            return {
-              user: {
-                account: '',
-                password: '',
-              },
-              errorMessage: '',
-              allUser: [],
-              db: 'https://volleague-default-rtdb.firebaseio.com/',
-            }
-        }
-        })
-
-        console.log(wrapper.vm.$route.params.teamid)
   
     })
   })
