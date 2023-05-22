@@ -1,5 +1,7 @@
 import { shallowMount, createLocalVue, mount } from '@vue/test-utils'
 import scoring from '@/views/scoring.vue'
+import cloneDeep from 'lodash'
+import { async } from 'q'
 
 // mock the Router
 const mockRouter = {
@@ -15,251 +17,463 @@ const mockRoute = {
 }
 
 
-describe('scoring.vue', () => {
-  it('DB SYNC - Score Board', () => {
-    // 用 spyOn 的方式 intercept "beforeMount" 
-    // 來避免 this.$http.get() Undefined 的錯誤
-    jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {
-      console.log('jest.spyOn()')
-    })
+describe('Testing Score Board', () => {
+  // 用 spyOn 的方式 intercept "beforeMount" 
+  // 來避免 this.$http.get() Undefined 的錯誤
+  jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
 
-    const wrapper = mount(scoring, {
-      stubs: ['router-link', 'router-view'], 
-      mocks: {
-        $router: mockRouter,
-        $route: mockRoute
-      },
-      data() {
-        return {
-          cur_game: 1,
-          id: this.uid,
-          teamid: this.$route.params.teamid,
-          contestid: this.$route.params.contestid,
-          db: 'https://volleague-default-rtdb.firebaseio.com/',
-          users: {
-            // 'uid': {
-            //   StatisticsList: [''],
-            //   authid: '',
-            //   birthday: {},
-            //   name: {},
-            //   position: [],
-            //   teamList: []
-            // }
-          },
-          contestInfo: {
-            contest: '成功盃',
-            date: '',
-            games: [],
-            opponent: 'NCKU CSIE',
-            score: '',
-            gameScore: '',
-            onCourtMem: '',
-            localRecordsRaw: [''],
-            localRecords: ['']
-          },
-          teamInfo:{
-            teamName: '',
-            bulletin: '',
-            awards: [''],
-            members: [],  // name, number, position, uid
-            contestRecords: [{
-              contest: '成功盃',
-              date: '',
-              gameScore: '',
-              key: '',
-              opponent: ''
-            }],
-          },
-          isGameOver: false,
-          isNextGame: false,
-          isCourtMemSet: false, // bind to court member section
-          isOpponentScore: false, // bind to button, '對方得分'
-          positions: ['OH', 'O', 'MB', 'S', 'L'],
-          translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
-                          'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
-                          'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
-          translateType2Eng: {'攻擊得分': 'attackPoint', '攔網得分': 'blockPoint','發球得分': 'servicePoint',
-                          '攻擊失誤': 'attackError', '舉球失誤': 'tossError', '觸網失誤': 'blockError',
-                          '接發失誤': 'receiveError', '發球失誤': 'serviceError', '對方得分': 'oppoScore'},
-          records_pushed_raw: [{
-            'ourTeam': {},
-            'placement': [[''], [''], [''], [''], [''], [''], [''], [''], [''], ['']]
-          }],
-          // records_pushed_raw: [
-          //   {
-          //     'ourTeam': {
-          //       '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
-          //                 attackPoint: 1, blockPoint: 0, servicePoint: 0,
-          //                 attackError: 0, tossError: 0, blockError: 0,
-          //                 receiveError: 0, serviceError: 0 },
-          //       'Test7': {name: 'Test7', pos: 'L', number: '88',
-          //                 attackPoint: 0, blockPoint: 0, servicePoint: 0,
-          //                 attackError: 0, tossError: 0, blockError: 1,
-          //                 receiveError: 0, serviceError: 0 },
-          //     }, 
-          //     'placement': [[''], [''], [{'num': 2, 'pos': 'S'}], [''], [''], [''], [''], [''], [''], ['']] // 0~8: 1~9 九號位置 ; 9: touch out
-          //   }
-          // ],
-          // landing: 呈現在表格 --> 1~9 + touch-out
-          records_local: [],
-          // records_local: [{'num': 88, 'name': 'Test7', 'position': 'L', 'record_type': '攻擊得分', 'landing': -1, 'game': 1},
-          //                 {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record_type': '攔網失誤', 'landing': -1, 'game': 1},
-          //                 {'num': 2, 'name': 'NCKU EE', 'position': 'S', 'record_type': '對方得分', 'landing': 3, 'game': 1}],
-          scoring: {
-            host: {'name': 'NYCU CS', 'winned_game': 0, 'cur_score': 0},
-            opponent: {'name': 'NCKU CSIE', 'winned_game': 0, 'cur_score': 0}
-          },
-          selected_button: {
-            'name': '',
-            'number': -1,
-            'position': '',
-            'record_type': '',
-            'landing': -1,  // 依照 placement 的 index (0~9)
-            'opponent': {'num': -1, 'pos': ''},
-            'game': this.cur_game
-          },
-          selected_members: [{}, {}, {}, {}, {}, {}, {}],     // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
-          // selected_members: [{'name': '張祐誠', 'number': 22, 'position': 'MB'},
-          //                    {'name': '張祐誠', 'number': 22, 'position': 'MB'},
-          //                    {'name': '張祐誠', 'number': 22, 'position': 'MB'},
-          //                    {'name': '張祐誠', 'number': 22, 'position': 'MB'}, 
-          //                    {'name': '張祐誠', 'number': 22, 'position': 'MB'}, 
-          //                    {'name': '張祐誠', 'number': 22, 'position': 'MB'}]
-        }
+  const wrapper = mount(scoring, {
+    stubs: ['router-link', 'router-view'], 
+    mocks: {
+      $router: mockRouter,
+      $route: mockRoute
+    },
+    data() {
+      return {
+        scoring: {
+          host: {'name': 'NYCU CS', 'winned_game': 1, 'cur_score': 20},
+          opponent: {'name': 'NCKU CSIE', 'winned_game': 0, 'cur_score': 19}
+        },
       }
-    })
-
-    console.log(wrapper.findComponent('.scores').text())
-    expect(wrapper.findComponent('.scores').text()).toContain('NCKU CSIE')
-    expect(wrapper.findComponent('.scores').text()).toContain('NYCU CS')
+    }
   })
 
-  it('DB SYNC - Record', async () => {
-    // 用 spyOn 的方式 intercept "beforeMount" 
-    // 來避免 this.$http.get() Undefined 的錯誤
-    jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {
-      console.log('jest.spyOn()')
-    })
+  let scoreBoard = wrapper.findComponent('.scores')
+  let teams = scoreBoard.findAll('button')
+  let scores = scoreBoard.findAll('span')
 
+  it('Score Board - Teams', () => {
+    expect(teams.at(0).text()).toEqual('NYCU CS')
+    expect(teams.at(1).text()).toEqual('NCKU CSIE')
+  })
+
+  it('Score Board - Game Score', () => {
+    expect(scores.at(0).text()).toEqual('1')
+    expect(scores.at(1).text()).toEqual('20')
+  })
+
+  it('Score Board - Score', () => {
+    expect(scores.at(2).text()).toEqual('0')
+    expect(scores.at(3).text()).toEqual('19')
+  })
+})
+
+describe('Testing Record', () => {
+  // 用 spyOn 的方式 intercept "beforeMount" 
+  // 來避免 this.$http.get() Undefined 的錯誤
+  jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
+  
+  let mocked = jest.spyOn(scoring.methods, 'deleteLocalRecord').mockImplementation((record2delete) => {
+    // delete from local record
+    let indexOfTarget = Array.from(wrapper.vm.records_local).indexOf(record2delete);
+    wrapper.vm.records_local.splice(indexOfTarget, 1);
+    
+    // delete from record to be pushed
+    if (record2delete.record_type == '對方得分' && record2delete.game == wrapper.vm.cur_game) {
+      wrapper.vm.scoring.opponent.cur_score--; // score adjustment
+      
+      // change "touch out" to numberic number
+      if (record2delete.landing == 'Touch Out') 
+        record2delete.landing = 10;
+
+      let opponent = wrapper.vm.records_pushed_raw[record2delete.game-1].placement[record2delete.landing-1].find(x => x.num == record2delete.num && x.pos == record2delete.position),
+          indexOfOpponent = wrapper.vm.records_pushed_raw[record2delete.game-1].placement[record2delete.landing-1].indexOf(opponent);
+      
+      wrapper.vm.records_pushed_raw[record2delete.game-1].placement[record2delete.landing-1].splice(indexOfOpponent, 1);
+    } else {
+      // score adjustment
+      if (record2delete.record_type.indexOf('失誤') != -1  && record2delete.game == wrapper.vm.cur_game)
+        wrapper.vm.scoring.opponent.cur_score--;
+      else if (record2delete.game == wrapper.vm.cur_game) // 刪掉我們得分的紀錄
+        wrapper.vm.scoring.host.cur_score--;
+
+      // record deletion
+      let engType = wrapper.vm.translateType2Eng[record2delete.record_type];
+      wrapper.vm.records_pushed_raw[record2delete.game-1].ourTeam[record2delete.name][engType]--;
+    }
+  })
+  
+  const wrapper = mount(scoring, {
+    stubs: ['router-link', 'router-view'], 
+    mocks: {
+      $router: mockRouter,
+      $route: mockRoute
+    },
+    data() {
+      return {
+        cur_game: 1,
+        records_pushed_raw: [
+          {
+            'ourTeam': {
+              '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
+                        attackPoint: 1, blockPoint: 0, servicePoint: 0,
+                        attackError: 0, tossError: 0, blockError: 0,
+                        receiveError: 0, serviceError: 0 },
+              'Test7': {name: 'Test7', pos: 'L', number: '88',
+                        attackPoint: 0, blockPoint: 0, servicePoint: 0,
+                        attackError: 0, tossError: 0, blockError: 1,
+                        receiveError: 0, serviceError: 0 },
+            }, 
+            'placement': [[''], [''], [{'num': 2, 'pos': 'S'}], [''], [''], [''], [''], [''], [''], [{'num': 43, 'pos': 'MB'}]] // 0~8: 1~9 九號位置 ; 9: touch out
+          }
+        ],
+        scoring: {
+          host: {'name': 'NYCU CS', 'winned_game': 0, 'cur_score': 1},
+          opponent: {'name': 'NCKU CSIE', 'winned_game': 0, 'cur_score': 3}
+        },
+        records_local: [{'num': 88, 'name': 'Test7', 'position': 'L', 'record_type': '攻擊得分', 'landing': -1, 'game': 1},
+                        {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record_type': '攔網失誤', 'landing': -1, 'game': 1},
+                        {'num': 2, 'name': 'NCKU CSIE', 'position': 'S', 'record_type': '對方得分', 'landing': 3, 'game': 1},
+                        {'num': 43, 'name': 'NCKU CSIE', 'position': 'MB', 'record_type': '對方得分', 'landing': 'Touch Out', 'game': 1}],
+      }
+    }
+  })
+  
+  let rows = wrapper.findAll('td')
+  let records_local = wrapper.vm.records_local
+  it('Record - Badge & Name & Number', async () => {
+    for (let i = 0; i < rows.length; ++i) {
+      let recordIdx = i / 5
+      if (i % 5 == 0) {
+        // check Badge & Name & Number 
+        let numAndName = rows.at(i).findAll('span')
+        let iconColor = numAndName.at(0).classes()[3]
+        
+        // check badge color
+        switch (records_local.at(recordIdx)['position']) {
+          case 'MB':
+            expect(iconColor).toEqual('bg-warning')
+            break
+          case 'OH':
+            expect(iconColor).toEqual('bg-danger')
+            break
+          case 'S':
+            expect(iconColor).toEqual('bg-success')
+            break
+          case 'L':
+            expect(iconColor).toEqual('bg-secondary')
+            break
+          case 'O':
+            expect(iconColor).toEqual('bg-primary')
+            break
+        }
+        
+        // check number and name 
+        expect(numAndName.at(0).text()).toEqual(records_local.at(recordIdx)['num'].toString())
+        expect(numAndName.at(1).text()).toEqual(records_local.at(recordIdx)['name'].toString())
+      }
+    }
+  })
+
+  it('Record - Record Type', async () => {
+    for (let i = 0; i < rows.length; ++i) {
+      let recordIdx = i / 5
+      if (i % 5 == 1) {
+        // check record type
+        expect(rows.at(i).text()).toEqual(records_local.at(recordIdx)['record_type'])
+      } 
+    }
+  })
+
+  it('Record - Landing', async () => {
+    for (let i = 0; i < rows.length; ++i) {
+      let recordIdx = i / 5
+      if (i % 5 == 2) {
+        let landing = rows.at(i).find('span').text()
+        if (records_local.at(recordIdx)['landing'] == 10)
+          expect(landing).toEqual('Touch Out')
+        else if (records_local.at(recordIdx)['landing'] != -1)
+          expect(landing).toEqual(records_local.at(recordIdx)['landing'].toString())
+        else
+          expect(landing).toEqual('X')
+      } 
+    }
+  })
+
+  it('Record - Game', async () => {
+    for (let i = 0; i < rows.length; ++i) {
+      let recordIdx = i / 5
+      if (i % 5 == 3) {
+        expect(rows.at(i).text()).toEqual(records_local.at(recordIdx)['game'].toString())
+      }
+    }
+  })
+
+  // 這個 function 我有測到 deleteLocalRecord()，不過是把寫入 DB 的程式片段拔掉的版本
+  it('Record - Delete Record', async () => {
+    let records_local_deep = Array.from(wrapper.vm.records_local)
+    let oldScoring = { host: {'name': 'NYCU CS', 'winned_game': 0, 'cur_score': 1},
+                       opponent: {'name': 'NCKU CSIE', 'winned_game': 0, 'cur_score': 3} }
+    for (let i = rows.length-1, counter = 0; i >= 0; --i) {
+      if (i % 5 == 4) {
+        let recordIdx = Math.floor(i / 5)
+        let deleteBtn = rows.at(i).find('button')
+
+        deleteBtn.trigger('click')
+        await wrapper.vm.$nextTick()
+
+        // after click
+        // delete record
+        expect(mocked).toHaveBeenCalledTimes(++counter)
+        expect(Array.from(wrapper.vm.records_local).indexOf(records_local_deep.at(recordIdx))).toEqual(-1)
+        
+        // deduct score
+        if (records_local_deep.at(recordIdx).record_type == '對方得分') 
+          expect(wrapper.vm.scoring.opponent.cur_score).toEqual(--oldScoring.opponent.cur_score)
+        else if (records_local_deep.at(recordIdx).record_type.indexOf('失誤') != -1) 
+          expect(wrapper.vm.scoring.opponent.cur_score).toEqual(--oldScoring.opponent.cur_score)
+        else 
+          expect(wrapper.vm.scoring.host.cur_score).toEqual(--oldScoring.host.cur_score)
+      }
+    }
+
+  })
+})
+
+describe('Player Selection', () => {
+  // 用 spyOn 的方式 intercept "beforeMount" 
+  // 來避免 this.$http.get() Undefined 的錯誤
+  jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
+  
+  
+  it('Check Dropdown Options', async () => {
     const wrapper = mount(scoring, {
       stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
       mocks: {
         $router: mockRouter,
         $route: mockRoute
       },
       data() {
         return {
-          cur_game: 1,
-          id: this.uid,
-          teamid: this.$route.params.teamid,
-          contestid: this.$route.params.contestid,
-          db: 'https://volleague-default-rtdb.firebaseio.com/',
-          users: {
-            // 'uid': {
-            //   StatisticsList: [''],
-            //   authid: '',
-            //   birthday: {},
-            //   name: {},
-            //   position: [],
-            //   teamList: []
-            // }
-          },
-          contestInfo: {
-            contest: '成功盃',
-            date: '',
-            games: [],
-            opponent: 'NCKU CSIE',
-            score: '',
-            gameScore: '',
-            onCourtMem: '',
-            localRecordsRaw: [''],
-            localRecords: ['']
-          },
           teamInfo:{
-            teamName: '',
-            bulletin: '',
-            awards: [''],
-            members: [],  // name, number, position, uid
-            contestRecords: [{
-              contest: '成功盃',
-              date: '',
-              gameScore: '',
-              key: '',
-              opponent: ''
-            }],
+            teamName: 'NYCU CS',
+            // name, number, position, uid
+            members: [{ "name": "蘇名偉", "number": "27", "position": "OH", "uid": "-N3hlfKxXwby0jSSDbxV" },
+                      { "name": "張祐誠", "number": "3" , "position": "MB", "uid": "-N3hloXHeW7EIdJuh5ZD" },
+                      { "name": "Test6", "number": "66", "position": "S" , "uid": "-N3hm182z3keR5kdjpoX" },
+                      { "name": "Test5", "number": "77", "position": "O" , "uid": "-N3hlzbf69tjAcJjsAdG" },
+                      { "name": "test4", "number": "4" , "position": "MB", "uid": "-N3hlp05s2nmpA4gx4XC" },
+                      { "name": "test2", "number": "2" , "position": "OH", "uid": "-N3hlhMMtjy-u_QrqVL8" },
+                      { "name": "Test7", "number": "88", "position": "L" , "uid": "-N3hm36BH5b9ngb2N8wQ" }],
           },
-          isGameOver: false,
-          isNextGame: false,
-          isCourtMemSet: false, // bind to court member section
-          isOpponentScore: false, // bind to button, '對方得分'
-          positions: ['OH', 'O', 'MB', 'S', 'L'],
-          translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
-                          'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
-                          'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
-          translateType2Eng: {'攻擊得分': 'attackPoint', '攔網得分': 'blockPoint','發球得分': 'servicePoint',
-                          '攻擊失誤': 'attackError', '舉球失誤': 'tossError', '觸網失誤': 'blockError',
-                          '接發失誤': 'receiveError', '發球失誤': 'serviceError', '對方得分': 'oppoScore'},
-          records_pushed_raw: [{
-            'ourTeam': {},
-            'placement': [[''], [''], [''], [''], [''], [''], [''], [''], [''], ['']]
-          }],
-          // records_pushed_raw: [
-          //   {
-          //     'ourTeam': {
-          //       '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
-          //                 attackPoint: 1, blockPoint: 0, servicePoint: 0,
-          //                 attackError: 0, tossError: 0, blockError: 0,
-          //                 receiveError: 0, serviceError: 0 },
-          //       'Test7': {name: 'Test7', pos: 'L', number: '88',
-          //                 attackPoint: 0, blockPoint: 0, servicePoint: 0,
-          //                 attackError: 0, tossError: 0, blockError: 1,
-          //                 receiveError: 0, serviceError: 0 },
-          //     }, 
-          //     'placement': [[''], [''], [{'num': 2, 'pos': 'S'}], [''], [''], [''], [''], [''], [''], ['']] // 0~8: 1~9 九號位置 ; 9: touch out
-          //   }
-          // ],
-          // landing: 呈現在表格 --> 1~9 + touch-out
-          // records_local: [],
-          records_local: [{'num': 88, 'name': 'Test7', 'position': 'L', 'record_type': '攻擊得分', 'landing': -1, 'game': 1},
-                          {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record_type': '攔網失誤', 'landing': -1, 'game': 1},
-                          {'num': 2, 'name': 'NCKU CSIE', 'position': 'S', 'record_type': '對方得分', 'landing': 3, 'game': 1}],
-          scoring: {
-            host: {'name': 'NYCU CS', 'winned_game': 0, 'cur_score': 0},
-            opponent: {'name': 'NCKU CSIE', 'winned_game': 0, 'cur_score': 0}
-          },
-          selected_button: {
-            'name': '',
-            'number': -1,
-            'position': '',
-            'record_type': '',
-            'landing': -1,  // 依照 placement 的 index (0~9)
-            'opponent': {'num': -1, 'pos': ''},
-            'game': this.cur_game
-          },
-          selected_members: [{}, {}, {}, {}, {}, {}, {}],     // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+          // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+          selected_members: [{}, {}, {}, {}, {}, {}, {}], 
+          isCourtMemSet: true,
         }
       }
     })
 
-    console.log(wrapper.findAll('td'))
-    let rows = wrapper.findAll('td')
-    
-    // for (let i = 0; i < rows.length; ++i) {
-
-    // }
-    await wrapper.vm.$nextTick();
-    console.log(rows.at(0).text(), rows.at(0).text().length, rows.at(0).text().split(' '))
-    console.log(rows.at(0).find('span').classes()[3])
-    for (let i = 0; i < rows.length; ++i) {
-      i %= 5
-      if (i % 5 == 0) {
-        iconColor = rows.at(0).find('span').classes()[3]
-      } else {
-
+    let selects = wrapper.findAll('select')
+    for (var i = 0; i < selects.length; ++i) {
+      let options = selects.at(i).findAll('option')
+      for (var j = 1; j < selects.length; ++j) {
+        var optionList = options.at(j).text().split(' | ')
+        // console.log(optionList.at(0), wrapper.vm.teamInfo.members.at(j-1))
+        expect(optionList.at(0)).toEqual(wrapper.vm.teamInfo.members[j-1]['number'])
+        expect(optionList[1]).toEqual(wrapper.vm.teamInfo.members[j-1]['name'])
+        expect(optionList[2]).toEqual(wrapper.vm.teamInfo.members[j-1]['position'])
       }
-      console.log(i, rows.at(i).text())
     }
+  })
+  
+  it('Check Libero is Selected in L (falsy)', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          teamInfo:{
+            teamName: 'NYCU CS',
+            // name, number, position, uid
+            members: [{ "name": "蘇名偉", "number": "27", "position": "OH", "uid": "-N3hlfKxXwby0jSSDbxV" },
+                      { "name": "張祐誠", "number": "3" , "position": "MB", "uid": "-N3hloXHeW7EIdJuh5ZD" },
+                      { "name": "Test6", "number": "66", "position": "S" , "uid": "-N3hm182z3keR5kdjpoX" },
+                      { "name": "Test5", "number": "77", "position": "O" , "uid": "-N3hlzbf69tjAcJjsAdG" },
+                      { "name": "test4", "number": "4" , "position": "MB", "uid": "-N3hlp05s2nmpA4gx4XC" },
+                      { "name": "test2", "number": "2" , "position": "OH", "uid": "-N3hlhMMtjy-u_QrqVL8" },
+                      { "name": "Test7", "number": "88", "position": "L" , "uid": "-N3hm36BH5b9ngb2N8wQ" }],
+          },
+          // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+          selected_members: [{ "name": "蘇名偉", "number": "27", "position": "OH"},
+                             { "name": "張祐誠", "number": "3" , "position": "MB"},
+                             { "name": "Test6", "number": "66", "position": "S" },
+                             { "name": "Test5", "number": "77", "position": "O" },
+                             { "name": "test4", "number": "4" , "position": "MB"},
+                             { "name": "Test7", "number": "88", "position": "L" },
+                             { "name": "test2", "number": "2" , "position": "OH"}], 
+          isCourtMemSet: true,
+        }
+      }
+    })
+
+    let select = wrapper.findAll('button').filter(divs => {return divs.classes().includes('team-member')})
+    expect(select.at(6).find('span').classes().at(3)).toStrictEqual('bg-secondary')
+  })
+
+  it('Check Libero is Selected in L (truthy)', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          teamInfo:{
+            teamName: 'NYCU CS',
+            // name, number, position, uid
+            members: [{ "name": "蘇名偉", "number": "27", "position": "OH", "uid": "-N3hlfKxXwby0jSSDbxV" },
+                      { "name": "張祐誠", "number": "3" , "position": "MB", "uid": "-N3hloXHeW7EIdJuh5ZD" },
+                      { "name": "Test6", "number": "66", "position": "S" , "uid": "-N3hm182z3keR5kdjpoX" },
+                      { "name": "Test5", "number": "77", "position": "O" , "uid": "-N3hlzbf69tjAcJjsAdG" },
+                      { "name": "test4", "number": "4" , "position": "MB", "uid": "-N3hlp05s2nmpA4gx4XC" },
+                      { "name": "test2", "number": "2" , "position": "OH", "uid": "-N3hlhMMtjy-u_QrqVL8" },
+                      { "name": "Test7", "number": "88", "position": "L" , "uid": "-N3hm36BH5b9ngb2N8wQ" }],
+          },
+          // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+          selected_members: [{ "name": "蘇名偉", "number": "27", "position": "OH"},
+                             { "name": "張祐誠", "number": "3" , "position": "MB"},
+                             { "name": "Test6", "number": "66", "position": "S" },
+                             { "name": "Test5", "number": "77", "position": "O" },
+                             { "name": "test4", "number": "4" , "position": "MB"},
+                             { "name": "test2", "number": "2" , "position": "OH"},
+                             { "name": "Test7", "number": "88", "position": "L" }], 
+          isCourtMemSet: true,
+        }
+      }
+    })
+
+    let select = wrapper.findAll('button').filter(divs => {return divs.classes().includes('team-member')})
+    // console.log(select.length, select.at(6).find('span').classes(), select.at(6).findAll('span').at(1).text())
+    expect(select.at(6).find('span').classes().at(3)).toStrictEqual('bg-secondary')
+  })
+
+  it('Check Selected Presentation - Position Tag', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          teamInfo:{
+            teamName: 'NYCU CS',
+            // name, number, position, uid
+            members: [{ "name": "蘇名偉", "number": "27", "position": "OH", "uid": "-N3hlfKxXwby0jSSDbxV" },
+                      { "name": "張祐誠", "number": "3" , "position": "MB", "uid": "-N3hloXHeW7EIdJuh5ZD" },
+                      { "name": "Test6", "number": "66", "position": "S" , "uid": "-N3hm182z3keR5kdjpoX" },
+                      { "name": "Test5", "number": "77", "position": "O" , "uid": "-N3hlzbf69tjAcJjsAdG" },
+                      { "name": "test4", "number": "4" , "position": "MB", "uid": "-N3hlp05s2nmpA4gx4XC" },
+                      { "name": "test2", "number": "2" , "position": "OH", "uid": "-N3hlhMMtjy-u_QrqVL8" },
+                      { "name": "Test7", "number": "88", "position": "L" , "uid": "-N3hm36BH5b9ngb2N8wQ" }],
+          },
+          // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+          selected_members: [{ "name": "蘇名偉", "number": "27", "position": "OH"},
+                             { "name": "張祐誠", "number": "3" , "position": "MB"},
+                             { "name": "Test6", "number": "66", "position": "S" },
+                             { "name": "Test5", "number": "77", "position": "O" },
+                             { "name": "test4", "number": "4" , "position": "MB"},
+                             { "name": "test2", "number": "2" , "position": "OH"},
+                             { "name": "Test7", "number": "88", "position": "L" }], 
+          isCourtMemSet: true,
+        }
+      }
+    })
+
+    let selects = wrapper.findAll('button').filter(divs => {return divs.classes().includes('team-member')})
+    expect(selects.at(0).findAll('span').at(0).classes().at(3)).toEqual('bg-danger')
+    expect(selects.at(1).findAll('span').at(0).classes().at(3)).toEqual('bg-warning')
+    expect(selects.at(2).findAll('span').at(0).classes().at(3)).toEqual('bg-success')
+    expect(selects.at(3).findAll('span').at(0).classes().at(3)).toEqual('bg-primary')
+    expect(selects.at(4).findAll('span').at(0).classes().at(3)).toEqual('bg-warning')
+    expect(selects.at(5).findAll('span').at(0).classes().at(3)).toEqual('bg-danger')
+  })
+
+  it('Check Selected Presentation - Number', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          teamInfo:{
+            teamName: 'NYCU CS',
+            // name, number, position, uid
+            members: [{ "name": "蘇名偉", "number": "27", "position": "OH", "uid": "-N3hlfKxXwby0jSSDbxV" },
+                      { "name": "張祐誠", "number": "3" , "position": "MB", "uid": "-N3hloXHeW7EIdJuh5ZD" },
+                      { "name": "Test6", "number": "66", "position": "S" , "uid": "-N3hm182z3keR5kdjpoX" },
+                      { "name": "Test5", "number": "77", "position": "O" , "uid": "-N3hlzbf69tjAcJjsAdG" },
+                      { "name": "test4", "number": "4" , "position": "MB", "uid": "-N3hlp05s2nmpA4gx4XC" },
+                      { "name": "test2", "number": "2" , "position": "OH", "uid": "-N3hlhMMtjy-u_QrqVL8" },
+                      { "name": "Test7", "number": "88", "position": "L" , "uid": "-N3hm36BH5b9ngb2N8wQ" }],
+          },
+          // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+          selected_members: [{ "name": "蘇名偉", "number": "27", "position": "OH"},
+                             { "name": "張祐誠", "number": "3" , "position": "MB"},
+                             { "name": "Test6", "number": "66", "position": "S" },
+                             { "name": "Test5", "number": "77", "position": "O" },
+                             { "name": "test4", "number": "4" , "position": "MB"},
+                             { "name": "test2", "number": "2" , "position": "OH"},
+                             { "name": "Test7", "number": "88", "position": "L" }], 
+          isCourtMemSet: true,
+        }
+      }
+    })
+
+    let selects = wrapper.findAll('button').filter(divs => {return divs.classes().includes('team-member')})
+    for (let idx = 0; idx < 7; ++idx)
+      expect(selects.at(idx).findAll('span').at(0).text()).toEqual(wrapper.vm.selected_members[idx]['number'])
+  })
+
+  it('Check Selected Presentation - Name', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          teamInfo:{
+            teamName: 'NYCU CS',
+            // name, number, position, uid
+            members: [{ "name": "蘇名偉", "number": "27", "position": "OH", "uid": "-N3hlfKxXwby0jSSDbxV" },
+                      { "name": "張祐誠", "number": "3" , "position": "MB", "uid": "-N3hloXHeW7EIdJuh5ZD" },
+                      { "name": "Test6", "number": "66", "position": "S" , "uid": "-N3hm182z3keR5kdjpoX" },
+                      { "name": "Test5", "number": "77", "position": "O" , "uid": "-N3hlzbf69tjAcJjsAdG" },
+                      { "name": "test4", "number": "4" , "position": "MB", "uid": "-N3hlp05s2nmpA4gx4XC" },
+                      { "name": "test2", "number": "2" , "position": "OH", "uid": "-N3hlhMMtjy-u_QrqVL8" },
+                      { "name": "Test7", "number": "88", "position": "L" , "uid": "-N3hm36BH5b9ngb2N8wQ" }],
+          },
+          // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
+          selected_members: [{ "name": "蘇名偉", "number": "27", "position": "OH"},
+                             { "name": "張祐誠", "number": "3" , "position": "MB"},
+                             { "name": "Test6", "number": "66", "position": "S" },
+                             { "name": "Test5", "number": "77", "position": "O" },
+                             { "name": "test4", "number": "4" , "position": "MB"},
+                             { "name": "test2", "number": "2" , "position": "OH"},
+                             { "name": "Test7", "number": "88", "position": "L" }], 
+          isCourtMemSet: true,
+        }
+      }
+    })
+
+    let selects = wrapper.findAll('button').filter(divs => {return divs.classes().includes('team-member')})
     
+    for (let idx = 0; idx < 7; ++idx)
+      expect(selects.at(idx).findAll('span').at(1).text()).toEqual(wrapper.vm.selected_members[idx]['name'])
   })
 
   
