@@ -1,6 +1,6 @@
-import { shallowMount, mount, RouterLinkStub, createLocalVue, createRouter, createWebHistory} from '@vue/test-utils'
+import { shallowMount, mount, RouterLinkStub, createLocalVue} from '@vue/test-utils'
 import VueRouter from 'vue-router';
-import singleRecord from '@/views/singleRecord'
+import singleRecord from '@/views/singleRecord';
 
 // mock the Router
 const mockRouter = {
@@ -17,6 +17,8 @@ const mockRoute = {
   
 // mock the uid
 const mockUid = '-N3hlfKxXwby0jSSDbxV'
+
+const db = 'https://volleague-default-rtdb.firebaseio.com/'
 
 describe('singleRecord', () => {
   // beforeMount
@@ -392,7 +394,7 @@ describe('singleRecord', () => {
                 }
               },
             ]
-          },
+          }
         }
       }
     });
@@ -402,6 +404,102 @@ describe('singleRecord', () => {
 
     // Assert that the contest name is correct
     expect(tabs).toHaveLength(3);
+
+  });
+
+  it('show the tab name correctly', async () => {
+    jest.spyOn(singleRecord, 'beforeMount').mockImplementation(() => {
+      console.log('show the tab name correctly - jest.spyOn()')
+    })
+
+    const wrapper = mount(singleRecord, {
+      propsData: {
+        uid: mockUid
+      },
+      // router: mockVueRouter,
+      stubs: ['router-link', 'router-view'], 
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          teamid: this.$route.params.teamid,
+          contestid: this.$route.params.contestid,
+          contestInfo: {
+            opponent: '交大電機',
+            contest: '系際盃',
+            date:'2023-04-20',
+            score: '1:0',
+            gameScore: '1:0',
+            localRecords: '',
+            games: [
+              {
+                ourTeam: [''],
+                placement:{
+                  1: [''],
+                  2: [''],
+                  3: [''],
+                  4: [''],
+                  5: [''],
+                  6: [''],
+                  7: [''],
+                  8: [''],
+                  9: [''],
+                  'touchout': [''],
+                }
+              },
+              {
+                ourTeam: [''],
+                placement:{
+                  1: [''],
+                  2: [''],
+                  3: [''],
+                  4: [''],
+                  5: [''],
+                  6: [''],
+                  7: [''],
+                  8: [''],
+                  9: [''],
+                  'touchout': [''],
+                }
+              },
+              {
+                ourTeam: [''],
+                placement:{
+                  1: [''],
+                  2: [''],
+                  3: [''],
+                  4: [''],
+                  5: [''],
+                  6: [''],
+                  7: [''],
+                  8: [''],
+                  9: [''],
+                  'touchout': [''],
+                }
+              },
+            ]
+          },
+          tabInfo:[
+            {id: "game1-tab", target: "#game1-tab-pane", aria_ctrl: "game1-tab-pane", aria_select: true, name: "第一局"},
+            {id: "game2-tab", target: "#game2-tab-pane", aria_ctrl: "game2-tab-pane", aria_select: false, name: "第二局"},
+            {id: "game3-tab", target: "#game3-tab-pane", aria_ctrl: "game3-tab-pane", aria_select: false, name: "第三局"},
+            {id: "game4-tab", target: "#game4-tab-pane", aria_ctrl: "game4-tab-pane", aria_select: false, name: "第四局"},
+            {id: "game5-tab", target: "#game5-tab-pane", aria_ctrl: "game5-tab-pane", aria_select: false, name: "第五局"},
+          ],
+        }
+      }
+    });
+
+    // find all the tabs
+    const tabs = wrapper.findAll('ul.nav.nav-tabs li.nav-item');
+    await wrapper.vm.$nextTick();
+
+    for(let i=0;i<3;i++){
+      // console.log(tabs.at(i).find('button').text());
+      expect(tabs.at(i).find('button').text()).toBe(wrapper.vm.tabInfo[i].name);
+    }
 
   });
 
