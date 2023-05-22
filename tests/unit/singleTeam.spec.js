@@ -34,6 +34,29 @@ const mockRoute = {
 const mockUid = '-N3hlfKxXwby0jSSDbxV'
 
 describe('singleTeam', () => {
+  // beforeMount
+  it('should execute beforeMount()', async () => {
+    const beforMountSpy = jest.spyOn(singleTeam, 'beforeMount').mockImplementation(() => {
+      console.log('should execute beforeMount() - jest.spyOn()')
+    })
+
+    const wrapper = mount(singleTeam, {
+      propsData: {
+        uid: mockUid
+      },
+      // router: mockVueRouter,
+      stubs: ['router-link', 'router-view'], 
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+    });
+
+    // Assert that the beforeMount should be called
+    expect(beforMountSpy).toHaveBeenCalled();
+
+  });
+  
   // go back btn
   it('test on back btn', async () => {
     // 用 spyOn 的方式 intercept "beforeMount" 
@@ -43,7 +66,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -74,7 +97,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -102,7 +125,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -134,7 +157,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -170,7 +193,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -212,7 +235,7 @@ describe('singleTeam', () => {
     })
   
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -265,7 +288,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -308,7 +331,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -375,7 +398,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -421,7 +444,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -466,9 +489,9 @@ describe('singleTeam', () => {
 
   });
 
-  it('can link to the record', async () => {
+  it('can link to the scoringd', async () => {
     jest.spyOn(singleTeam, 'beforeMount').mockImplementation(() => {
-      console.log('can link to the record - jest.spyOn()')
+      console.log('can link to the scoring - jest.spyOn()')
     })
 
     const localVue = createLocalVue();
@@ -478,14 +501,14 @@ describe('singleTeam', () => {
 
     const wrapper = mount(singleTeam, {
       localVue,
-      props: {
+      propsData: {
         uid: mockUid
       },
       router: mockVueRouter,
       // stubs: ['router-link', 'router-view'], 
       mocks: {
         // $router: mockRouter2,
-        $route: {value: mockRoute}
+        // $route: {value: mockRoute}
       },
       data() {
         return {
@@ -501,7 +524,8 @@ describe('singleTeam', () => {
                 key: 'NTdKbOPAh9F89udkTNB'
               },
             ],
-          }
+          },
+          teamid: '-NTd4gODlBQPL9Na1VYr',
         }
       }
     });
@@ -528,13 +552,13 @@ describe('singleTeam', () => {
     await routerLinkComponents.at(0).trigger('click');
     await wrapper.vm.$nextTick();
     // Assert that the expected navigation occurred
-    expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.$route.params.teamid + '/scoring/' + wrapper.vm.teamInfo.contestRecords[0].key);
+    expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.teamid + '/scoring/' + wrapper.vm.teamInfo.contestRecords[0].key);
 
   });
 
-  it('can link to the scoring', async () => {
+  it('can link to the record', async () => {
     jest.spyOn(singleTeam, 'beforeMount').mockImplementation(() => {
-      console.log('can link to the scoring - jest.spyOn()')
+      console.log('can link to the record - jest.spyOn()')
     })
 
     const localVue = createLocalVue();
@@ -544,7 +568,7 @@ describe('singleTeam', () => {
 
     const wrapper = mount(singleTeam, {
       localVue,
-      props: {
+      propsData: {
         uid: mockUid
       },
       router: mockVueRouter,
@@ -567,7 +591,8 @@ describe('singleTeam', () => {
                 key: 'NTdKbOPAh9F89udkTNB'
               },
             ],
-          }
+          },
+          teamid: '-NTd4gODlBQPL9Na1VYr',
         }
       }
     });
@@ -594,7 +619,7 @@ describe('singleTeam', () => {
     await routerLinkComponents.at(1).trigger('click');
     await wrapper.vm.$nextTick();
     // Assert that the expected navigation occurred
-    expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.$route.params.teamid + '/record/' + wrapper.vm.teamInfo.contestRecords[0].key);
+    expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.teamid + '/record/' + wrapper.vm.teamInfo.contestRecords[0].key);
 
   });
 
@@ -608,7 +633,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -663,7 +688,7 @@ describe('singleTeam', () => {
     });
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -711,7 +736,7 @@ describe('singleTeam', () => {
     });
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -751,7 +776,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -778,7 +803,7 @@ describe('singleTeam', () => {
     })
 
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -816,7 +841,7 @@ describe('singleTeam', () => {
     })
   
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -862,7 +887,7 @@ describe('singleTeam', () => {
     })
   
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -904,7 +929,7 @@ describe('singleTeam', () => {
     })
   
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 
@@ -946,7 +971,7 @@ describe('singleTeam', () => {
     })
   
     const wrapper = mount(singleTeam, {
-      props: {
+      propsData: {
         uid: mockUid
       },
       stubs: ['router-link', 'router-view'], 

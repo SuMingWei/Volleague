@@ -19,10 +19,31 @@ const mockRoute = {
 const mockUid = '-N3hlfKxXwby0jSSDbxV'
 
 describe('singleRecord', () => {
+  // beforeMount
+  it('should execute beforeMount()', async () => {
+    const beforMountSpy = jest.spyOn(singleRecord, 'beforeMount').mockImplementation(() => {
+      console.log('should execute beforeMount() - jest.spyOn()')
+    })
+
+    const wrapper = mount(singleRecord, {
+      propsData: {
+        uid: mockUid
+      },
+      // router: mockVueRouter,
+      stubs: ['router-link', 'router-view'], 
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+    });
+
+    // Assert that the beforeMount should be called
+    expect(beforMountSpy).toHaveBeenCalled();
+
+  });
+  
   // go back btn
   it('test on back btn', async () => {
-    // 用 spyOn 的方式 intercept "beforeMount" 
-		// 來避免 this.$http.get() Undefined 的錯誤
     jest.spyOn(singleRecord, 'beforeMount').mockImplementation(() => {
       console.log('test on back btn - jest.spyOn()')
     })
@@ -34,7 +55,7 @@ describe('singleRecord', () => {
 
     const wrapper = mount(singleRecord, {
       localVue,
-      props: {
+      propsData: {
         uid: mockUid
       },
       router: mockVueRouter,
@@ -42,6 +63,12 @@ describe('singleRecord', () => {
       mocks: {
         // $router: mockRouter,
         // $route: mockRoute
+      },
+      data() {
+        return {
+          teamid: '-NTd4gODlBQPL9Na1VYr',
+          contestid: '-NTdKbOPAh9F89udkTNB'
+        }
       }
     });
 
@@ -60,7 +87,7 @@ describe('singleRecord', () => {
     await wrapper.vm.$nextTick();
     // Assert that the expected navigation occurred
     // expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.$route.params.teamid + '/scoring/' + wrapper.vm.teamInfo.contestRecords[0].key);
-    expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' +wrapper.vm.$route.params.teamid);
+    expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.teamid);
 
   });
 
@@ -70,20 +97,26 @@ describe('singleRecord', () => {
       console.log('test on scoring btn - jest.spyOn()')
     })
 
+    const localVue = createLocalVue();
+    localVue.use(VueRouter);
+
+    const mockVueRouter = new VueRouter();
+
     const wrapper = mount(singleRecord, {
+      localVue,
       propsData: {
         uid: mockUid
       },
-      // router: mockVueRouter,
-      stubs: ['router-link', 'router-view'], 
+      router: mockVueRouter,
+      // stubs: ['router-link', 'router-view'], 
       mocks: {
-        $router: mockRouter,
-        $route: mockRoute
+        // $router: mockRouter,
+        // $route: mockRoute
       },
       data() {
         return {
-          teamid: this.$route.params.teamid,
-          contestid: this.$route.params.contestid,
+          teamid: '-NTd4gODlBQPL9Na1VYr',
+          contestid: '-NTdKbOPAh9F89udkTNB'
         }
       }
     });
@@ -101,15 +134,9 @@ describe('singleRecord', () => {
     // Simulate a click on the router-link component
     await routerLinks.at(1).trigger('click');
     await wrapper.vm.$nextTick();
+
     // Assert that the expected navigation occurred
-    // expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.$route.params.teamid + '/scoring/' + wrapper.vm.teamInfo.contestRecords[0].key);
-    // expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid 
-    //                                   + '/team/' + wrapper.vm.$route.params.teamid 
-    //                                   + '/scoring/' + wrapper.vm.$route.params.contestid);
-    // expect(mockRouter.push).toHaveBeenCalledWith({
-    //   path: `/home/${wrapper.props().uid}/team/${wrapper.vm.teamid}/scoring/${wrapper.vm.contestid}`
-    // });
-    // console.log(wrapper.props().uid);
+    expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.teamid + '/scoring/' + wrapper.vm.contestid);
 
   });
 
