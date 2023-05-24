@@ -297,7 +297,7 @@
               </div>
 
               <!-- 落點記錄 -->
-              <div v-if="isOpponentScore" class="card mb-3 fw-bolds">
+              <div v-if="isOpponentScore" class="card mb-3 fw-bold">
                 <!-- 標題 -->
                 <div class="card-head py-2" style="background-color:#E5E8E8">
                   <span class="fw-bolder fs-5">

@@ -235,7 +235,6 @@ describe('Player Selection', () => {
   // 來避免 this.$http.get() Undefined 的錯誤
   jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
   
-  
   it('Check Dropdown Options', async () => {
     const wrapper = mount(scoring, {
       stubs: ['router-link', 'router-view'], 
@@ -476,5 +475,344 @@ describe('Player Selection', () => {
       expect(selects.at(idx).findAll('span').at(1).text()).toEqual(wrapper.vm.selected_members[idx]['name'])
   })
 
+  it('Check if Opponent scores, players don\'t show', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          isOpponentScore: true,
+        }
+      }
+    })
+
+    let playerDiv = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                 divs.classes().includes('mb-3') && 
+                                                                 divs.classes().includes('fw-bold')})
+
+    expect(playerDiv.at(0).attributes('style')).toBeDefined()
+    expect(playerDiv.at(2).attributes('style')).toBeUndefined()
+  })
+
+  it('Check if Opponent doesn\'t score, players show', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          isOpponentScore: false,
+        }
+      }
+    })
+
+    let playerDiv = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                 divs.classes().includes('mb-3') && 
+                                                                 divs.classes().includes('fw-bold')})
+    expect(playerDiv.at(0).attributes('style')).toBeUndefined()
+  })
+})
+
+describe('Record Buttons', () => {
+  // 用 spyOn 的方式 intercept "beforeMount" 
+  // 來避免 this.$http.get() Undefined 的錯誤
+  jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
   
+  it('Check Attack Scoring', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: false,
+          translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
+                              'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
+                              'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': '',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+    let btns = btnCandidates.at(1).findAll('button')
+    btns.at(0).trigger('click')
+    await wrapper.vm.$nextTick()
+    
+    // console.log(wrapper.vm.selected_button.record_type, btns.at(9).text().split('   ').at(1))
+    expect(wrapper.vm.selected_button.record_type).toEqual('attackPoint')
+    expect(btns.at(9).text().split('   ').at(1)).toEqual('攻擊得分')
+
+    // console.log(btnCandidates.length)
+    // for (let a = 0; a < btnCandidates.length; ++a) 
+    // console.log(btnCandidates.at(a).html())
+    
+    // console.log(btns.length)
+    // for (let a = 0; a < btns.length; ++a) 
+    //   console.log(btns.at(a).text())
+  })
+  
+  it('Check Block Scoring', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: false,
+          translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
+                              'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
+                              'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': '',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+    let btns = btnCandidates.at(1).findAll('button')
+    btns.at(1).trigger('click')
+    await wrapper.vm.$nextTick()
+    
+    expect(wrapper.vm.selected_button.record_type).toEqual('blockPoint')
+    expect(btns.at(9).text().split('   ').at(1)).toEqual('攔網得分')
+  })
+
+  it('Check Serve Scoring', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: false,
+          translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
+                              'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
+                              'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': '',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+    let btns = btnCandidates.at(1).findAll('button')
+    btns.at(2).trigger('click')
+    await wrapper.vm.$nextTick()
+    
+    expect(wrapper.vm.selected_button.record_type).toEqual('servicePoint')
+    expect(btns.at(9).text().split('   ').at(1)).toEqual('發球得分')
+  })
+
+  it('Check Attack failures', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: false,
+          translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
+                              'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
+                              'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': '',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+    let btns = btnCandidates.at(1).findAll('button')
+    btns.at(3).trigger('click')
+    await wrapper.vm.$nextTick()
+    
+    console.log(wrapper.vm.selected_button.record_type, btns.at(9).text().split('   ').at(1))
+    expect(wrapper.vm.selected_button.record_type).toEqual('attackError')
+    expect(btns.at(9).text().split('   ').at(1)).toEqual('攻擊失誤')
+  })
+
+  it('Check Set failures', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: false,
+          translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
+                              'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
+                              'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': '',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+    let btns = btnCandidates.at(1).findAll('button')
+    btns.at(4).trigger('click')
+    await wrapper.vm.$nextTick()
+    
+    console.log(wrapper.vm.selected_button.record_type, btns.at(9).text().split('   ').at(1))
+    expect(wrapper.vm.selected_button.record_type).toEqual('tossError')
+    expect(btns.at(9).text().split('   ').at(1)).toEqual('舉球失誤')
+  })
+
+  it('Check Block failures', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: false,
+          translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
+                              'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
+                              'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': '',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+    let btns = btnCandidates.at(1).findAll('button')
+    btns.at(5).trigger('click')
+    await wrapper.vm.$nextTick()
+
+    console.log(wrapper.vm.selected_button.record_type, btns.at(9).text().split('   ').at(1))
+    expect(wrapper.vm.selected_button.record_type).toEqual('blockError')
+    expect(btns.at(9).text().split('   ').at(1)).toEqual('觸網失誤')
+  })
+
+  it('Check Receive failures', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          isOpponentScore: true,
+        }
+      }
+    })
+
+    let playerDiv = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                 divs.classes().includes('mb-3') && 
+                                                                 divs.classes().includes('fw-bold')})
+
+    expect(playerDiv.at(0).attributes('style')).toBeDefined()
+    expect(playerDiv.at(2).attributes('style')).toBeUndefined()
+  })
+
+  it('Check Serve failures', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          isOpponentScore: false,
+        }
+      }
+    })
+
+    let playerDiv = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                 divs.classes().includes('mb-3') && 
+                                                                 divs.classes().includes('fw-bold')})
+    console.log(playerDiv.length, wrapper.vm.isOpponentScore)
+    expect(playerDiv.at(0).attributes('style')).toBeUndefined()
+  })
 })
