@@ -686,7 +686,6 @@ describe('Record Buttons', () => {
     btns.at(3).trigger('click')
     await wrapper.vm.$nextTick()
     
-    console.log(wrapper.vm.selected_button.record_type, btns.at(9).text().split('   ').at(1))
     expect(wrapper.vm.selected_button.record_type).toEqual('attackError')
     expect(btns.at(9).text().split('   ').at(1)).toEqual('攻擊失誤')
   })
@@ -726,7 +725,6 @@ describe('Record Buttons', () => {
     btns.at(4).trigger('click')
     await wrapper.vm.$nextTick()
     
-    console.log(wrapper.vm.selected_button.record_type, btns.at(9).text().split('   ').at(1))
     expect(wrapper.vm.selected_button.record_type).toEqual('tossError')
     expect(btns.at(9).text().split('   ').at(1)).toEqual('舉球失誤')
   })
@@ -766,7 +764,6 @@ describe('Record Buttons', () => {
     btns.at(5).trigger('click')
     await wrapper.vm.$nextTick()
 
-    console.log(wrapper.vm.selected_button.record_type, btns.at(9).text().split('   ').at(1))
     expect(wrapper.vm.selected_button.record_type).toEqual('blockError')
     expect(btns.at(9).text().split('   ').at(1)).toEqual('觸網失誤')
   })
@@ -781,17 +778,34 @@ describe('Record Buttons', () => {
       },
       data() {
         return {
-          isOpponentScore: true,
+          cur_game: 1,
+          isOpponentScore: false,
+          translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
+                              'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
+                              'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': '',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
         }
       }
     })
 
-    let playerDiv = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
-                                                                 divs.classes().includes('mb-3') && 
-                                                                 divs.classes().includes('fw-bold')})
-
-    expect(playerDiv.at(0).attributes('style')).toBeDefined()
-    expect(playerDiv.at(2).attributes('style')).toBeUndefined()
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+    let btns = btnCandidates.at(1).findAll('button')
+    btns.at(6).trigger('click')
+    await wrapper.vm.$nextTick()
+    
+    console.log(wrapper.vm.selected_button.record_type, btns.at(9).text().split('   ').at(1))
+    expect(wrapper.vm.selected_button.record_type).toEqual('receiveError')
+    expect(btns.at(9).text().split('   ').at(1)).toEqual('接發失誤')
   })
 
   it('Check Serve failures', async () => {
@@ -804,15 +818,33 @@ describe('Record Buttons', () => {
       },
       data() {
         return {
+          cur_game: 1,
           isOpponentScore: false,
+          translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
+                              'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
+                              'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': '',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
         }
       }
     })
 
-    let playerDiv = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
-                                                                 divs.classes().includes('mb-3') && 
-                                                                 divs.classes().includes('fw-bold')})
-    console.log(playerDiv.length, wrapper.vm.isOpponentScore)
-    expect(playerDiv.at(0).attributes('style')).toBeUndefined()
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+    let btns = btnCandidates.at(1).findAll('button')
+    btns.at(7).trigger('click')
+    await wrapper.vm.$nextTick()
+    
+    console.log(wrapper.vm.selected_button.record_type, btns.at(9).text().split('   ').at(1))
+    expect(wrapper.vm.selected_button.record_type).toEqual('serviceError')
+    expect(btns.at(9).text().split('   ').at(1)).toEqual('發球失誤')
   })
 })
