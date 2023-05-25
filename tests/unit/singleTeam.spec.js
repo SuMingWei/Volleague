@@ -489,7 +489,7 @@ describe('singleTeam', () => {
 
   });
 
-  it('can link to the scoringd', async () => {
+  it('can link to the scoring', async () => {
     jest.spyOn(singleTeam, 'beforeMount').mockImplementation(() => {
       console.log('can link to the scoring - jest.spyOn()')
     })
