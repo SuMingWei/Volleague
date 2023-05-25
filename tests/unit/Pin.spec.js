@@ -1,10 +1,99 @@
 import { shallowMount, createLocalVue, mount } from '@vue/test-utils'
 import login from '@/views/login.vue'
+import signup from '@/views/signup.vue'
+import home from '@/views/home.vue';
+import VueRouter from 'vue-router';
 
+// Mock the DatePicker component
+jest.mock('vue2-datepicker', () => ({
+    // Create a functional component as the mock implementation
+    functional: true,
+    // render(h, { slots }) {
+    //   return slots.default();
+    // },
+    render(h) {
+      return h('div', 'Mocked DatePicker');
+    },
+  }));
+  
+  
+  // Mock the CSS import
+  jest.mock('vue2-datepicker/index.css', () => ({}));
+  
+  // mock the Router
+  const mockRouter = {
+    push: jest.fn()
+  }
+  
+  // mock the Route
+  const mockRoute = {
+    params: {
+      teamid: '-NTd4gODlBQPL9Na1VYr',
+    }
+  }
+  
+  // mock the uid
+  const mockUid = '-N3hlfKxXwby0jSSDbxV'
+  
 
 describe('login.vue', () => {
     
-    it('Call loginRequest method', () => {
+    // login btn
+    it('test on login btn', async () => {
+
+        // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+        jest.spyOn(login, 'created').mockImplementation(() => {})
+        const loginMethod = jest.spyOn(login.methods, 'loginRequest').mockImplementation(() => {})
+                
+  
+        const wrapper = mount(login, {
+            propsData: {
+              uid: mockUid
+            },
+            stubs: ['router-link', 'router-view'], 
+            mocks: {
+              $router: mockRouter,
+              $route: mockRoute
+            },
+            data() {
+                return {
+                  user: {
+                    account: '',
+                    password: '',
+                  },
+                  errorMessage: '',
+                  allUser: [],
+                  db: 'https://volleague-default-rtdb.firebaseio.com/',
+                }
+            }
+          });
+    
+    
+    // Get user account
+    const accountName= wrapper.find('#account')
+    // Modify the account
+    await accountName.setValue('testUser');
+
+     // Get user account
+     const password= wrapper.find('#password')
+     // Modify the account
+     await password.setValue('testPassword');
+
+    // Assert that the button exists
+    expect(wrapper.find('button')).toBeTruthy();
+
+    // Assert the button's text
+    expect(wrapper.find('button').text()).toContain('登入');
+
+    // Simulate a button click
+    await wrapper.find('button').trigger('click');
+
+    
+    // Assert that the correct router push is called
+    expect(loginMethod).toHaveBeenCalled();
+    });
+
+    it('cannot login if user account is empty', async () => {
         // mock the Router
         const mockRouter = {
         push: jest.fn()
@@ -18,134 +107,656 @@ describe('login.vue', () => {
         }
         }
 
-  
-    })
+        // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+        jest.spyOn(login, 'created').mockImplementation(() => {})
+        jest.spyOn(login.methods, 'loginRequest').mockImplementation(() => {})
+        const wrapper = mount(login, {
+        stubs: ['router-link', 'router-view'], 
+        mocks: {
+            $router: mockRouter,
+            $route: mockRoute
+        },
+        data() {
+            return {
+              user: {
+                account: '',
+                password: '',
+              },
+              errorMessage: '',
+              allUser: [],
+              db: 'https://volleague-default-rtdb.firebaseio.com/',
+            }
+        }
+        })
+
+        // Get user account
+        const accountName= wrapper.find('#account')
+        // Modify the account
+        await accountName.setValue('');
+
+        // Find the button in the modal-footer
+        const button = wrapper.find('button');
+        // Assert that the button is disabled
+        expect(button.attributes('disabled')).toBe('disabled');
+
+        
+    });
+
+    it('cannot login if user password is empty', async () => {
+        // mock the Router
+        const mockRouter = {
+        push: jest.fn()
+        }
+
+        // mock the Route
+        const mockRoute = {
+        params: {
+            teamid: '-NTd4gODlBQPL9Na1VYr',
+            contestid: '-NTdKbOPAh9F89udkTNB'
+        }
+        }
+
+        // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+        jest.spyOn(login, 'created').mockImplementation(() => {})
+        jest.spyOn(login.methods, 'loginRequest').mockImplementation(() => {})
+        const wrapper = mount(login, {
+        stubs: ['router-link', 'router-view'], 
+        mocks: {
+            $router: mockRouter,
+            $route: mockRoute
+        },
+        data() {
+            return {
+              user: {
+                account: '',
+                password: '',
+              },
+              errorMessage: '',
+              allUser: [],
+              db: 'https://volleague-default-rtdb.firebaseio.com/',
+            }
+        }
+        })
+
+        // Get user password
+        const passwordName= wrapper.find('#password')
+        // Modify the password
+        await passwordName.setValue('');
+
+        // Find the button in the modal-footer
+        const button = wrapper.find('button');
+        // Assert that the button is disabled
+        expect(button.attributes('disabled')).toBe('disabled');
+
+        
+    });
+
+    it('login btn is enabled if account and password are filled', async () => {
+        // mock the Router
+        const mockRouter = {
+        push: jest.fn()
+        }
+
+        // mock the Route
+        const mockRoute = {
+        params: {
+            teamid: '-NTd4gODlBQPL9Na1VYr',
+            contestid: '-NTdKbOPAh9F89udkTNB'
+        }
+        }
+
+        // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+        jest.spyOn(login, 'created').mockImplementation(() => {})
+        jest.spyOn(login.methods, 'loginRequest').mockImplementation(() => {})
+        const wrapper = mount(login, {
+        stubs: ['router-link', 'router-view'], 
+        mocks: {
+            $router: mockRouter,
+            $route: mockRoute
+        },
+        data() {
+            return {
+              user: {
+                account: '',
+                password: '',
+              },
+              errorMessage: '',
+              allUser: [],
+              db: 'https://volleague-default-rtdb.firebaseio.com/',
+            }
+        }
+        })
+
+        // Get user account
+        const accountName= wrapper.find('#account')
+        // Modify the account
+        await accountName.setValue('test');
+
+        // Get user account
+        const password= wrapper.find('#password')
+        // Modify the account
+        await password.setValue('123');
+
+        // Find the button in the modal-footer
+        const button = wrapper.find('button');
+        // Assert that the button is enabled
+        expect(button.attributes('disabled')).toBeUndefined();
+        
+    });
+
+    it('test error message', async () => {
+        // mock the Router
+        const mockRouter = {
+        push: jest.fn()
+        }
+
+        // mock the Route
+        const mockRoute = {
+        params: {
+            teamid: '-NTd4gODlBQPL9Na1VYr',
+            contestid: '-NTdKbOPAh9F89udkTNB'
+        }
+        }
+
+        // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+        jest.spyOn(login, 'created').mockImplementation(() => {})
+        jest.spyOn(login.methods, 'loginRequest').mockImplementation(() => {})
+        const wrapper = mount(login, {
+        stubs: ['router-link', 'router-view'], 
+        mocks: {
+            $router: mockRouter,
+            $route: mockRoute
+        },
+        data() {
+            return {
+              user: {
+                account: '',
+                password: '',
+              },
+              errorMessage: '沒有這個使用者!',
+              allUser: [],
+              db: 'https://volleague-default-rtdb.firebaseio.com/',
+            }
+        }
+        })
+
+        expect(wrapper.find('.alert-danger span').text()).toBe('沒有這個使用者!');
+        
+    });
+
+    it('can link to signup', async () => {
+
+        // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+        jest.spyOn(login, 'created').mockImplementation(() => {})
+        jest.spyOn(login.methods, 'loginRequest').mockImplementation(() => {})
+      
+        const localVue = createLocalVue();
+        localVue.use(VueRouter);
+    
+        const mockVueRouter = new VueRouter();
+        // mock the uid
+        const mockUid = '-N3hlfKxXwby0jSSDbxV'
+
+        const wrapper = mount(login, {
+            localVue,
+            propsData: {
+              uid: mockUid
+            },
+            router: mockVueRouter,
+            // stubs: ['router-link', 'router-view'], 
+            mocks: {
+              // $router: mockRouter2,
+              // $route: {value: mockRoute}
+            },
+            data() {
+                return {
+                  user: {
+                    account: '',
+                    password: '',
+                  },
+                  errorMessage: '',
+                  allUser: [],
+                  db: 'https://volleague-default-rtdb.firebaseio.com/',
+                }
+            }
+          });
+       
+        const routerLinkComponent = wrapper.findComponent({ name: 'router-link' });
+        await routerLinkComponent.trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$route.path).toBe('/signup');
+    });
+
+      
+    
   })
-  
 
-// describe('scoring.vue', () => {
-//   it('Single Record', () => {
-// 		// mock the Router
-//     const mockRouter = {
-//       push: jest.fn()
-//     }
-	  
-// 		// mock the Route
-//     const mockRoute = {
-//       params: {
-//         teamid: '-NTd4gODlBQPL9Na1VYr',
-//         contestid: '-NTdKbOPAh9F89udkTNB'
-//       }
-//     }
-		
-// 		// 用 spyOn 的方式 intercept "beforeMount" 
-// 		// 來避免 this.$http.get() Undefined 的錯誤
-//     jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {
-//       console.log('jest.spyOn()')
-//     })
+  describe('signup.vue', () => {
+    // go signup btn
+    it('test on signup btn', async () => {
+        // mock the Router
+        const mockRouter = {
+            push: jest.fn()
+            }
+    
+            // mock the Route
+            const mockRoute = {
+            params: {
+                teamid: '-NTd4gODlBQPL9Na1VYr',
+                contestid: '-NTdKbOPAh9F89udkTNB'
+            }
+            }
+    
+            // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+            jest.spyOn(signup, 'created').mockImplementation(() => {})
+            const signupMethod = jest.spyOn(signup.methods, 'signupRequest').mockImplementation(() => {})
+            const wrapper = mount(signup, {
+            stubs: ['router-link', 'router-view'], 
+            mocks: {
+                $router: mockRouter,
+                $route: mockRoute
+            },
+            data() {
+                return {
+                  user: {
+                    account: '',
+                    password: '',
+                  },
+                  errorMessage: '',
+                  successMessage: '',
+                  allUser: [],
+                  db: 'https://volleague-default-rtdb.firebaseio.com/',
+                  SingleProfile: {
+                    authid: '',
+                    name: 'User',
+                    birthday: {
+                      year: 'yyyy',
+                      month: 'mm',
+                      day: 'dd',
+                    },
+                    position: ['OH'],
+                    teamList: [''],
+                    StatisticsList: [''],
+                  }
+                }
+            }
+            })
+        // Get user account
+        const accountName= wrapper.find('#account')
+        // Modify the account
+        await accountName.setValue('testUser');
 
-//     const wrapper = mount(scoring, {
-//       stubs: ['router-link', 'router-view'], 
-//       mocks: {
-//         $router: mockRouter,
-//         $route: mockRoute
-//       },
-//       data() {
-//         return {
-//           cur_game: 1,
-//           id: this.uid,
-//           teamid: this.$route.params.teamid,
-//           contestid: this.$route.params.contestid,
-//           db: 'https://volleague-default-rtdb.firebaseio.com/',
-//           users: {
-//             // 'uid': {
-//             //   StatisticsList: [''],
-//             //   authid: '',
-//             //   birthday: {},
-//             //   name: {},
-//             //   position: [],
-//             //   teamList: []
-//             // }
-//           },
-//           contestInfo: {
-//             contest: '成功盃',
-//             date: '',
-//             games: [],
-//             opponent: '',
-//             score: '',
-//             gameScore: '',
-//             onCourtMem: '',
-//             localRecordsRaw: [''],
-//             localRecords: ['']
-//           },
-//           teamInfo:{
-//             teamName: '',
-//             bulletin: '',
-//             awards: [''],
-//             members: [],  // name, number, position, uid
-//             contestRecords: [{
-//               contest: '成功盃',
-//               date: '',
-//               gameScore: '',
-//               key: '',
-//               opponent: ''
-//             }],
-//           },
-//           isGameOver: false,
-//           isNextGame: false,
-//           isCourtMemSet: false, // bind to court member section
-//           isOpponentScore: false, // bind to button, '對方得分'
-//           positions: ['OH', 'O', 'MB', 'S', 'L'],
-//           translateType2Man: {'attackPoint': '攻擊得分', 'blockPoint': '攔網得分','servicePoint': '發球得分',
-//                           'attackError': '攻擊失誤', 'tossError': '舉球失誤', 'blockError': '觸網失誤',
-//                           'receiveError': '接發失誤', 'serviceError': '發球失誤', 'oppoScore': '對方得分'},
-//           translateType2Eng: {'攻擊得分': 'attackPoint', '攔網得分': 'blockPoint','發球得分': 'servicePoint',
-//                           '攻擊失誤': 'attackError', '舉球失誤': 'tossError', '觸網失誤': 'blockError',
-//                           '接發失誤': 'receiveError', '發球失誤': 'serviceError', '對方得分': 'oppoScore'},
-//           records_pushed_raw: [{
-//             'ourTeam': {},
-//             'placement': [[''], [''], [''], [''], [''], [''], [''], [''], [''], ['']]
-//           }],
-//           // records_pushed_raw: [
-//           //   {
-//           //     'ourTeam': {
-//           //       '蘇名偉': {name: '蘇名偉', pos: 'OH', number: '27',
-//           //                 attackPoint: 1, blockPoint: 0, servicePoint: 0,
-//           //                 attackError: 0, tossError: 0, blockError: 0,
-//           //                 receiveError: 0, serviceError: 0 },
-//           //       'Test7': {name: 'Test7', pos: 'L', number: '88',
-//           //                 attackPoint: 0, blockPoint: 0, servicePoint: 0,
-//           //                 attackError: 0, tossError: 0, blockError: 1,
-//           //                 receiveError: 0, serviceError: 0 },
-//           //     }, 
-//           //     'placement': [[''], [''], [{'num': 2, 'pos': 'S'}], [''], [''], [''], [''], [''], [''], ['']] // 0~8: 1~9 九號位置 ; 9: touch out
-//           //   }
-//           // ],
-//           // landing: 呈現在表格 --> 1~9 + touch-out
-//           records_local: [],
-//           // records_local: [{'num': 88, 'name': 'Test7', 'position': 'L', 'record_type': '攻擊得分', 'landing': -1, 'game': 1},
-//           //                 {'num': 27, 'name': '蘇名偉', 'position': 'OH', 'record_type': '攔網失誤', 'landing': -1, 'game': 1},
-//           //                 {'num': 2, 'name': 'NCKU EE', 'position': 'S', 'record_type': '對方得分', 'landing': 3, 'game': 1}],
-//           scoring: {
-//             host: {'name': '', 'winned_game': 0, 'cur_score': 0},
-//             opponent: {'name': '', 'winned_game': 0, 'cur_score': 0}
-//           },
-//           selected_button: {
-//             'name': '',
-//             'number': -1,
-//             'position': '',
-//             'record_type': '',
-//             'landing': -1,  // 依照 placement 的 index (0~9)
-//             'opponent': {'num': -1, 'pos': ''},
-//             'game': this.cur_game
-//           },
-//           selected_members: [{}, {}, {}, {}, {}, {}, {}],     // e.g.:) {'name': '張祐誠', 'number': 22, 'position': 'MB'}
-//         }
-//       }
-//     })
+        // Get user account
+        const password= wrapper.find('#password')
+        // Modify the account
+        await password.setValue('testPassword');    
 
-//     console.log(wrapper.vm.$route.params.teamid)
-//   })
+        // Assert that the button exists
+        expect(wrapper.find('button')).toBeTruthy();
 
-// })
+        // Assert the button's text
+        expect(wrapper.find('button').text()).toContain('註冊');
+
+        // Simulate a button click
+        await wrapper.find('button').trigger('click');
+
+        // Assert that the correct router push is called
+        expect(signupMethod).toHaveBeenCalled();
+
+    });
+    
+    it('cannot signup if user account is empty', async () => {
+        // mock the Router
+        const mockRouter = {
+        push: jest.fn()
+        }
+
+        // mock the Route
+        const mockRoute = {
+        params: {
+            teamid: '-NTd4gODlBQPL9Na1VYr',
+            contestid: '-NTdKbOPAh9F89udkTNB'
+        }
+        }
+
+        // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+        jest.spyOn(signup, 'created').mockImplementation(() => {})
+        jest.spyOn(signup.methods, 'signupRequest').mockImplementation(() => {})
+        const wrapper = mount(signup, {
+        stubs: ['router-link', 'router-view'], 
+        mocks: {
+            $router: mockRouter,
+            $route: mockRoute
+        },
+        data() {
+            return {
+              user: {
+                account: '',
+                password: '',
+              },
+              errorMessage: '',
+              successMessage: '',
+              allUser: [],
+              db: 'https://volleague-default-rtdb.firebaseio.com/',
+              SingleProfile: {
+                authid: '',
+                name: 'User',
+                birthday: {
+                  year: 'yyyy',
+                  month: 'mm',
+                  day: 'dd',
+                },
+                position: ['OH'],
+                teamList: [''],
+                StatisticsList: [''],
+              }
+            }
+        }
+        })
+
+         // Get user account
+         const accountName= wrapper.find('#account')
+         // Modify the account
+         await accountName.setValue('');
+ 
+         // Find the button in the modal-footer
+         const button = wrapper.find('button');
+         // Assert that the button is disabled
+         expect(button.attributes('disabled')).toBe('disabled');
+ 
+        
+    });
+
+    it('cannot signup if user password is empty', async () => {
+        // mock the Router
+        const mockRouter = {
+        push: jest.fn()
+        }
+
+        // mock the Route
+        const mockRoute = {
+        params: {
+            teamid: '-NTd4gODlBQPL9Na1VYr',
+            contestid: '-NTdKbOPAh9F89udkTNB'
+        }
+        }
+
+        // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+        jest.spyOn(signup, 'created').mockImplementation(() => {})
+        jest.spyOn(signup.methods, 'signupRequest').mockImplementation(() => {})
+        const wrapper = mount(signup, {
+        stubs: ['router-link', 'router-view'], 
+        mocks: {
+            $router: mockRouter,
+            $route: mockRoute
+        },
+        data() {
+            return {
+              user: {
+                account: '',
+                password: '',
+              },
+              errorMessage: '',
+              successMessage: '',
+              allUser: [],
+              db: 'https://volleague-default-rtdb.firebaseio.com/',
+              SingleProfile: {
+                authid: '',
+                name: 'User',
+                birthday: {
+                  year: 'yyyy',
+                  month: 'mm',
+                  day: 'dd',
+                },
+                position: ['OH'],
+                teamList: [''],
+                StatisticsList: [''],
+              }
+            }
+        }
+        })
+
+         // Get user password
+         const passwordName= wrapper.find('#password')
+         // Modify the password
+         await passwordName.setValue('');
+ 
+         // Find the button in the modal-footer
+         const button = wrapper.find('button');
+         // Assert that the button is disabled
+         expect(button.attributes('disabled')).toBe('disabled');
+ 
+        
+    });
+
+    it('test error message', async () => {
+        // mock the Router
+        const mockRouter = {
+            push: jest.fn()
+            }
+    
+            // mock the Route
+            const mockRoute = {
+            params: {
+                teamid: '-NTd4gODlBQPL9Na1VYr',
+                contestid: '-NTdKbOPAh9F89udkTNB'
+            }
+            }
+    
+            // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+            jest.spyOn(signup, 'created').mockImplementation(() => {})
+            jest.spyOn(signup.methods, 'signupRequest').mockImplementation(() => {})
+            const wrapper = mount(signup, {
+            stubs: ['router-link', 'router-view'], 
+            mocks: {
+                $router: mockRouter,
+                $route: mockRoute
+            },
+            data() {
+                return {
+                  user: {
+                    account: '',
+                    password: '',
+                  },
+                  errorMessage: '這個帳號已被使用!',
+                  successMessage: '',
+                  allUser: [],
+                  db: 'https://volleague-default-rtdb.firebaseio.com/',
+                  SingleProfile: {
+                    authid: '',
+                    name: 'User',
+                    birthday: {
+                      year: 'yyyy',
+                      month: 'mm',
+                      day: 'dd',
+                    },
+                    position: ['OH'],
+                    teamList: [''],
+                    StatisticsList: [''],
+                  }
+                }
+            }
+            })
+
+        expect(wrapper.find('.alert-danger span').text()).toBe('這個帳號已被使用!');
+        
+    });
+
+    it('test success message', async () => {
+        // mock the Router
+        const mockRouter = {
+            push: jest.fn()
+            }
+    
+            // mock the Route
+            const mockRoute = {
+            params: {
+                teamid: '-NTd4gODlBQPL9Na1VYr',
+                contestid: '-NTdKbOPAh9F89udkTNB'
+            }
+            }
+    
+            // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+            jest.spyOn(signup, 'created').mockImplementation(() => {})
+            jest.spyOn(signup.methods, 'signupRequest').mockImplementation(() => {})
+            const wrapper = mount(signup, {
+            stubs: ['router-link', 'router-view'], 
+            mocks: {
+                $router: mockRouter,
+                $route: mockRoute
+            },
+            data() {
+                return {
+                  user: {
+                    account: '',
+                    password: '',
+                  },
+                  errorMessage: '',
+                  successMessage: '註冊成功!',
+                  allUser: [],
+                  db: 'https://volleague-default-rtdb.firebaseio.com/',
+                  SingleProfile: {
+                    authid: '',
+                    name: 'User',
+                    birthday: {
+                      year: 'yyyy',
+                      month: 'mm',
+                      day: 'dd',
+                    },
+                    position: ['OH'],
+                    teamList: [''],
+                    StatisticsList: [''],
+                  }
+                }
+            }
+            })
+
+        expect(wrapper.find('.alert-success').text()).toContain('註冊成功!');
+        
+    });
+
+    it('signup btn is enabled if account and password are filled', async () => {
+        // mock the Router
+        const mockRouter = {
+            push: jest.fn()
+            }
+    
+            // mock the Route
+            const mockRoute = {
+            params: {
+                teamid: '-NTd4gODlBQPL9Na1VYr',
+                contestid: '-NTdKbOPAh9F89udkTNB'
+            }
+            }
+    
+            // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+            jest.spyOn(signup, 'created').mockImplementation(() => {})
+            jest.spyOn(signup.methods, 'signupRequest').mockImplementation(() => {})
+            const wrapper = mount(signup, {
+            stubs: ['router-link', 'router-view'], 
+            mocks: {
+                $router: mockRouter,
+                $route: mockRoute
+            },
+            data() {
+                return {
+                  user: {
+                    account: '',
+                    password: '',
+                  },
+                  errorMessage: '',
+                  successMessage: '',
+                  allUser: [],
+                  db: 'https://volleague-default-rtdb.firebaseio.com/',
+                  SingleProfile: {
+                    authid: '',
+                    name: 'User',
+                    birthday: {
+                      year: 'yyyy',
+                      month: 'mm',
+                      day: 'dd',
+                    },
+                    position: ['OH'],
+                    teamList: [''],
+                    StatisticsList: [''],
+                  }
+                }
+            }
+            })
+
+        // Get user account
+        const accountName= wrapper.find('#account')
+        // Modify the account
+        await accountName.setValue('test');
+
+        // Get user account
+        const password= wrapper.find('#password')
+        // Modify the account
+        await password.setValue('123');
+
+        // Find the button in the modal-footer
+        const button = wrapper.find('button');
+        // Assert that the button is enabled
+        expect(button.attributes('disabled')).toBeUndefined();
+        
+    });
+
+    it('can link to login', async () => {
+
+        // 用 spyOn 來避免 this.$http.get() Undefined 的錯誤
+        jest.spyOn(signup, 'created').mockImplementation(() => {})
+        jest.spyOn(signup.methods, 'signupRequest').mockImplementation(() => {})
+      
+        const localVue = createLocalVue();
+        localVue.use(VueRouter);
+    
+        const mockVueRouter = new VueRouter();
+        // mock the uid
+        const mockUid = '-N3hlfKxXwby0jSSDbxV'
+
+        const wrapper = mount(signup, {
+            localVue,
+            propsData: {
+              uid: mockUid
+            },
+            router: mockVueRouter,
+            // stubs: ['router-link', 'router-view'], 
+            mocks: {
+              // $router: mockRouter2,
+              // $route: {value: mockRoute}
+            },
+            ddata() {
+                return {
+                  user: {
+                    account: '',
+                    password: '',
+                  },
+                  errorMessage: '',
+                  successMessage: '',
+                  allUser: [],
+                  db: 'https://volleague-default-rtdb.firebaseio.com/',
+                  SingleProfile: {
+                    authid: '',
+                    name: 'User',
+                    birthday: {
+                      year: 'yyyy',
+                      month: 'mm',
+                      day: 'dd',
+                    },
+                    position: ['OH'],
+                    teamList: [''],
+                    StatisticsList: [''],
+                  }
+                }
+            }
+          });
+       
+        const routerLinkComponent = wrapper.findComponent({ name: 'router-link' });
+        await routerLinkComponent.trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$route.path).toBe('/');
+    });
+    
+  })
+
 
