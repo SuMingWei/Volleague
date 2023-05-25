@@ -1,7 +1,6 @@
-import { shallowMount, createLocalVue, mount } from '@vue/test-utils'
+import { createLocalVue, mount } from '@vue/test-utils'
 import scoring from '@/views/scoring.vue'
-import cloneDeep from 'lodash'
-import { async } from 'q'
+import VueRouter from 'vue-router';
 
 // mock the Router
 const mockRouter = {
@@ -16,6 +15,100 @@ const mockRoute = {
   }
 }
 
+const mockUid = '-N3hlfKxXwby0jSSDbxV'
+describe('Page Transition', () => {
+  it('Go Back to Profile Page', async () => {
+    jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
+
+    const localVue = createLocalVue();
+    localVue.use(VueRouter);
+
+    const mockVueRouter = new VueRouter();
+
+    const wrapper = mount(scoring, {
+      localVue,
+      propsData: {
+        uid: mockUid
+      },
+      router: mockVueRouter,
+      // stubs: ['router-link', 'router-view'], 
+      mocks: {
+        // $router: mockRouter,
+        // $route: mockRoute
+      },
+      data() {
+        return {
+          teamid: '-NTd4gODlBQPL9Na1VYr',
+          contestid: '-NTdKbOPAh9F89udkTNB'
+        }
+      }
+    });
+
+    // Assert that the button exists
+    const routerLinks = wrapper.findAllComponents({name: 'router-link'});
+    await wrapper.vm.$nextTick();
+    expect(routerLinks).toHaveLength(3);
+
+    // Assert that the button exists
+    expect(routerLinks.at(0)).toBeTruthy();
+    // Assert the button's text
+    expect(routerLinks.at(0).text()).toContain('返回');
+
+    // Simulate a click on the router-link component
+    await routerLinks.at(0).trigger('click');
+    await wrapper.vm.$nextTick();
+    // Assert that the expected navigation occurred
+    // expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.$route.params.teamid + '/scoring/' + wrapper.vm.teamInfo.contestRecords[0].key);
+    expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.teamid);
+
+  });
+
+  it('Go to Record Page', async () => {
+    jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
+
+    const localVue = createLocalVue();
+    localVue.use(VueRouter);
+
+    const mockVueRouter = new VueRouter();
+
+    const wrapper = mount(scoring, {
+      localVue,
+      propsData: {
+        uid: mockUid
+      },
+      router: mockVueRouter,
+      // stubs: ['router-link', 'router-view'], 
+      mocks: {
+        // $router: mockRouter,
+        // $route: mockRoute
+      },
+      data() {
+        return {
+          teamid: '-NTd4gODlBQPL9Na1VYr',
+          contestid: '-NTdKbOPAh9F89udkTNB'
+        }
+      }
+    });
+
+    // Assert that the button exists
+    const routerLinks = wrapper.findAllComponents({name: 'router-link'});
+    await wrapper.vm.$nextTick();
+    expect(routerLinks).toHaveLength(3);
+
+    // Assert that the button exists
+    expect(routerLinks.at(1)).toBeTruthy();
+    // Assert the button's text
+    expect(routerLinks.at(1).text()).toContain('分析');
+
+    // Simulate a click on the router-link component
+    await routerLinks.at(1).trigger('click');
+    await wrapper.vm.$nextTick();
+
+    // Assert that the expected navigation occurred
+    expect(wrapper.vm.$route.path).toBe('/home/' + wrapper.vm.uid + '/team/' + wrapper.vm.teamid + '/record/' + wrapper.vm.contestid);
+
+  });
+})
 
 describe('Testing Score Board', () => {
   // 用 spyOn 的方式 intercept "beforeMount" 
@@ -520,7 +613,7 @@ describe('Player Selection', () => {
   })
 })
 
-describe('Record Buttons', () => {
+describe('Record Buttons - Score & Error Type', () => {
   // 用 spyOn 的方式 intercept "beforeMount" 
   // 來避免 this.$http.get() Undefined 的錯誤
   jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
@@ -848,7 +941,7 @@ describe('Record Buttons', () => {
 })
 
 var counter = 0;
-jest.spyOn(scoring.methods, 'record').mockImplementation(() => { console.log('[Record Button] click on record'); ++counter; })
+jest.spyOn(scoring.methods, 'record').mockImplementation(() => { ++counter; })
 describe('Send Record Buttons - Our Score & Error', () => {
   // 用 spyOn 的方式 intercept "beforeMount" 
   // 來避免 this.$http.get() Undefined 的錯誤
@@ -1189,7 +1282,7 @@ describe('Opponent Scores - Landing Point Selection', () => {
   // var counter = 0;
   jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
 
-  it('Select landing point 1', async () => {
+  it('Select landing point: 1', async () => {
     const wrapper = mount(scoring, {
       stubs: ['router-link', 'router-view'], 
       attachTo: document.body, // for testing modal
@@ -1217,16 +1310,995 @@ describe('Opponent Scores - Landing Point Selection', () => {
     let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
                                                                        divs.classes().includes('mb-3') && 
                                                                        divs.classes().includes('fw-bold')})
-    console.log(btnCandidates.at(2).html())
+             
     let btns = btnCandidates.at(2).findAll('button')
-    // for (let a = 0; a < btns.length; ++a)
-    //   console.log(btns.at(a).html())
-    // console.log(btns.at(9).html())
-    btns.at(0).trigger('click')
+    let landingIdx = 0
+    btns.at(landingIdx).trigger('click')
     await wrapper.vm.$nextTick()
 
-    // console.log(counter)
-    expect(wrapper.vm.landing).toEqual(0)
-    counter = 0;
+    expect(wrapper.vm.selected_button.landing).toEqual(landingIdx)
   })
+
+  it('Select landing point: 2', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+             
+    let btns = btnCandidates.at(2).findAll('button')
+    let landingIdx = 1
+    btns.at(landingIdx).trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.selected_button.landing).toEqual(landingIdx)
+  })
+
+  it('Select landing point: 3', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+             
+    let btns = btnCandidates.at(2).findAll('button')
+    let landingIdx = 2
+    btns.at(landingIdx).trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.selected_button.landing).toEqual(landingIdx)
+  })
+
+  it('Select landing point: 4', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+             
+    let btns = btnCandidates.at(2).findAll('button')
+    let landingIdx = 3
+    btns.at(landingIdx).trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.selected_button.landing).toEqual(landingIdx)
+  })
+
+  it('Select landing point: 5', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+             
+    let btns = btnCandidates.at(2).findAll('button')
+    let landingIdx = 4
+    btns.at(landingIdx).trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.selected_button.landing).toEqual(landingIdx)
+  })
+
+  it('Select landing point: 6', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+             
+    let btns = btnCandidates.at(2).findAll('button')
+    let landingIdx = 5
+    btns.at(landingIdx).trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.selected_button.landing).toEqual(landingIdx)
+  })
+
+  it('Select landing point: 7', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+             
+    let btns = btnCandidates.at(2).findAll('button')
+    let landingIdx = 6
+    btns.at(landingIdx).trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.selected_button.landing).toEqual(landingIdx)
+  })
+
+  it('Select landing point: 8', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+             
+    let btns = btnCandidates.at(2).findAll('button')
+    let landingIdx = 7
+    btns.at(landingIdx).trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.selected_button.landing).toEqual(landingIdx)
+  })
+
+  it('Select landing point: 9', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+             
+    let btns = btnCandidates.at(2).findAll('button')
+    let landingIdx = 8
+    btns.at(landingIdx).trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.selected_button.landing).toEqual(landingIdx)
+  })
+
+  it('Select landing point: Touch Out', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let btnCandidates = wrapper.findAll('div').filter(divs => { return divs.classes().includes('card') &&
+                                                                       divs.classes().includes('mb-3') && 
+                                                                       divs.classes().includes('fw-bold')})
+             
+    let btns = btnCandidates.at(2).findAll('button')
+    let landingIdx = 9
+    btns.at(landingIdx).trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.selected_button.landing).toEqual(landingIdx)
+  })
+})
+
+describe('Opponent Scores - Info Submission', () => {
+  // 用 spyOn 的方式 intercept "beforeMount" 
+  // 來避免 this.$http.get() Undefined 的錯誤
+  // var counter = 0;
+  jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
+
+  it('Check Opponent Number isn\'t Number', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let input = wrapper.find('input')
+    input.setValue('錯誤')
+    await wrapper.vm.$nextTick()
+    expect(isNaN(Number(wrapper.vm.selected_button['opponent']['num']))).toBeTruthy()
+  })
+
+  it('Check Opponent Number is Number', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let input = wrapper.find('input')
+    input.setValue(86)
+    await wrapper.vm.$nextTick()
+    expect(isNaN(Number(wrapper.vm.selected_button['opponent']['num']))).toBeFalsy()
+  })
+
+  it('Check Opponent Position is OH', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let selects = wrapper.findAll('select')
+    let options = selects.at(selects.length-1).findAll('option')
+
+    await options.at(1).setSelected()
+    
+    let checkeds = wrapper.findAll('option:checked')
+    expect(wrapper.vm.selected_button['opponent']['pos'].length).toBeGreaterThan(0)
+    expect(wrapper.vm.selected_button['opponent']['pos']).toEqual(wrapper.find('option:checked').element.value)
+  })
+
+  it('Check Opponent Position is O', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let selects = wrapper.findAll('select')
+    let options = selects.at(selects.length-1).findAll('option')
+
+    await options.at(2).setSelected()
+    
+    let checkeds = wrapper.findAll('option:checked')
+    expect(wrapper.vm.selected_button['opponent']['pos'].length).toBeGreaterThan(0)
+    expect(wrapper.vm.selected_button['opponent']['pos']).toEqual(wrapper.find('option:checked').element.value)
+  })
+
+  it('Check Opponent Position is MB', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let selects = wrapper.findAll('select')
+    let options = selects.at(selects.length-1).findAll('option')
+
+    await options.at(3).setSelected()
+    
+    let checkeds = wrapper.findAll('option:checked')
+    expect(wrapper.vm.selected_button['opponent']['pos'].length).toBeGreaterThan(0)
+    expect(wrapper.vm.selected_button['opponent']['pos']).toEqual(wrapper.find('option:checked').element.value)
+  })
+
+  it('Check Opponent Position is S', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let selects = wrapper.findAll('select')
+    let options = selects.at(selects.length-1).findAll('option')
+
+    await options.at(4).setSelected()
+    
+    let checkeds = wrapper.findAll('option:checked')
+    expect(wrapper.vm.selected_button['opponent']['pos'].length).toBeGreaterThan(0)
+    expect(wrapper.vm.selected_button['opponent']['pos']).toEqual(wrapper.find('option:checked').element.value)
+  })
+
+  it('Check Opponent Position is L', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let selects = wrapper.findAll('select')
+    let options = selects.at(selects.length-1).findAll('option')
+
+    await options.at(5).setSelected()
+    
+    let checkeds = wrapper.findAll('option:checked')
+    expect(wrapper.vm.selected_button['opponent']['pos'].length).toBeGreaterThan(0)
+    expect(wrapper.vm.selected_button['opponent']['pos']).toEqual(wrapper.find('option:checked').element.value)
+  })
+
+
+
+
+})
+
+describe('Send Record Buttons - Opponent Score', () => {
+  // 用 spyOn 的方式 intercept "beforeMount" 
+  // 來避免 this.$http.get() Undefined 的錯誤
+  jest.spyOn(scoring, 'beforeMount').mockImplementation(() => {})
+
+  it('Cancel Button', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': -1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': -1, 'pos': ''},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '取消' })
+    let btn = cancekBtnCandidates.at(2)
+    // let landingIdx = 9
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.isOpponentScore).toBeFalsy()
+    expect(wrapper.vm.selected_button.record_type).toEqual('')
+  })
+
+  it('Check Sending Record on Landing Point: 1', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          positions: ['OH', 'O', 'MB', 'S', 'L'],
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': 0,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': 25, 'pos': 'MB'},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '送出' })
+    let btn = cancekBtnCandidates.at(0)
+
+    counter = 0
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(counter).toEqual(1)
+  })
+
+  it('Check Sending Record on Landing Point: 2', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          positions: ['OH', 'O', 'MB', 'S', 'L'],
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': 1,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': 25, 'pos': 'MB'},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '送出' })
+    let btn = cancekBtnCandidates.at(0)
+
+    counter = 0
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(counter).toEqual(1)
+  })
+
+  it('Check Sending Record on Landing Point: 3', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          positions: ['OH', 'O', 'MB', 'S', 'L'],
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': 2,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': 25, 'pos': 'MB'},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '送出' })
+    let btn = cancekBtnCandidates.at(0)
+
+    counter = 0
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(counter).toEqual(1)
+  })
+
+  it('Check Sending Record on Landing Point: 4', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          positions: ['OH', 'O', 'MB', 'S', 'L'],
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': 3,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': 25, 'pos': 'MB'},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '送出' })
+    let btn = cancekBtnCandidates.at(0)
+
+    counter = 0
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(counter).toEqual(1)
+  })
+
+  it('Check Sending Record on Landing Point: 5', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          positions: ['OH', 'O', 'MB', 'S', 'L'],
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': 4,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': 25, 'pos': 'MB'},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '送出' })
+    let btn = cancekBtnCandidates.at(0)
+
+    counter = 0
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(counter).toEqual(1)
+  })
+
+  it('Check Sending Record on Landing Point: 6', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          positions: ['OH', 'O', 'MB', 'S', 'L'],
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': 5,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': 25, 'pos': 'MB'},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '送出' })
+    let btn = cancekBtnCandidates.at(0)
+
+    counter = 0
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(counter).toEqual(1)
+  })
+
+  it('Check Sending Record on Landing Point: 7', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          positions: ['OH', 'O', 'MB', 'S', 'L'],
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': 6,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': 25, 'pos': 'MB'},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '送出' })
+    let btn = cancekBtnCandidates.at(0)
+
+    counter = 0
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(counter).toEqual(1)
+  })
+
+  it('Check Sending Record on Landing Point: 8', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          positions: ['OH', 'O', 'MB', 'S', 'L'],
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': 7,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': 25, 'pos': 'MB'},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '送出' })
+    let btn = cancekBtnCandidates.at(0)
+
+    counter = 0
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(counter).toEqual(1)
+  })
+
+  it('Check Sending Record on Landing Point: 9', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          positions: ['OH', 'O', 'MB', 'S', 'L'],
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': 8,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': 25, 'pos': 'MB'},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '送出' })
+    let btn = cancekBtnCandidates.at(0)
+
+    counter = 0
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(counter).toEqual(1)
+  })
+
+  it('Check Sending Record on Landing Point: Touch Out', async () => {
+    const wrapper = mount(scoring, {
+      stubs: ['router-link', 'router-view'], 
+      attachTo: document.body, // for testing modal
+      mocks: {
+        $router: mockRouter,
+        $route: mockRoute
+      },
+      data() {
+        return {
+          cur_game: 1,
+          isOpponentScore: true,
+          positions: ['OH', 'O', 'MB', 'S', 'L'],
+          selected_button: {
+            'name': '',
+            'number': -1,
+            'position': '',
+            'record_type': 'oppoScore',
+            'landing': 9,  // 依照 placement 的 index (0~9)
+            'opponent': {'num': 25, 'pos': 'MB'},
+            'game': this.cur_game
+          }
+        }
+      }
+    })
+
+    let cancekBtnCandidates = wrapper.findAll('button').filter(divs => { return divs.text() == '送出' })
+    let btn = cancekBtnCandidates.at(0)
+
+    counter = 0
+    btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(counter).toEqual(1)
+  })
+
 })
