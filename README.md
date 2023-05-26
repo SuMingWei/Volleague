@@ -12,7 +12,7 @@
 1-2. Use the command below to use Openssl.
 
 ```bash
-    # MAC user
+    # MAC/Linux user
     $ export NODE_OPTIONS=--openssl-legacy-provider
 
     # PowerShell
