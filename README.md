@@ -38,13 +38,13 @@
 	            "test:unit": "vue-cli-service test:unit"
             }
         ```
-- Run all the test files in `tests/unit/`
+- Run the test files in `tests/unit/`
     ```bash
-        $ npm run test:unit
+        $ npm run test:unit [--file /tests/unit/<filename>]
     ```
-- Run specified test file in `tests/unit/`
+- Show the test coverage in `tests/unit/`
     ```bash
-        $ npm run test:unit --file /tests/unit/<filename>
+        $ npm run test:coverage [--file /tests/unit/<filename>]
     ```
 
 ## Deployment
