@@ -80,6 +80,11 @@
                 cls.driver = webdriver.Chrome()
                 cls.rootURL = 'http://localhost:8080/'  # <<< set your website URL here
         ```
+    
+    5. Run the unittest
+        ```bash
+        python3 -m unittest tests/seleniumTest.py -v
+        ```
 
 
 ## Deployment
