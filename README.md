@@ -6,7 +6,7 @@
     - Install dependent modules
 
 ```bash
-    $ npm install
+    npm install
 ```
 
 1-2. Use the command below to use Openssl.
@@ -28,24 +28,59 @@
         ```
 
 ## Testing
+
+### Unit test
+
 - You can use the following command to add the Vue Test Utils
+
     ```bash
-        $ vue add unit-jest
+        vue add unit-jest
     ```
-    - Then the CLI will add the testing command in `packet.json`
-        ```json
-            "scripts": {
-	            "test:unit": "vue-cli-service test:unit"
-            }
-        ```
+
+  - Then the CLI will add the testing command in `packet.json`
+
+    ```json
+        "scripts": {
+            "test:unit": "vue-cli-service test:unit"
+        }
+    ```
+
 - Run the test files in `tests/unit/`
+
     ```bash
-        $ npm run test:unit [--file /tests/unit/<filename>]
+        npm run test:unit [--file /tests/unit/<filename>]
     ```
+
 - Show the test coverage in `tests/unit/`
+
     ```bash
-        $ npm run test:coverage [--file /tests/unit/<filename>]
+        npm run test:coverage [--file /tests/unit/<filename>]
     ```
+
+### Selenium
+
+- Before running selenium test, there are several things you need to make sure:
+    1. You have **Google Chrome** installed.
+    2. You have `unittest` and `selenium` installed. If you don't any of them, you can install them by the following command:
+        ```bash
+        pip install unittest
+        pip install selenium
+        ```
+    3. Your website is up and running
+        ```bash
+        npm run serve
+        ```
+    4. Set your website URL in `seleniumTest.py` > `TestScoring` class > `setUpClass` function > `cls.rootURL` variable.
+        ```python
+        # in `seleniumTest.py`
+        class TestScoring(unittest.TestCase):
+
+            @classmethod
+            def setUpClass(cls):
+                cls.driver = webdriver.Chrome()
+                cls.rootURL = 'http://localhost:8080/'  # <<< set your website URL here
+        ```
+
 
 ## Deployment
 
