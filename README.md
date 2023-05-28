@@ -59,6 +59,8 @@
 
 ### Selenium
 
+- **The whole testing process might take a little longer than expected (about 2 minutes). It is completely normal. Please be patient.**
+
 - Before running selenium test, there are several things you need to make sure:
     1. You have **Google Chrome** installed.
     2. You have `unittest` and `selenium` installed. If you don't any of them, you can install them by the following command:
@@ -81,10 +83,11 @@
                 cls.rootURL = 'http://localhost:8080/'  # <<< set your website URL here
         ```
     
-    5. Run the unittest
-        ```bash
-        python3 -m unittest tests/seleniumTest.py -v
-        ```
+- Run the unittest
+    ```bash
+    python -m unittest tests/selenium/seleniumTest.py -v
+    ```
+
 
 
 ## Deployment
